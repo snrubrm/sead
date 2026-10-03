@@ -37,6 +37,8 @@ public:
 
         ~Slot() override { release(); }
 
+        bool isConnected() const { return mConnectedToDelegateEvent; }
+
         void release()
         {
             if (mConnectedToDelegateEvent)
