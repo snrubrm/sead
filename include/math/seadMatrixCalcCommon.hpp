@@ -484,8 +484,8 @@ void Matrix33CalcCommon<T>::makeR(Base& o, const Vec3& r)
 template <typename T>
 void Matrix33CalcCommon<T>::makeRIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
@@ -507,8 +507,8 @@ void Matrix33CalcCommon<T>::makeRIdx(Base& o, u32 xr, u32 yr, u32 zr)
 template <typename T>
 void Matrix33CalcCommon<T>::makeRzxyIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
@@ -568,8 +568,8 @@ void Matrix33CalcCommon<T>::makeSR(Base& o, const Vec3& s, const Vec3& r)
 template <typename T>
 void Matrix33CalcCommon<T>::makeSRIdx(Base& o, const Vec3& s, const Vector3<u32>& r)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -591,8 +591,8 @@ void Matrix33CalcCommon<T>::makeSRIdx(Base& o, const Vec3& s, const Vector3<u32>
 template <typename T>
 void Matrix33CalcCommon<T>::makeSRzxyIdx(Base& o, const Vec3& s, const Vector3<u32>& r)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1321,8 +1321,8 @@ void Matrix34CalcCommon<T>::makeR(Base& o, const Vec3& r)
 template <typename T>
 void Matrix34CalcCommon<T>::makeRIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
@@ -1378,8 +1378,8 @@ inline void Matrix34CalcCommon<T>::makeRT(Base& o, const Vec3& r, const Vec3& t)
 template <typename T>
 void Matrix34CalcCommon<T>::makeRTIdx(Base& o, const Vector3<u32>& r, const Vec3& t)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1405,8 +1405,8 @@ void Matrix34CalcCommon<T>::makeRTIdx(Base& o, const Vector3<u32>& r, const Vec3
 template <typename T>
 void Matrix34CalcCommon<T>::makeRzxyIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
@@ -1432,8 +1432,8 @@ void Matrix34CalcCommon<T>::makeRzxyIdx(Base& o, u32 xr, u32 yr, u32 zr)
 template <typename T>
 void Matrix34CalcCommon<T>::makeRzxyTIdx(Base& o, const Vector3<u32>& r, const Vec3& t)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1547,8 +1547,8 @@ void Matrix34CalcCommon<T>::makeSR(Base& o, const Vec3& s, const Vec3& r)
 template <typename T>
 void Matrix34CalcCommon<T>::makeSRIdx(Base& o, const Vec3& s, const Vector3<u32>& r)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1604,8 +1604,8 @@ void Matrix34CalcCommon<T>::makeSRT(Base& o, const Vec3& s, const Vec3& r, const
 template <typename T>
 void Matrix34CalcCommon<T>::makeSRTIdx(Base& o, const Vec3& s, const Vector3<u32>& r, const Vec3& t)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1631,8 +1631,8 @@ void Matrix34CalcCommon<T>::makeSRTIdx(Base& o, const Vec3& s, const Vector3<u32
 template <typename T>
 void Matrix34CalcCommon<T>::makeSRzxyIdx(Base& o, const Vec3& s, const Vector3<u32>& r)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -1659,8 +1659,8 @@ template <typename T>
 void Matrix34CalcCommon<T>::makeSRzxyTIdx(Base& o, const Vec3& s, const Vector3<u32>& r,
                                           const Vec3& t)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], r.x);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], r.y);
@@ -2546,8 +2546,8 @@ void Matrix44CalcCommon<T>::makeR(Base& o, const Vec3& r)
 template <typename T>
 void Matrix44CalcCommon<T>::makeRIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
@@ -2578,8 +2578,8 @@ void Matrix44CalcCommon<T>::makeRIdx(Base& o, u32 xr, u32 yr, u32 zr)
 template <typename T>
 void Matrix44CalcCommon<T>::makeRzxyIdx(Base& o, u32 xr, u32 yr, u32 zr)
 {
-    const T sinV[3];
-    const T cosV[3];
+    T sinV[3];
+    T cosV[3];
 
     MathCalcCommon<T>::sinCosIdx(&sinV[0], &cosV[0], xr);
     MathCalcCommon<T>::sinCosIdx(&sinV[1], &cosV[1], yr);
