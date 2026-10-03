@@ -35,7 +35,7 @@ class StringCutOffPrintOutput : public PrintOutput
 {
 public:
     explicit StringCutOffPrintOutput(BufferedSafeString* buffer);
-    ~StringCutOffPrintOutput() override = default;
+    ~StringCutOffPrintOutput() override;
     void write(const char* string, s32 size) override;
 
 protected:
@@ -85,22 +85,29 @@ public:
     void flush();
     void flushWithLineBreak();
 
-    PrintFormatter& operator,(s8);
-    PrintFormatter& operator,(u8);
-    PrintFormatter& operator,(s16);
-    PrintFormatter& operator,(u16);
-    PrintFormatter& operator,(s32);
-    PrintFormatter& operator,(u32);
     PrintFormatter& operator<<(char*);
     PrintFormatter& operator<<(const char*);
 
     PrintFormatter& operator<<(PrintFormatter& (&fn)(PrintFormatter&)) { return fn(*this); }
 
-    template <typename T>
-    PrintFormatter& operator,(const T&);
+    PrintFormatter& operator,(s8 value) { return operator,<s8>(value); }
+    PrintFormatter& operator,(u8 value) { return operator,<u8>(value); }
+    PrintFormatter& operator,(s16 value) { return operator,<s16>(value); }
+    PrintFormatter& operator,(u16 value) { return operator,<u16>(value); }
+    PrintFormatter& operator,(s32 value) { return operator,<s32>(value); }
+    PrintFormatter& operator,(u32 value) { return operator,<u32>(value); }
 
     template <typename T>
-    void out(const T&, const char*, PrintOutput* output);
+    PrintFormatter& operator,(const T& value)
+    {
+        char format[32];
+        if (proceedToFormatMark_(format))
+            out(value, format[0] == '\0' ? nullptr : format, mPrintOutput);
+        return *this;
+    }
+
+    template <typename T>
+    static void out(const T&, const char*, PrintOutput* output);
 
 protected:
     bool proceedToFormatMark_(char*);
