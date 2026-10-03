@@ -580,13 +580,10 @@ public:
     class UnbindDummy final : public Base::Interface_
     {
     public:
-        UnbindDummy() {}
         R invoke() override { return {}; }
 #if SEAD_DELEGATE_ISNODUMMY
         bool isNoDummy() const override { return false; }
 #endif
-    private:
-        s32 mUnk = 1;
     };
 
     AnyDelegateR() {}
