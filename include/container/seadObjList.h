@@ -237,9 +237,7 @@ public:
     void freeBuffer() = delete;
 
 private:
-    std::aligned_storage_t<ObjList<T>::calculateWorkBufferSize(N),
-                           std::max(alignof(T), alignof(T*))>
-        mWork;
+    u8 mWork[ObjList<T>::calculateWorkBufferSize(N)];
 };
 
 }  // namespace sead

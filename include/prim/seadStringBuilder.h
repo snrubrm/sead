@@ -210,12 +210,11 @@ inline const T* StringBuilderBase<T>::cstr() const
 template <typename T>
 inline const T& StringBuilderBase<T>::at(s32 idx) const
 {
-    if (idx < 0 || idx > mLength)
-    {
-        SEAD_ASSERT_MSG(false, "index(%d) out of range[0, %d]", idx, mLength);
-        return SafeStringBase<T>::cNullChar;
-    }
-    return mBuffer[idx];
+    if (u32(idx) < u32(mLength))
+        return mBuffer[idx];
+
+    SEAD_ASSERT_MSG(false, "index(%d) out of range[0, %d]", idx, mLength);
+    return mBuffer[0];
 }
 
 // UNCHECKED

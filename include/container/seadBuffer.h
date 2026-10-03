@@ -37,10 +37,7 @@ public:
     {
     public:
         explicit iterator(T* buffer, s32 index = 0) : mIndex(index), mBuffer(buffer) {}
-        bool operator==(const iterator& rhs) const
-        {
-            return mIndex == rhs.mIndex && mBuffer == rhs.mBuffer;
-        }
+        bool operator==(const iterator& rhs) const { return mIndex == rhs.mIndex; }
         bool operator!=(const iterator& rhs) const { return !operator==(rhs); }
         iterator& operator++()
         {
