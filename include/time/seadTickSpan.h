@@ -27,7 +27,7 @@ public:
         return 1000 * (mSpan / cFrequency);
     }
 
-    s64 toSeconds() const { return toMilliSeconds() / 1000; }
+    s64 toSeconds() const { return mSpan / cFrequency; }
 
     void setNanoSeconds(s64 nsec);
 
