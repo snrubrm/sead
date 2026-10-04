@@ -83,6 +83,7 @@ public:
     u32 getProjectionType() const override;
 
     void set(f32 near, f32 far, f32 fovy_rad, f32 aspect);
+    void setFovy_(f32 fovy_rad);
     void doUpdateMatrix(Matrix44f* mtx) const override;
     void setFovx(f32);
     void createDividedProjection(PerspectiveProjection* projection, s32, s32, s32, s32);

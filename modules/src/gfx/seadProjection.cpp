@@ -134,6 +134,23 @@ f32 PerspectiveProjection::getFovy() const { return mFovyRad; }
 f32 PerspectiveProjection::getAspect() const { return mAspect; }
 u32 PerspectiveProjection::getProjectionType() const { return 0; }
 
+void PerspectiveProjection::setFovy_(f32 fovy_rad)
+{
+    mFovyRad = fovy_rad;
+    mFovySin = Mathf::sin(fovy_rad * 0.5f);
+    mFovyCos = Mathf::cos(fovy_rad * 0.5f);
+    mFovyTan = Mathf::tan(fovy_rad * 0.5f);
+    setDirty();
+}
+
+void PerspectiveProjection::set(f32 near, f32 far, f32 fovy_rad, f32 aspect)
+{
+    setNear(near);
+    setFar(far);
+    setFovy_(fovy_rad);
+    setAspect(aspect);
+}
+
 void PerspectiveProjection::getOffset(Vector2f* offset) const
 {
     offset->x = mOffset.x;
