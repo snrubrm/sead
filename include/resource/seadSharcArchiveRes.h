@@ -79,6 +79,9 @@ public:
 #endif
     bool prepareArchive_(const void* archive) override;
 
+    // The number of entries in the archive (the size of the FAT entry buffer): an entry ID is an index below this.
+    s32 getEntryNum() const { return mFATEntrys.size(); }
+
 protected:
     static const u32 cArchiveVersion = 0x100;
     static const u32 cArchiveEntryMax = 0x3fff;
