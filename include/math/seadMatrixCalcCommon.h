@@ -92,6 +92,8 @@ public:
     static void transpose(Base& o);
     static void transposeTo(Base& o, const Base& n);
 
+    static void slerpTo(Base& o, const Base& a, const Base& b, T t);
+
     static void makeQ(Base& o, const Quat& q);
     static void makeQT(Base& o, const Quat& q, const Vec3& t);
     static void makeR(Base& o, const Vec3& r);
