@@ -86,10 +86,53 @@ void Projection::unprojectRay(Ray<Vector3f>* dst, const Vector3f& screen_pos,
     camera.unprojectRayByMatrix(dst, camera_pos);
 }
 
+// NON_MATCHING: natural matrix assignment and posture switch use different loads and scheduling.
+void Projection::doUpdateDeviceMatrix(Matrix44f* mtx, const Matrix44f& projection,
+                                       Graphics::DevicePosture posture) const
+{
+    *mtx = projection;
+    Vector4f row0 = projection.getRow(0);
+    Vector4f row1 = projection.getRow(1);
+    switch (posture)
+    {
+    case Graphics::cDevicePosture_RotateRight:
+        row0.negate();
+        mtx->setRow(0, row1);
+        mtx->setRow(1, row0);
+        break;
+    case Graphics::cDevicePosture_RotateLeft:
+        row1.negate();
+        mtx->setRow(0, row1);
+        mtx->setRow(1, row0);
+        break;
+    case Graphics::cDevicePosture_RotateHalfAround:
+        row0.negate();
+        row1.negate();
+        mtx->setRow(0, row0);
+        mtx->setRow(1, row1);
+        break;
+    case Graphics::cDevicePosture_FlipX:
+        row0.negate();
+        mtx->setRow(0, row0);
+        break;
+    case Graphics::cDevicePosture_FlipY:
+        row1.negate();
+        mtx->setRow(1, row1);
+        break;
+    default:
+        break;
+    }
+    mtx->m[2][0] *= mDeviceZScale;
+    mtx->m[2][1] *= mDeviceZScale;
+    mtx->m[2][2] = (mtx->m[2][2] + mtx->m[3][2] * mDeviceZOffset) * mDeviceZScale;
+    mtx->m[2][3] = mtx->m[2][3] * mDeviceZScale + mtx->m[3][3] * mDeviceZOffset;
+}
+
 f32 PerspectiveProjection::getNear() const { return mNear; }
 f32 PerspectiveProjection::getFar() const { return mFar; }
 f32 PerspectiveProjection::getFovy() const { return mFovyRad; }
 f32 PerspectiveProjection::getAspect() const { return mAspect; }
+u32 PerspectiveProjection::getProjectionType() const { return 0; }
 
 void PerspectiveProjection::getOffset(Vector2f* offset) const
 {
@@ -131,6 +174,7 @@ f32 OrthoProjection::getNear() const { return mNear; }
 f32 OrthoProjection::getFar() const { return mFar; }
 f32 OrthoProjection::getFovy() const { return 0.0f; }
 f32 OrthoProjection::getAspect() const { return (mRight - mLeft) / (mTop - mBottom); }
+u32 OrthoProjection::getProjectionType() const { return 1; }
 
 void OrthoProjection::getOffset(Vector2f* offset) const
 {
@@ -174,6 +218,7 @@ void OrthoProjection::doUpdateMatrix(Matrix44f* mtx) const
 f32 FrustumProjection::getNear() const { return mNear; }
 f32 FrustumProjection::getFar() const { return mFar; }
 f32 FrustumProjection::getAspect() const { return (mRight - mLeft) / (mTop - mBottom); }
+u32 FrustumProjection::getProjectionType() const { return 0; }
 
 f32 FrustumProjection::getFovy() const
 {
@@ -215,6 +260,7 @@ f32 DirectProjection::getNear() const { return mNear; }
 f32 DirectProjection::getFar() const { return mFar; }
 f32 DirectProjection::getFovy() const { return mFovy; }
 f32 DirectProjection::getAspect() const { return mAspect; }
+u32 DirectProjection::getProjectionType() const { return 2; }
 
 void DirectProjection::getOffset(Vector2f* offset) const
 {
