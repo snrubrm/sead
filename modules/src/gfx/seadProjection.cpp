@@ -135,6 +135,18 @@ void Projection::doUpdateDeviceMatrix(Matrix44f* mtx, const Matrix44f& projectio
     mtx->m[2][3] = mtx->m[2][3] * mDeviceZScale + mtx->m[3][3] * mDeviceZOffset;
 }
 
+PerspectiveProjection::PerspectiveProjection()
+    : mNear(1.0f), mFar(10000.0f), mAspect(4.0f / 3.0f), mOffset(Vector2f::zero)
+{
+    setFovy_(Mathf::pi() / 4.0f);
+}
+
+PerspectiveProjection::PerspectiveProjection(f32 near, f32 far, f32 fovy_rad, f32 aspect)
+    : mNear(near), mFar(far), mAspect(aspect), mOffset(Vector2f::zero)
+{
+    setFovy_(fovy_rad);
+}
+
 f32 PerspectiveProjection::getNear() const { return mNear; }
 f32 PerspectiveProjection::getFar() const { return mFar; }
 f32 PerspectiveProjection::getFovy() const { return mFovyRad; }
