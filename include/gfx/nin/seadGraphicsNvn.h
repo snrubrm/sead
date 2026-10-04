@@ -3,6 +3,7 @@
 #include <gfx/seadColor.h>
 #include <gfx/seadGraphics.h>
 #include <thread/seadCriticalSection.h>
+#include <nn/gfx/gfx_Types.h>
 #include "nvn/nvn.h"
 
 namespace sead
@@ -69,6 +70,10 @@ public:
 
     NVNdevice* getNvnDevice() const { return mNvnDevice; }
 
+    // Inline-only in the original; name is a guess. Screen and FontMgr pass +0x48
+    // to NN gfx APIs; initializeImpl constructs its NN device at this address.
+    nn::gfx::Device* getNnDevice() const { return mNnDevice; }
+
     NVNtexturePool* getTexturePool() { return &mNvnTexturePool; }
 
     s32 getTextureSamplerID() const { return mTextureSamplerID; }
@@ -83,7 +88,7 @@ private:
     NVNdevice* mNvnDevice;
     void* _38;
     void* _40;
-    void* _48;
+    nn::gfx::Device* mNnDevice;
     void* _50;
     NVNtexturePool mNvnTexturePool;
     void* _78;
