@@ -46,12 +46,14 @@ add_library(sead OBJECT
   include/controller/seadControllerMgr.h
   include/controller/seadControllerWrapper.h
   include/controller/seadControllerWrapperBase.h
+  include/controller/seadMaskControllerWrapper.h
   include/controller/seadPatternRumbleAddon.h
   modules/src/controller/seadController.cpp
   modules/src/controller/seadControllerBase.cpp
   modules/src/controller/seadControllerMgr.cpp
   modules/src/controller/seadControllerWrapper.cpp
   modules/src/controller/seadControllerWrapperBase.cpp
+  modules/src/controller/seadMaskControllerWrapper.cpp
   modules/src/controller/seadPatternRumbleAddon.cpp
 
   include/devenv/seadAssertConfig.h
