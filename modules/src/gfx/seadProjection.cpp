@@ -206,6 +206,17 @@ void PerspectiveProjection::doUpdateMatrix(Matrix44f* mtx) const
     mtx->setRow(3, {0.0f, 0.0f, -1.0f, 0.0f});
 }
 
+OrthoProjection::OrthoProjection() : mNear(0.0f), mFar(1.0f)
+{
+    setTBLR(0.5f, -0.5f, -0.5f, 0.5f);
+}
+
+OrthoProjection::OrthoProjection(f32 near, f32 far, f32 top, f32 bottom, f32 left, f32 right)
+    : mNear(near), mFar(far)
+{
+    setTBLR(top, bottom, left, right);
+}
+
 f32 OrthoProjection::getNear() const { return mNear; }
 f32 OrthoProjection::getFar() const { return mFar; }
 f32 OrthoProjection::getFovy() const { return 0.0f; }
@@ -249,6 +260,13 @@ void OrthoProjection::doUpdateMatrix(Matrix44f* mtx) const
     mtx->setRow(2, {0.0f, 0.0f, inverse_depth * -2.0f,
                     -inverse_depth * (mNear + mFar)});
     mtx->setRow(3, {0.0f, 0.0f, 0.0f, 1.0f});
+}
+
+FrustumProjection::FrustumProjection(f32 near, f32 far, f32 top, f32 bottom, f32 left,
+                                     f32 right)
+    : mNear(near), mFar(far), mTop(top), mBottom(bottom), mLeft(left), mRight(right)
+{
+    setDirty();
 }
 
 f32 FrustumProjection::getNear() const { return mNear; }
