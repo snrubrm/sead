@@ -97,6 +97,15 @@ void PerspectiveProjection::getOffset(Vector2f* offset) const
     offset->y = mOffset.y;
 }
 
+void PerspectiveProjection::doScreenPosToCameraPosTo(Vector3f* camera_pos,
+                                                     const Vector3f& screen_pos) const
+{
+    camera_pos->set(0.0f, 0.0f, -mNear);
+    camera_pos->y = (2.0f * mNear * mFovyTan) * 0.5f * (screen_pos.y + 2.0f * mOffset.y);
+    camera_pos->x = (2.0f * mNear * mFovyTan * mAspect) * 0.5f *
+                    (screen_pos.x + 2.0f * mOffset.x);
+}
+
 f32 OrthoProjection::getNear() const { return mNear; }
 f32 OrthoProjection::getFar() const { return mFar; }
 f32 OrthoProjection::getFovy() const { return 0.0f; }
@@ -108,15 +117,38 @@ void OrthoProjection::getOffset(Vector2f* offset) const
     offset->y = (mTop + mBottom) * 0.5f / (mTop - mBottom);
 }
 
+// NON_MATCHING: equivalent screen conversion, with different arithmetic scheduling.
+void OrthoProjection::doScreenPosToCameraPosTo(Vector3f* camera_pos,
+                                               const Vector3f& screen_pos) const
+{
+    camera_pos->x = (mRight + mLeft) * 0.5f + screen_pos.x * (mRight - mLeft) * 0.5f;
+    camera_pos->y = (mTop + mBottom) * 0.5f + screen_pos.y * (mTop - mBottom) * 0.5f;
+    camera_pos->z = -mNear;
+}
+
 f32 FrustumProjection::getNear() const { return mNear; }
 f32 FrustumProjection::getFar() const { return mFar; }
 f32 FrustumProjection::getAspect() const { return (mRight - mLeft) / (mTop - mBottom); }
+
+f32 FrustumProjection::getFovy() const
+{
+    return 2.0f * Mathf::atan2((mTop - mBottom) * 0.5f, getNear());
+}
 
 // NON_MATCHING: equivalent offset arithmetic, with different scheduling.
 void FrustumProjection::getOffset(Vector2f* offset) const
 {
     offset->x = (mRight + mLeft) * 0.5f / (mRight - mLeft);
     offset->y = (mTop + mBottom) * 0.5f / (mTop - mBottom);
+}
+
+// NON_MATCHING: equivalent screen conversion, with different arithmetic scheduling.
+void FrustumProjection::doScreenPosToCameraPosTo(Vector3f* camera_pos,
+                                                 const Vector3f& screen_pos) const
+{
+    camera_pos->z = -mNear;
+    camera_pos->x = (mRight + mLeft) * 0.5f + (mRight - mLeft) * screen_pos.x * 0.5f;
+    camera_pos->y = (mTop + mBottom) * 0.5f + (mTop - mBottom) * screen_pos.y * 0.5f;
 }
 
 f32 DirectProjection::getNear() const { return mNear; }
