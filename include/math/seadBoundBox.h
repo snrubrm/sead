@@ -93,11 +93,11 @@ struct BoundBox3
     void scaleY(T sy);
     void scaleZ(T sz);
 
+    static const BoundBox3<T> cUndefined;
+
 private:
     Vector3 mMin;
     Vector3 mMax;
-
-    static const BoundBox3<T> cUndefined;
 };
 
 typedef BoundBox2<f32> BoundBox2f;
