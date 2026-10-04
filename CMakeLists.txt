@@ -155,6 +155,7 @@ add_library(sead OBJECT
   modules/src/math/seadQuat.cpp
   modules/src/math/seadVector.cpp
 
+  include/message/seadMessageSet.h
   include/mc/seadCoreInfo.h
   include/mc/seadJob.h
   include/mc/seadJobQueue.h
