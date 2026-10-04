@@ -5,6 +5,13 @@
 
 namespace sead
 {
+// The original non-deleting destructors are empty; each deleting destructor
+// only calls operator delete. No resources are owned by these derived members.
+PerspectiveProjection::~PerspectiveProjection() = default;
+OrthoProjection::~OrthoProjection() = default;
+FrustumProjection::~FrustumProjection() = default;
+DirectProjection::~DirectProjection() = default;
+
 Projection::Projection()
 {
     mDevicePosture = Graphics::sDefaultDevicePosture;
