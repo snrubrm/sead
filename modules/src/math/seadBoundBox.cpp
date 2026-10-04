@@ -17,8 +17,8 @@ static BoundBox3<T> getUndefined3()
 {
     Vector3<T> min(std::numeric_limits<T>::max(), std::numeric_limits<T>::max(),
                    std::numeric_limits<T>::max());
-    Vector3<T> max(std::numeric_limits<T>::min(), std::numeric_limits<T>::min(),
-                   std::numeric_limits<T>::min());
+    Vector3<T> max(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest(),
+                   std::numeric_limits<T>::lowest());
     return {min, max};
 }
 
