@@ -86,4 +86,54 @@ void Projection::unprojectRay(Ray<Vector3f>* dst, const Vector3f& screen_pos,
     camera.unprojectRayByMatrix(dst, camera_pos);
 }
 
+f32 PerspectiveProjection::getNear() const { return mNear; }
+f32 PerspectiveProjection::getFar() const { return mFar; }
+f32 PerspectiveProjection::getFovy() const { return mFovyRad; }
+f32 PerspectiveProjection::getAspect() const { return mAspect; }
+
+void PerspectiveProjection::getOffset(Vector2f* offset) const
+{
+    offset->x = mOffset.x;
+    offset->y = mOffset.y;
+}
+
+f32 OrthoProjection::getNear() const { return mNear; }
+f32 OrthoProjection::getFar() const { return mFar; }
+f32 OrthoProjection::getFovy() const { return 0.0f; }
+f32 OrthoProjection::getAspect() const { return (mRight - mLeft) / (mTop - mBottom); }
+
+void OrthoProjection::getOffset(Vector2f* offset) const
+{
+    offset->x = (mLeft + mRight) * 0.5f / (mRight - mLeft);
+    offset->y = (mTop + mBottom) * 0.5f / (mTop - mBottom);
+}
+
+f32 FrustumProjection::getNear() const { return mNear; }
+f32 FrustumProjection::getFar() const { return mFar; }
+f32 FrustumProjection::getAspect() const { return (mRight - mLeft) / (mTop - mBottom); }
+
+// NON_MATCHING: equivalent offset arithmetic, with different scheduling.
+void FrustumProjection::getOffset(Vector2f* offset) const
+{
+    offset->x = (mRight + mLeft) * 0.5f / (mRight - mLeft);
+    offset->y = (mTop + mBottom) * 0.5f / (mTop - mBottom);
+}
+
+f32 DirectProjection::getNear() const { return mNear; }
+f32 DirectProjection::getFar() const { return mFar; }
+f32 DirectProjection::getFovy() const { return mFovy; }
+f32 DirectProjection::getAspect() const { return mAspect; }
+
+void DirectProjection::getOffset(Vector2f* offset) const
+{
+    offset->x = mOffset.x;
+    offset->y = mOffset.y;
+}
+
+// NON_MATCHING: natural Matrix44 assignment copies components separately.
+void DirectProjection::doUpdateMatrix(Matrix44f* mtx) const
+{
+    *mtx = mProjectionMatrix;
+}
+
 }  // namespace sead
