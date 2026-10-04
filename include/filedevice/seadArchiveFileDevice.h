@@ -52,6 +52,8 @@ protected:
     ArchiveFileHandle* getArchiveFileHandle_(FileHandle* handle);
     ArchiveFileHandle* constructArchiveFileHandle_(FileHandle* handle) const;
 
+public:
+    // SharcArchive::FileReader owns this device and accesses the archive at +0x80.
     ArchiveRes* mArchive;
 };
 }  // namespace sead
