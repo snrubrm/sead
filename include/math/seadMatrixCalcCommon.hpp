@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include <math/seadMathCalcCommon.h>
+#include <math/seadQuatCalcCommon.h>
 #ifndef SEAD_MATH_MATRIX_CALC_COMMON_H_
 #include <math/seadMatrixCalcCommon.h>
 #endif
@@ -1223,6 +1224,17 @@ void Matrix34CalcCommon<T>::transposeTo(Base& o, const Base& n)
 //}
 
 #endif  // cafe
+
+// 0x7100041114
+template <typename T>
+void Matrix34CalcCommon<T>::slerpTo(Base& o, const Base& a, const Base& b, T t)
+{
+    Quat first, second, interpolated;
+    toQuat(first, a);
+    toQuat(second, b);
+    QuatCalcCommon<T>::slerpTo(interpolated, first, second, t);
+    makeQ(o, interpolated);
+}
 
 template <typename T>
 void Matrix34CalcCommon<T>::makeQ(Base& o, const Quat& q)
