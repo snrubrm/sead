@@ -1,5 +1,6 @@
 #include <gfx/seadViewport.h>
 #include <gfx/seadFrameBuffer.h>
+#include <gfx/seadProjection.h>
 
 namespace sead
 {
@@ -75,5 +76,20 @@ void Viewport::getOnFrameBufferSize(Vector2f* out, const LogicalFrameBuffer& buf
     out->y /= buffer.getVirtualSize().y;
     out->x *= buffer.getPhysicalArea().getSizeX();
     out->y *= buffer.getPhysicalArea().getSizeY();
+}
+// NON_MATCHING: natural vector construction combines bounds/input loads differently.
+void Viewport::unproject(Vector3f* out, const Vector2f& point, const Projection& projection,
+                         const Camera& camera) const
+{
+    const Vector3f screen_pos(point.x / getHalfSizeX(), point.y / getHalfSizeY(), 0.0f);
+    projection.unproject(out, screen_pos, camera);
+}
+
+// NON_MATCHING: natural vector construction combines bounds/input loads differently.
+void Viewport::unprojectRay(Ray<Vector3f>* out, const Vector2f& point,
+                            const Projection& projection, const Camera& camera) const
+{
+    const Vector3f screen_pos(point.x / getHalfSizeX(), point.y / getHalfSizeY(), 0.0f);
+    projection.unprojectRay(out, screen_pos, camera);
 }
 }  // namespace sead
