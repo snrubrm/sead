@@ -310,6 +310,13 @@ void FrustumProjection::doUpdateMatrix(Matrix44f* mtx) const
     mtx->setRow(3, {0.0f, 0.0f, -1.0f, 0.0f});
 }
 
+DirectProjection::DirectProjection()
+    : mProjectionMatrix(Matrix44f::ident), mNear(0.0f), mFar(0.0f), mFovy(0.0f),
+      mAspect(0.0f), mOffset(0.0f, 0.0f), _f0(true)
+{
+    setDirty();
+}
+
 f32 DirectProjection::getNear() const { return mNear; }
 f32 DirectProjection::getFar() const { return mFar; }
 f32 DirectProjection::getFovy() const { return mFovy; }
