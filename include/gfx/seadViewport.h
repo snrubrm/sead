@@ -17,10 +17,10 @@ class Viewport : public BoundBox2f
 {
 public:
     Viewport();
-    Viewport(float left, float top, float right, float bottom);
+    Viewport(float left, float top, float width, float height);
     explicit Viewport(const BoundBox2f& parent);
     explicit Viewport(const LogicalFrameBuffer& buffer);
-    virtual ~Viewport() = default;
+    virtual ~Viewport();
 
     // inline-only in the original; name is a guess. This posture read appears
     // in the viewport-based OrthoProjection constructor and Viewport::apply.
@@ -39,5 +39,7 @@ public:
 
 private:
     Graphics::DevicePosture mDevicePosture;
+    f32 mMinDepth;
+    f32 mMaxDepth;
 };
 }  // namespace sead

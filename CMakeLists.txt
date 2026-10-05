@@ -117,6 +117,7 @@ add_library(sead OBJECT
   # modules/src/gfx/seadPrimitiveRenderer.cpp
   # modules/src/gfx/seadPrimitiveRendererUtil.cpp
   modules/src/gfx/seadProjection.cpp
+  modules/src/gfx/seadViewport.cpp
 
   include/heap/seadArena.h
   include/heap/seadDisposer.h
