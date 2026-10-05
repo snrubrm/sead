@@ -317,6 +317,53 @@ DirectProjection::DirectProjection()
     setDirty();
 }
 
+// NON_MATCHING: the matrix setter remains an out-of-line call instead of being inlined.
+DirectProjection::DirectProjection(const Matrix44f& mtx, Graphics::DevicePosture posture)
+    : mNear(0.0f), mFar(0.0f), mFovy(0.0f), mAspect(0.0f), mOffset(0.0f, 0.0f), _f0(true)
+{
+    setProjectionMatrix(mtx, posture);
+}
+
+// NON_MATCHING: natural matrix assignment and row operations use separate component loads.
+void DirectProjection::setProjectionMatrix(const Matrix44f& mtx,
+                                           Graphics::DevicePosture posture)
+{
+    mProjectionMatrix = mtx;
+    Vector4f row0 = mtx.getRow(0);
+    Vector4f row1 = mtx.getRow(1);
+    switch (posture)
+    {
+    case Graphics::cDevicePosture_RotateRight:
+        row1.negate();
+        mProjectionMatrix.setRow(0, row1);
+        mProjectionMatrix.setRow(1, row0);
+        break;
+    case Graphics::cDevicePosture_RotateLeft:
+        row0.negate();
+        mProjectionMatrix.setRow(0, row1);
+        mProjectionMatrix.setRow(1, row0);
+        break;
+    case Graphics::cDevicePosture_RotateHalfAround:
+        row0.negate();
+        row1.negate();
+        mProjectionMatrix.setRow(0, row0);
+        mProjectionMatrix.setRow(1, row1);
+        break;
+    case Graphics::cDevicePosture_FlipX:
+        row0.negate();
+        mProjectionMatrix.setRow(0, row0);
+        break;
+    case Graphics::cDevicePosture_FlipY:
+        row1.negate();
+        mProjectionMatrix.setRow(1, row1);
+        break;
+    default:
+        break;
+    }
+    setDirty();
+    _f0 = true;
+}
+
 f32 DirectProjection::getNear() const { return mNear; }
 f32 DirectProjection::getFar() const { return mFar; }
 f32 DirectProjection::getFovy() const { return mFovy; }
