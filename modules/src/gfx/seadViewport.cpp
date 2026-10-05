@@ -1,4 +1,5 @@
 #include <gfx/seadViewport.h>
+#include <gfx/seadFrameBuffer.h>
 
 namespace sead
 {
@@ -28,5 +29,51 @@ void Viewport::project(Vector2f* out, const Vector2f& point) const
 {
     out->x = point.x * getHalfSizeX();
     out->y = point.y * getHalfSizeY();
+}
+// NON_MATCHING: natural vector copy and posture cases schedule bounds loads differently.
+void Viewport::getOnFrameBufferPos(Vector2f* out, const LogicalFrameBuffer& buffer) const
+{
+    out->set(getMin());
+    switch (mDevicePosture)
+    {
+    case Graphics::cDevicePosture_RotateRight:
+        out->x = getMin().y;
+        out->y = buffer.getVirtualSize().y - getSizeX() - getMin().x;
+        break;
+    case Graphics::cDevicePosture_RotateLeft:
+        out->x = buffer.getVirtualSize().x - getSizeY() - getMin().y;
+        out->y = getMin().x;
+        break;
+    case Graphics::cDevicePosture_RotateHalfAround:
+        out->x = buffer.getVirtualSize().x - getSizeX() - getMin().x;
+        out->y = buffer.getVirtualSize().y - getSizeY() - getMin().y;
+        break;
+    case Graphics::cDevicePosture_FlipX:
+        out->x = buffer.getVirtualSize().x - getSizeX() - getMin().x;
+        break;
+    case Graphics::cDevicePosture_FlipY:
+        out->y = buffer.getVirtualSize().y - getSizeY() - getMin().y;
+        break;
+    default:
+        break;
+    }
+    out->x /= buffer.getVirtualSize().x;
+    out->y /= buffer.getVirtualSize().y;
+    out->x *= buffer.getPhysicalArea().getSizeX();
+    out->y *= buffer.getPhysicalArea().getSizeY();
+    out->x += buffer.getPhysicalArea().getMin().x;
+    out->y += buffer.getPhysicalArea().getMin().y;
+}
+
+void Viewport::getOnFrameBufferSize(Vector2f* out, const LogicalFrameBuffer& buffer) const
+{
+    out->set(getSizeX(), getSizeY());
+    if (mDevicePosture == Graphics::cDevicePosture_RotateRight ||
+        mDevicePosture == Graphics::cDevicePosture_RotateLeft)
+        out->set(out->y, out->x);
+    out->x /= buffer.getVirtualSize().x;
+    out->y /= buffer.getVirtualSize().y;
+    out->x *= buffer.getPhysicalArea().getSizeX();
+    out->y *= buffer.getPhysicalArea().getSizeY();
 }
 }  // namespace sead
