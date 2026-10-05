@@ -22,6 +22,10 @@ public:
     explicit Viewport(const LogicalFrameBuffer& buffer);
     virtual ~Viewport() = default;
 
+    // inline-only in the original; name is a guess. This posture read appears
+    // in the viewport-based OrthoProjection constructor and Viewport::apply.
+    Graphics::DevicePosture getDevicePosture() const { return mDevicePosture; }
+
     void setByFrameBuffer(const LogicalFrameBuffer& buffer);
     void apply(DrawContext*, const LogicalFrameBuffer& buffer) const;
     void getOnFrameBufferPos(Vector2f* out, const LogicalFrameBuffer& buffer) const;

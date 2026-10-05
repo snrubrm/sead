@@ -217,6 +217,21 @@ OrthoProjection::OrthoProjection(f32 near, f32 far, f32 top, f32 bottom, f32 lef
     setTBLR(top, bottom, left, right);
 }
 
+// NON_MATCHING: viewport bounds are computed together before the member stores.
+OrthoProjection::OrthoProjection(f32 near, f32 far, const Viewport& viewport)
+    : mNear(near), mFar(far)
+{
+    setByViewport(viewport);
+    setDevicePosture(viewport.getDevicePosture());
+}
+
+// NON_MATCHING: the bound values use different floating-point registers.
+void OrthoProjection::setByViewport(const Viewport& viewport)
+{
+    setTBLR(viewport.getSizeY() * 0.5f, viewport.getSizeY() * -0.5f,
+            viewport.getSizeX() * -0.5f, viewport.getSizeX() * 0.5f);
+}
+
 f32 OrthoProjection::getNear() const { return mNear; }
 f32 OrthoProjection::getFar() const { return mFar; }
 f32 OrthoProjection::getFovy() const { return 0.0f; }
