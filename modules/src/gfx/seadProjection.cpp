@@ -397,4 +397,12 @@ void DirectProjection::doUpdateMatrix(Matrix44f* mtx) const
     *mtx = mProjectionMatrix;
 }
 
+void DirectProjection::doScreenPosToCameraPosTo(Vector3f* camera_pos,
+                                                const Vector3f& screen_pos) const
+{
+    Matrix44f inverse;
+    inverse.setInverse(mProjectionMatrix);
+    camera_pos->setMul(inverse, screen_pos);
+}
+
 }  // namespace sead
