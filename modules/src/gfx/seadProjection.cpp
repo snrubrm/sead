@@ -391,6 +391,52 @@ void DirectProjection::getOffset(Vector2f* offset) const
     offset->y = mOffset.y;
 }
 
+// NON_MATCHING: complete attribute recovery, with different matrix-load scheduling.
+void DirectProjection::updateAttributesForDirectProjection()
+{
+    if (!_f0)
+        return;
+
+    Matrix44f inverse;
+    inverse.setInverse(mProjectionMatrix);
+    const Vector4f clip[8] = {
+        {-1.0f, -1.0f, -1.0f, 1.0f}, {-1.0f, 1.0f, -1.0f, 1.0f},
+        {1.0f, 1.0f, -1.0f, 1.0f}, {1.0f, -1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, 1.0f, 1.0f}, {-1.0f, 1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, -1.0f, 1.0f, 1.0f},
+    };
+    Vector3f camera[8];
+    for (s32 i = 0; i < 8; ++i)
+    {
+        const Vector4f& point = clip[i];
+        const f32 inverse_w = 1.0f / (inverse.m[3][0] * point.x +
+            inverse.m[3][1] * point.y + inverse.m[3][2] * point.z +
+            inverse.m[3][3] * point.w);
+        camera[i].x = (inverse.m[0][0] * point.x + inverse.m[0][1] * point.y +
+            inverse.m[0][2] * point.z + inverse.m[0][3] * point.w) * inverse_w;
+        camera[i].y = (inverse.m[1][0] * point.x + inverse.m[1][1] * point.y +
+            inverse.m[1][2] * point.z + inverse.m[1][3] * point.w) * inverse_w;
+        camera[i].z = (inverse.m[2][0] * point.x + inverse.m[2][1] * point.y +
+            inverse.m[2][2] * point.z + inverse.m[2][3] * point.w) * inverse_w;
+    }
+
+    mNear = -camera[0].z;
+    mFar = -camera[4].z;
+    const f32 height = camera[1].y - camera[0].y;
+    const f32 width = camera[2].x - camera[0].x;
+    mAspect = width / height;
+    mOffset.x = (camera[0].x + camera[2].x) * 0.5f / width;
+    mOffset.y = (camera[1].y + camera[0].y) * 0.5f / height;
+    if (Mathf::abs(camera[0].x - camera[4].x) > 0.0001f ||
+        Mathf::abs(camera[1].x - camera[5].x) > 0.0001f ||
+        Mathf::abs(camera[2].x - camera[6].x) > 0.0001f ||
+        Mathf::abs(camera[3].x - camera[7].x) > 0.0001f)
+        mFovy = 2.0f * Mathf::atan2(height * 0.5f, mNear);
+    else
+        mFovy = 0.0f;
+    _f0 = false;
+}
+
 // NON_MATCHING: natural Matrix44 assignment copies components separately.
 void DirectProjection::doUpdateMatrix(Matrix44f* mtx) const
 {
