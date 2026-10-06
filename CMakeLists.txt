@@ -8,6 +8,9 @@ set_property(
 )
 
 add_library(sead OBJECT
+  include/audio/seadAudioSettingParameter.h
+  modules/src/audio/seadAudioSettingParameter.cpp
+
   include/basis/seadNew.h
   include/basis/seadRawPrint.h
   include/basis/seadTypes.h
