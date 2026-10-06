@@ -87,6 +87,7 @@ public:
     void setProjection(const Projection* projection);
     void setProjectionMatrix(const Matrix44f* projectionMtx);
     void setModelMatrix(const Matrix34f* modelMtx);
+    const Matrix34f* getModelMatrix() const { return mModel; }
     void setDrawContext(DrawContext* context);
     void begin();
     PrimitiveDrawMgrNvn* getDrawMgr_();
