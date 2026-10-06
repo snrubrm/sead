@@ -6,7 +6,9 @@
 
 namespace sead
 {
+class AudioMgr;
 class AudioPlayer;
+class AudioResetter;
 class AudioResourceLoader;
 class AudioSubsetBase;
 class AudioSystem;
@@ -25,8 +27,10 @@ public:
     void appendSubset(AudioSubsetBase* subset);
 
 private:
+    friend class AudioMgr;
+
     AudioSystem* mAudioSystem = nullptr;
-    void* _10 = nullptr;
+    AudioResetter* mResetter = nullptr;
     AudioPlayer* mPlayer = nullptr;
     AudioResourceLoader* mResourceLoader = nullptr;
     /// The subsets are linked through a node at offset 8 of AudioSubsetBase.
