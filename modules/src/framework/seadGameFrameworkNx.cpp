@@ -4,8 +4,9 @@
 namespace sead
 {
 // 0x7100af8510 (D1) / 0x7100af8528 (D0)
-// NON_MATCHING: the original keeps the store of the GameFrameworkNx vtable pointer before the tail call to ~GameFramework
-GameFrameworkNx::~GameFrameworkNx() = default;
+// The body keeps the store of the GameFrameworkNx vtable pointer before the tail call to ~GameFramework (a defaulted or
+// empty destructor drops it).
+GameFrameworkNx::~GameFrameworkNx() { ; }
 
 // 0x7100af8ef0
 void GameFrameworkNx::outOfMemoryCallback_(NVNcommandBuffer*, NVNcommandBufferMemoryEvent, size_t,

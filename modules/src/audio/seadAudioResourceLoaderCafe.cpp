@@ -5,9 +5,9 @@ namespace sead
 // 0x7100b97604
 AudioResourceLoaderCafe::AudioResourceLoaderCafe() = default;
 
-// NON_MATCHING (D2): the original keeps the store of the vtable pointer in the destructor, which is dropped here.
+// The body keeps the vtable pointer store of the destructor (a defaulted or empty destructor does not store it).
 // 0x7100b97658 (D2) / 0x7100b9766c (D0)
-AudioResourceLoaderCafe::~AudioResourceLoaderCafe() = default;
+AudioResourceLoaderCafe::~AudioResourceLoaderCafe() { ; }
 
 // 0x7100b979ac
 void AudioResourceLoaderCafe::setHeap(Heap* heap)
