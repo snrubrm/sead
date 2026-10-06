@@ -4,22 +4,36 @@
 #include <gfx/seadGraphics.h>
 #include <thread/seadCriticalSection.h>
 #include <nn/gfx/gfx_Types.h>
+#include <prim/seadDelegate.h>
+#include <thread/seadAtomic.h>
 #include "nvn/nvn.h"
 
 namespace sead
 {
 class DisplayBufferNvn;
-enum class NVNdebugCallbackSource;
-enum class NVNdebugCallbackType;
-enum class NVNdebugCallbackSeverity;
 
 class GraphicsNvn : public Graphics
 {
 public:
-    class CreateArg;
-    struct NvnDebugCallbackParam;
+    struct CreateArg
+    {
+        NVNdevice* device;
+        u32 _8;
+        bool _c;
+        bool _d;
+    };
+
+    struct NvnDebugCallbackParam
+    {
+        NVNdebugCallbackSource source;
+        NVNdebugCallbackType type;
+        s32 id;
+        NVNdebugCallbackSeverity severity;
+        const char* message;
+    };
 
     GraphicsNvn(const CreateArg& arg);
+    ~GraphicsNvn() override;
 
     void initializeDrawLockContext(Heap*) override;
     void initializeImpl(Heap*) override;
@@ -35,11 +49,11 @@ public:
     void registerDisplayBufferNvn(DisplayBufferNvn*);
     void applyDeferredFinalizes();
 
-    void nvnDebugCallback(NVNdebugCallbackSource, NVNdebugCallbackType, s32,
-                          NVNdebugCallbackSeverity, const char*, void*);
+    static void nvnDebugCallback(NVNdebugCallbackSource, NVNdebugCallbackType, s32,
+                                 NVNdebugCallbackSeverity, const char*, void*);
 
-    u64 convertGPUTimeStampToSystemTick(const NVNcounterData*);
-    s32 convertNvnDebugLevel(u32);
+    static u64 convertGPUTimeStampToSystemTick(const NVNcounterData*);
+    static s32 convertNvnDebugLevel(u32);
     void setViewportImpl(f32, f32, f32, f32) override;
     void setScissorImpl(f32, f32, f32, f32) override;
     void setDepthTestEnableImpl(bool) override;
@@ -108,19 +122,17 @@ private:
     void* _E8;
     void* _F0;
     s32 mTextureSamplerID;
+    u32 mVBlankWaitInterval;
     void* _100;
-    s32 _108;
-    s32 _10C;
+    Atomic<s32> mSamplerIdCounter;
+    Atomic<s32> mTextureIdCounter;
     s32 _110;
     s32 _114;
     CriticalSection mCriticalSection1;
     CriticalSection mCriticalSection2;
     CriticalSection mCriticalSection3;
-    void* _1D8;
-    void* _1E0;
-    void* _1E8;
-    void* _1F0;
-    void* _1F8;
+    Delegate1<GraphicsNvn, const NvnDebugCallbackParam&> mDefaultDebugCallback;
+    IDelegate1<const NvnDebugCallbackParam&>* mDebugCallback;
     bool _200;
     bool _201;
     bool _202;
