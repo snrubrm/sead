@@ -19,12 +19,10 @@ public:
     struct InitializeArg
     {
     public:
-        InitializeArg(const TaskBase::CreateArg& roottask_arg) : roottask_create_arg(roottask_arg)
-        {
-        }
+        InitializeArg(const TaskBase::CreateArg& roottask_arg);
 
         u32 create_queue_size = 0x20;
-        u32 prepare_stack_size = 0x8000;
+        u32 prepare_stack_size = 0x10000;
         s32 prepare_priority = -1;
         const TaskBase::CreateArg& roottask_create_arg;
         Heap* heap = nullptr;
@@ -36,6 +34,8 @@ public:
 public:
     TaskMgr(const InitializeArg& arg);
 
+    static TaskMgr* initialize(const InitializeArg& arg);
+
     void appendToList_(TaskBase::List& ls, TaskBase* task);
     bool changeTaskState_(TaskBase* task, TaskBase::State state);
     void destroyTaskSync(TaskBase* task);
@@ -44,6 +44,10 @@ public:
 
     void beforeCalc();
     void afterCalc();
+    bool destroyable_(TaskBase* task);
+    TaskBase* doCreateTask_(const TaskBase::CreateArg& arg, HeapArray* heap_array);
+    void calcCreation_();
+    void calcDestruction_();
 
     TaskBase* createTaskSync(const TaskBase::CreateArg& arg);
 
@@ -78,8 +82,6 @@ public:
     TaskBase::CreateArg mRootTaskCreateArg;
     TaskMgr::InitializeArg mInitializeArg;
     MethodTreeNode mCalcDestructionTreeNode;
-    u32 useless1;
-    u32 useless2;
 };
 
 }  // namespace sead

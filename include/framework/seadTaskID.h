@@ -44,6 +44,8 @@ public:
     TaskClassID(TaskFactory f) : mType(Type::cFactory) { mID.mFactory = f; }
     TaskClassID(const char* s) : mType(Type::cString) { mID.mString = s; }
 
+    TaskBase* create(const TaskConstructArg& arg) const;
+
 public:
     Type mType = Type::cInvalid;
     union

@@ -8,6 +8,105 @@
 
 namespace sead
 {
+TaskMgr::InitializeArg::InitializeArg(const TaskBase::CreateArg& roottask_arg)
+    : roottask_create_arg(roottask_arg)
+{
+}
+
+TaskMgr* TaskMgr::initialize(const InitializeArg& arg)
+{
+    return new (arg.heap, 8) TaskMgr(arg);
+}
+
+void TaskMgr::beforeCalc()
+{
+    calcCreation_();
+}
+
+void TaskMgr::afterCalc()
+{
+    calcDestruction_();
+}
+
+void TaskMgr::appendToList_(TaskBase::List& ls, TaskBase* task)
+{
+    ScopedLock<CriticalSection> lock(&mCriticalSection);
+    task->mTaskListNode.erase();
+    for (auto it = ls.begin(); it != ls.end(); ++it)
+    {
+        TaskBase* other = *it;
+        if (other->mTag < task->mTag)
+        {
+            other->mTaskListNode.mList->insertBefore(&other->mTaskListNode, &task->mTaskListNode);
+            return;
+        }
+    }
+    ls.pushBack(&task->mTaskListNode);
+}
+
+void TaskMgr::calcDestruction_()
+{
+    mCalcDestructionTreeNode.call();
+    if (!mCriticalSection.tryLock())
+        return;
+
+    auto it = mActiveList.begin();
+    while (it != mActiveList.end())
+    {
+        TaskBase* task = *it;
+        ++it;
+        if (task->mInternalFlag.isOnBit(1) && destroyable_(task))
+            changeTaskState_(task, TaskBase::cDestroyable);
+    }
+
+    while (mDestroyableList.begin() != mDestroyableList.end())
+    {
+        TaskBase* task = *mDestroyableList.begin();
+        task->detachCalcImpl();
+        task->detachDrawImpl();
+        task->detachAll();
+        doDestroyTask_(task);
+    }
+
+    mCriticalSection.unlock();
+}
+
+TaskBase* TaskMgr::doCreateTask_(const TaskBase::CreateArg& arg, HeapArray* heap_array)
+{
+    ScopedLock<CriticalSection> lock(&mCriticalSection);
+    const TaskClassID class_id = arg.factory;
+    const TaskBase::Tag tag = arg.tag;
+    TaskBase* task;
+    {
+        ScopedCurrentHeapSetter heap_setter(heap_array->getPrimaryHeap());
+        TaskConstructArg construct_arg;
+        construct_arg.heap_array = heap_array;
+        construct_arg.mgr = this;
+        construct_arg.param = arg.parameter;
+        task = class_id.create(construct_arg);
+    }
+    task->mClassID = class_id;
+    task->mTag = tag;
+    if (arg.parent)
+        arg.parent->pushBackChild(task);
+    return task;
+}
+
+bool TaskMgr::destroyable_(TaskBase* task)
+{
+    ScopedLock<CriticalSection> lock(&mCriticalSection);
+    if (task->mInternalFlag.isOnAll(6) && task->mState == TaskBase::cRunning)
+    {
+        while (task->child())
+        {
+            if (!destroyable_(task->child()->value()))
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 bool TaskMgr::changeTaskState_(TaskBase* task, TaskBase::State state)
 {
     sead::ScopedLock<CriticalSection> lock{&mCriticalSection};
