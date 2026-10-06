@@ -3,6 +3,7 @@
 #include <math/seadMathCalcCommon.h>
 #include <prim/seadPtrUtil.h>
 #include <prim/seadScopedLock.h>
+#include <string.h>
 
 namespace sead
 {
@@ -136,6 +137,488 @@ void ExpHeap::freeAll()
     mUseList.clear();
     mFreeList.clear();
     createMaxSizeFreeMemBlock_(this);
+}
+
+namespace
+{
+void callAllocFailedCallback(HeapMgr* mgr, Heap* heap, size_t size, s32 alignment,
+                             size_t alloc_size, s32 alloc_alignment)
+{
+    if (!mgr)
+        return;
+    if (auto* callback = mgr->getAllocFailedCallback())
+    {
+        HeapMgr::AllocFailedCallbackArg arg{heap, size, alignment, alloc_size, alloc_alignment};
+        callback->invoke(&arg);
+    }
+}
+}  // namespace
+
+void* ExpHeap::tryAlloc(size_t size, s32 alignment)
+{
+    HeapMgr* heap_mgr = HeapMgr::sInstancePtr;
+    size_t alloc_size = size > 8 ? size : 8;
+    const s32 abs_alignment = Mathi::abs(alignment);
+    if ((abs_alignment & (abs_alignment - 1)) != 0)
+    {
+        callAllocFailedCallback(heap_mgr, this, size, alignment, alloc_size, alignment);
+        return nullptr;
+    }
+
+    alloc_size = (alloc_size + 7) & ~size_t(7);
+    if (alloc_size < size)
+    {
+        callAllocFailedCallback(heap_mgr, this, size, alignment, alloc_size, alignment);
+        return nullptr;
+    }
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+
+    s32 real_alignment = mDirection * alignment;
+    MemBlock* block;
+    if (real_alignment >= 0)
+    {
+        if (real_alignment <= 8)
+            block = allocFromHead_(alloc_size);
+        else
+            block = allocFromHead_(alloc_size, real_alignment);
+    }
+    else
+    {
+        real_alignment = -real_alignment;
+        if (real_alignment <= 8)
+            block = allocFromTail_(alloc_size);
+        else
+            block = allocFromTail_(alloc_size, real_alignment);
+    }
+
+    if (!block)
+    {
+        callAllocFailedCallback(heap_mgr, this, size, alignment, alloc_size, real_alignment);
+        return nullptr;
+    }
+
+    block->mHeapCheckTag = mHeapCheckTag;
+    return reinterpret_cast<u8*>(block) + block->mOffset + sizeof(MemBlock);
+}
+
+inline MemBlock* ExpHeap::findFreeMemBlockFromHead_(size_t size, FindMode mode) const
+{
+    MemBlock* found = nullptr;
+    for (auto it = mFreeList.begin(); it != mFreeList.end(); ++it)
+    {
+        if (it->mSize < size)
+            continue;
+        if (mode == FindMode::FirstFit)
+        {
+            found = &*it;
+            break;
+        }
+        if (!found || (mode == FindMode::BestFit && found->mSize > it->mSize) ||
+            (mode == FindMode::LargestFit && found->mSize < it->mSize))
+            found = &*it;
+    }
+    return found;
+}
+
+MemBlock* ExpHeap::findFreeMemBlockFromHead_(size_t size, s32 alignment, FindMode mode) const
+{
+    MemBlock* found = nullptr;
+    for (auto it = mFreeList.begin(); it != mFreeList.end(); ++it)
+    {
+        const uintptr_t mask = u32(alignment - 1);
+        if (it->mSize < size)
+            continue;
+        const uintptr_t data = reinterpret_cast<uintptr_t>(&*it) + it->mOffset + sizeof(MemBlock);
+        const size_t padding = ((data + mask) & ~mask) - data;
+        if (it->mSize < size + padding)
+            continue;
+        if (mode == FindMode::FirstFit)
+        {
+            found = &*it;
+            break;
+        }
+        if (!found || (mode == FindMode::BestFit && found->mSize > it->mSize) ||
+            (mode == FindMode::LargestFit && found->mSize < it->mSize))
+            found = &*it;
+    }
+    return found;
+}
+
+MemBlock* ExpHeap::findFreeMemBlockFromTail_(size_t size, FindMode mode) const
+{
+    MemBlock* found = nullptr;
+    for (MemBlock* block = mFreeList.back(); block; block = mFreeList.prev(block))
+    {
+        if (block->mSize < size)
+            continue;
+        if (mode == FindMode::FirstFit)
+            return block;
+        if (!found || (mode == FindMode::BestFit && found->mSize > block->mSize) ||
+            (mode == FindMode::LargestFit && found->mSize < block->mSize))
+            found = block;
+    }
+    return found;
+}
+
+// NON_MATCHING: same instructions and structure, but the loop-invariant (0x20 - size) / (alignment - 1) values end up in swapped registers.
+MemBlock* ExpHeap::findFreeMemBlockFromTail_(size_t size, s32 alignment, FindMode mode) const
+{
+    MemBlock* found = nullptr;
+    for (MemBlock* block = mFreeList.back(); block; block = mFreeList.prev(block))
+    {
+        const size_t front_size = sizeof(MemBlock) - size;
+        const uintptr_t mask = u32(alignment - 1);
+        if (block->mSize < size)
+            continue;
+        const u32 start =
+            u32(front_size + reinterpret_cast<uintptr_t>(block) + block->mSize + block->mOffset);
+        const size_t padding = start & mask;
+        if (block->mSize < size + padding)
+            continue;
+        if (mode == FindMode::FirstFit)
+            return block;
+        if (!found || (mode == FindMode::BestFit && found->mSize > block->mSize) ||
+            (mode == FindMode::LargestFit && found->mSize < block->mSize))
+            found = block;
+    }
+    return found;
+}
+
+MemBlock* ExpHeap::allocFromHead_(size_t size)
+{
+    MemBlock* block = findFreeMemBlockFromHead_(size, getFindMode_());
+    if (!block)
+        return nullptr;
+
+    const size_t block_size = block->mSize;
+    block->mSize = size;
+    const size_t offset = block->mOffset;
+    const size_t remaining = block_size - size;
+    MemBlock* next = mFreeList.next(block);
+    mFreeList.erase(block);
+    pushToUseList_(block);
+
+    if (remaining > sizeof(MemBlock))
+    {
+        auto* free_block =
+            new (reinterpret_cast<void*>(size + reinterpret_cast<uintptr_t>(block) + offset +
+                                         sizeof(MemBlock))) MemBlock();
+        free_block->mSize = remaining - sizeof(MemBlock);
+        free_block->mHeapCheckTag = 0xffff;
+        if (next)
+            mFreeList.insertBefore(next, free_block);
+        else
+            mFreeList.pushBack(free_block);
+    }
+    else if (remaining != 0)
+    {
+        block->mSize = block_size;
+    }
+    return block;
+}
+
+// NON_MATCHING: same instruction stream apart from callee-saved register numbering and the position of the block size load.
+MemBlock* ExpHeap::allocFromHead_(size_t size, s32 alignment)
+{
+    MemBlock* block = findFreeMemBlockFromHead_(size, alignment, getFindMode_());
+    if (!block)
+        return nullptr;
+
+    MemBlock* next = mFreeList.next(block);
+    const uintptr_t mask = u32(alignment - 1);
+    const uintptr_t data = reinterpret_cast<uintptr_t>(block) + block->mOffset + sizeof(MemBlock);
+    const size_t padding = ((data + mask) & ~mask) - data;
+    const size_t leftover = block->mSize - size;
+
+    if (padding >= 0x10000)
+    {
+        // The padding does not fit the offset: leave it as its own free block.
+        block->mOffset = 0;
+        block->mSize = padding - sizeof(MemBlock);
+        block = new (reinterpret_cast<void*>(padding + reinterpret_cast<uintptr_t>(block))) MemBlock();
+        block->mOffset = 0;
+        block->mSize = size;
+    }
+    else
+    {
+        const u16 offset = padding;
+        block->mOffset = offset;
+        if (offset)
+            *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemBlock) +
+                                          block->mOffset - sizeof(uintptr_t)) =
+                reinterpret_cast<uintptr_t>(block) + 1;
+        block->mSize = size;
+        mFreeList.erase(block);
+    }
+
+    pushToUseList_(block);
+
+    const size_t remaining = leftover - padding;
+    if (remaining > sizeof(MemBlock))
+    {
+        auto* free_block =
+            new (reinterpret_cast<u8*>(block) + size + block->mOffset + sizeof(MemBlock)) MemBlock();
+        free_block->mSize = remaining - sizeof(MemBlock);
+        free_block->mHeapCheckTag = 0xffff;
+        if (next)
+            mFreeList.insertBefore(next, free_block);
+        else
+            mFreeList.pushBack(free_block);
+    }
+    else if (remaining != 0)
+    {
+        block->mSize = remaining + size;
+    }
+    return block;
+}
+
+MemBlock* ExpHeap::allocFromTail_(size_t size)
+{
+    MemBlock* block = findFreeMemBlockFromTail_(size, getFindMode_());
+    if (!block)
+        return nullptr;
+
+    const size_t remaining = block->mSize - size;
+    if (remaining > sizeof(MemBlock))
+    {
+        block->mSize = remaining - sizeof(MemBlock);
+        block = new (reinterpret_cast<u8*>(block) + remaining + block->mOffset) MemBlock();
+        block->mSize = size;
+        pushToUseList_(block);
+    }
+    else
+    {
+        mFreeList.erase(block);
+        pushToUseList_(block);
+    }
+    return block;
+}
+
+MemBlock* ExpHeap::allocFromTail_(size_t size, s32 alignment)
+{
+    MemBlock* block = findFreeMemBlockFromTail_(size, alignment, getFindMode_());
+    if (!block)
+        return nullptr;
+
+    const uintptr_t data = reinterpret_cast<uintptr_t>(block) + sizeof(MemBlock);
+    const u32 start = u32(data - size + block->mOffset + block->mSize);
+    const uintptr_t mask = u32(alignment - 1);
+    const size_t alloc_size = (start & mask) + size;
+    const size_t remaining = block->mSize - alloc_size;
+    if (remaining > sizeof(MemBlock))
+    {
+        block->mSize = remaining - sizeof(MemBlock);
+        block = new (reinterpret_cast<void*>(remaining + reinterpret_cast<uintptr_t>(block) +
+                                             block->mOffset)) MemBlock();
+        block->mSize = alloc_size;
+        pushToUseList_(block);
+    }
+    else
+    {
+        const u16 offset = remaining;
+        block->mOffset = offset;
+        if (offset)
+            reinterpret_cast<uintptr_t*>(data + block->mOffset)[-1] =
+                reinterpret_cast<uintptr_t>(block) + 1;
+        block->mSize = alloc_size;
+        mFreeList.erase(block);
+        pushToUseList_(block);
+    }
+    return block;
+}
+
+inline void ExpHeap::checkUseList() const
+{
+    ConditionalScopedLock<CriticalSection> lock(const_cast<CriticalSection*>(&mCS), isLockEnabled());
+    for (auto it = mUseList.begin(); it != mUseList.end(); ++it)
+    {
+    }
+}
+
+inline void ExpHeap::checkFreeList() const
+{
+    ConditionalScopedLock<CriticalSection> lock(const_cast<CriticalSection*>(&mCS), isLockEnabled());
+    for (auto it = mFreeList.begin(); it != mFreeList.end(); ++it)
+    {
+    }
+}
+
+void ExpHeap::free(void* ptr)
+{
+    freeAndGetAllocatableSize(ptr, 8);
+}
+
+size_t ExpHeap::freeAndGetAllocatableSize(void* ptr, s32 alignment)
+{
+    if (!ptr || !isInclude(ptr) || mFlag.isOnBit(Flag::cDisposing))
+        return 0;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+
+    MemBlock* block = MemBlock::FindManageArea(ptr);
+    if (block && block->mHeapCheckTag == mHeapCheckTag)
+    {
+        mUseList.erase(block);
+        const size_t size = block->mSize + block->mOffset;
+        block->mOffset = 0;
+        block->mSize = size;
+
+        const MemBlock* merged = pushToFreeList_(block);
+        const s32 abs_alignment = Mathi::abs(alignment);
+        size_t allocatable = merged->mSize;
+        if (abs_alignment > 8)
+        {
+            const uintptr_t data =
+                reinterpret_cast<uintptr_t>(merged) + merged->mOffset + sizeof(MemBlock);
+            const uintptr_t mask = u32(abs_alignment - 1);
+            const uintptr_t aligned = (data + mask) & ~mask;
+            allocatable = data + allocatable - aligned;
+        }
+        return allocatable;
+    }
+
+    if (!block)
+    {
+        checkUseList();
+        checkFreeList();
+    }
+    return 0;
+}
+
+size_t ExpHeap::getAllocatedSize(void* object)
+{
+    if (!isInclude(object))
+        return 0;
+    return MemBlock::FindManageArea(object)->mSize;
+}
+
+// NON_MATCHING: one add has its operands swapped (offset + diff instead of diff + offset).
+void* ExpHeap::resizeFront(void* ptr, size_t size)
+{
+    if (!isInclude(ptr))
+        return nullptr;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+
+    MemBlock* block = MemBlock::FindManageArea(ptr);
+    const size_t new_size = (size + 7) & ~size_t(7);
+    if (block->mSize < new_size)
+        return nullptr;
+
+    if (block->mSize != new_size)
+    {
+        const size_t diff = block->mSize - new_size;
+        const size_t offset = block->mOffset;
+        const size_t front = sizeof(MemBlock) - new_size + block->mSize + offset;
+        if (front - sizeof(MemBlock) < sizeof(MemBlock))
+        {
+            const u16 new_offset = diff + offset;
+            block->mOffset = new_offset;
+            if (new_offset)
+                *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(block) + sizeof(MemBlock) +
+                                              block->mOffset - sizeof(uintptr_t)) =
+                    reinterpret_cast<uintptr_t>(block) + 1;
+        }
+        else
+        {
+            auto* used_block = new (reinterpret_cast<void*>(front - sizeof(MemBlock) +
+                                                            reinterpret_cast<uintptr_t>(block)))
+                MemBlock();
+            used_block->mHeapCheckTag = mHeapCheckTag;
+            used_block->mSize = new_size;
+            pushToUseList_(used_block);
+            mUseList.erase(block);
+            block->mSize = front - 2 * sizeof(MemBlock);
+            block->mOffset = 0;
+            pushToFreeList_(block);
+            block = used_block;
+        }
+    }
+    return reinterpret_cast<u8*>(block) + block->mOffset + sizeof(MemBlock);
+}
+
+// NON_MATCHING: register assignment of the rounded size and the old size is swapped.
+void* ExpHeap::resizeBack(void* ptr, size_t size)
+{
+    if (!isInclude(ptr))
+        return nullptr;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+
+    MemBlock* block = MemBlock::FindManageArea(ptr);
+    const size_t old_size = block->mSize;
+    const size_t new_size = (size + 7) & ~size_t(7);
+    if (old_size < new_size)
+        return nullptr;
+
+    if (old_size != new_size)
+    {
+        const size_t diff = old_size - new_size;
+        if (diff < sizeof(MemBlock))
+            return reinterpret_cast<u8*>(block) + block->mOffset + sizeof(MemBlock);
+
+        block->mSize = new_size;
+        auto* free_block = new (reinterpret_cast<u8*>(block) + new_size + block->mOffset +
+                                sizeof(MemBlock)) MemBlock();
+        free_block->mSize = diff - sizeof(MemBlock);
+        pushToFreeList_(free_block);
+    }
+    return reinterpret_cast<u8*>(block) + block->mOffset + sizeof(MemBlock);
+}
+
+// NON_MATCHING: one callee-saved register more than the original (the block offset is kept across the tryAlloc call).
+void* ExpHeap::tryRealloc(void* ptr, size_t size, s32 alignment)
+{
+    if (!ptr)
+        return tryAlloc(size, alignment);
+
+    if (size == 0)
+    {
+        free(ptr);
+        return nullptr;
+    }
+
+    if (!isInclude(ptr) || alignment < 0)
+        return nullptr;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+
+    MemBlock* block = MemBlock::FindManageArea(ptr);
+    const size_t old_size = block->mSize;
+    const size_t new_size = (size + 7) & ~size_t(7);
+    void* result;
+    if (old_size < new_size)
+    {
+        const u16 offset = block->mOffset;
+        result = tryAlloc(new_size, alignment == 0 ? 8 : alignment);
+        if (!result)
+            return nullptr;
+        memcpy(result, reinterpret_cast<u8*>(block) + offset + sizeof(MemBlock), old_size);
+        free(ptr);
+        return result;
+    }
+
+    const uintptr_t data = reinterpret_cast<uintptr_t>(block) + block->mOffset + sizeof(MemBlock);
+    if (alignment != 0 && (data & u32(alignment - 1)) != 0)
+    {
+        result = tryAlloc(new_size, alignment);
+        if (!result)
+            return nullptr;
+        memcpy(result, reinterpret_cast<void*>(data), new_size);
+        free(ptr);
+        return result;
+    }
+
+    const size_t diff = old_size - new_size;
+    if (diff > sizeof(MemBlock) - 1)
+    {
+        block->mSize = new_size;
+        auto* free_block = new (reinterpret_cast<u8*>(block) + new_size + block->mOffset + sizeof(MemBlock)) MemBlock();
+        free_block->mSize = diff - sizeof(MemBlock);
+        pushToFreeList_(free_block);
+    }
+    return reinterpret_cast<u8*>(block) + block->mOffset + sizeof(MemBlock);
 }
 
 ExpHeap::ExpHeap(const SafeString& name, Heap* parent, void* address, size_t size,

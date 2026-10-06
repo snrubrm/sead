@@ -23,9 +23,12 @@ public:
         ByIteratingMemBlock = 2,
     };
 
-    // FIXME: incomplete
+    // The allocation mode is passed as-is to the block search (third value is only seen there).
     enum class FindMode
     {
+        FirstFit = 0,
+        BestFit = 1,
+        LargestFit = 2,
     };
 
     static ExpHeap* create(size_t size, const SafeString& name, Heap* parent,
@@ -66,6 +69,7 @@ public:
     void dumpYAML(WriteStream& stream, int i) const override;
     void genInformation_(hostio::Context* context) override;
 
+    size_t freeAndGetAllocatableSize(void* ptr, s32 alignment);
     virtual s32 destroyAndGetAllocatableSize(s32);
     virtual void setFindFreeBlockMode(FindFreeBlockMode mode);
 
@@ -91,15 +95,21 @@ protected:
     static void doCreate(ExpHeap*, Heap*);
 
     static void createMaxSizeFreeMemBlock_(ExpHeap*);
-    MemBlock* findFreeMemBlockFromHead_(size_t, FindMode) const;
+    MemBlock* findFreeMemBlockFromHead_(size_t size, FindMode mode) const;
     MemBlock* findFreeMemBlockFromHead_(size_t, s32, FindMode) const;
     MemBlock* findFreeMemBlockFromTail_(size_t, FindMode) const;
     MemBlock* findFreeMemBlockFromTail_(size_t, s32, FindMode) const;
     MemBlock* findLastMemBlockIfFree_();
     MemBlock* findFirstMemBlockIfFree_();
 
-    void pushToUseList_(MemBlock*);
-    void pushToFreeList_(MemBlock*);
+    void pushToUseList_(MemBlock* block)
+    {
+        if (mDirection == cHeapDirection_Forward)
+            mUseList.pushBack(block);
+        else
+            mUseList.pushFront(block);
+    }
+    MemBlock* pushToFreeList_(MemBlock*);
 
     size_t adjustBack_();
     size_t adjustFront_();
@@ -108,6 +118,11 @@ protected:
     MemBlock* allocFromHead_(size_t, s32);
     MemBlock* allocFromTail_(size_t);
     MemBlock* allocFromTail_(size_t, s32);
+
+    FindMode getFindMode_() const
+    {
+        return static_cast<FindMode>(static_cast<s32>(static_cast<AllocMode>(mAllocMode)));
+    }
 
     static s32 compareMemBlockAddr_(const MemBlock*, const MemBlock*);
 

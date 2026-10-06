@@ -9,7 +9,15 @@ namespace sead
 class MemBlock
 {
 public:
-    static MemBlock* FindManageArea(void* ptr);
+    // The block is either directly in front of the data or referenced by a tagged pointer that is
+    // stored right before the (aligned) data.
+    static MemBlock* FindManageArea(void* ptr)
+    {
+        const uintptr_t tagged = reinterpret_cast<uintptr_t*>(ptr)[-1];
+        if (tagged & 1)
+            return reinterpret_cast<MemBlock*>(tagged - 1);
+        return reinterpret_cast<MemBlock*>(static_cast<u8*>(ptr) - sizeof(MemBlock));
+    }
 
     MemBlock() : mListNode(), mHeapCheckTag(0), mOffset(0), mSize(0) {}
 
