@@ -107,10 +107,13 @@ add_library(sead OBJECT
   modules/src/framework/seadTaskBase.cpp
   modules/src/framework/seadTaskMgr.cpp
 
+  include/gfx/nin/seadDisplayBufferNvn.h
+  include/gfx/nin/seadFrameBufferNvn.h
   include/gfx/nin/seadGraphicsNvn.h
   include/gfx/nvn/seadDebugFontMgrNvn.h
   include/gfx/seadCamera.h
   include/gfx/seadColor.h
+  include/gfx/seadDisplayBuffer.h
   include/gfx/seadDrawContext.h
   include/gfx/seadDrawLockContext.h
   include/gfx/seadFrameBuffer.h
@@ -119,11 +122,14 @@ add_library(sead OBJECT
   include/gfx/seadProjection.h
   include/gfx/seadRendering.h
   include/gfx/seadTexture.h
+  modules/src/gfx/nin/seadDisplayBufferNvn.cpp
+  modules/src/gfx/nin/seadFrameBufferNvn.cpp
   modules/src/gfx/nin/seadGraphicsNvn.cpp
   modules/src/gfx/nvn/seadDebugFontMgrNvn.cpp
   modules/src/gfx/seadCamera.cpp
   modules/src/gfx/seadColor.cpp
   modules/src/gfx/seadDrawLockContext.cpp
+  modules/src/gfx/seadDrawContext.cpp
   modules/src/gfx/seadFrameBuffer.cpp
   modules/src/gfx/seadGraphics.cpp
   # modules/src/gfx/seadPrimitiveRenderer.cpp

@@ -4,7 +4,7 @@
 namespace sead
 {
 GraphicsNvn::GraphicsNvn(const CreateArg& arg)
-    : mNvnDevice(arg.device), _38(nullptr), _40(nullptr), mNnDevice(nullptr), _50(nullptr),
+    : mNvnDevice(arg.device), mNvnQueue(nullptr), _40(nullptr), mNnDevice(nullptr), _50(nullptr),
       mTextureSamplerID(0), mVBlankWaitInterval(0), mSamplerIdCounter(0), mTextureIdCounter(0),
       _110(arg._8), _114(0x1000),
       mDefaultDebugCallback(this, &GraphicsNvn::defaultNvnDebugCallback_),

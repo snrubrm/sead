@@ -83,6 +83,7 @@ public:
     void setPolygonOffsetEnableImpl(bool, bool, bool) override;
 
     NVNdevice* getNvnDevice() const { return mNvnDevice; }
+    NVNqueue* getQueue() const { return mNvnQueue; }
 
     // Inline-only in the original; name is a guess. Screen and FontMgr pass +0x48
     // to NN gfx APIs; initializeImpl constructs its NN device at this address.
@@ -100,7 +101,7 @@ private:
     void defaultNvnDebugCallback_(const NvnDebugCallbackParam&);
 
     NVNdevice* mNvnDevice;
-    void* _38;
+    NVNqueue* mNvnQueue;  // set by registerQueue; used to present the display buffer textures
     void* _40;
     nn::gfx::Device* mNnDevice;
     void* _50;
