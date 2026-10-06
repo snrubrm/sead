@@ -46,9 +46,10 @@ public:
         s32 mControlMemorySize;
         u32 mDebugLevel;
         u32 _44;
+        u32 _48;
     };
 
-    static_assert(sizeof(CreateArg) == 0x48);
+    static_assert(sizeof(CreateArg) == 0x4c);
 
     static void initialize(const Framework::InitializeArg&);
 
@@ -115,8 +116,10 @@ private:
     u8 _209;
     bool _20a;
     u8 _20b;
+    /// 1: use the GPU, 2: do not (requestChangeUseGPU).
+    u8 mUseGPURequest;
 };
 
-static_assert(sizeof(GameFrameworkNx) == 0x210);
+static_assert(sizeof(GameFrameworkNx) == 0x218);
 
 }  // namespace sead
