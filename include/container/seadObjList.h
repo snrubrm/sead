@@ -177,7 +177,7 @@ public:
     iterator end() const { return iterator(listNodeToObj(const_cast<ListNode*>(&mStartEnd))); }
     iterator begin(T* ptr) const { return iterator(ptr); }
 
-    static constexpr size_t calculateWorkBufferSize(size_t n) { return n * ElementSize; }
+    static constexpr size_t calculateWorkBufferSize(s32 n) { return n * ElementSize; }
 
 private:
     struct Node
@@ -218,7 +218,7 @@ private:
         return node ? listNodeToObj(node) : nullptr;
     }
 
-    static constexpr size_t ElementSize = std::max(sizeof(Node), FreeList::cPtrSize);
+    static constexpr s32 ElementSize = std::max(sizeof(Node), FreeList::cPtrSize);
 
     sead::FreeList mFreeList;
     s32 mMaxNum = 0;
