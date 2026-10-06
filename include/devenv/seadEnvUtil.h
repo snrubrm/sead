@@ -19,5 +19,10 @@ public:
     static RegionID getRegion();
     static s32 getEnvironmentVariable(BufferedSafeString* out, const SafeString& variable);
     static s32 resolveEnvronmentVariable(BufferedSafeString* out, const SafeString& str);
+
+    /// The region / language of the system settings (nn::oe::GetDesiredLanguage), used until RegionLanguageMgr is
+    /// initialized.
+    static RegionID getSystemRegion_();
+    static LanguageID getSystemLanguage_();
 };
 }  // namespace sead
