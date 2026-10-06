@@ -56,6 +56,7 @@ protected:
     ~FrameHeap() override;
 
     void initialize_();
+    size_t adjustBack_();
     void* getAreaStart_() const;
     void* getAreaEnd_() const;
 
