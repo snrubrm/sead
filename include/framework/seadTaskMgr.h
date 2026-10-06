@@ -41,6 +41,7 @@ public:
     void destroyTaskSync(TaskBase* task);
     void doDestroyTask_(TaskBase* task);
     void finalize();
+    void destroyAllAndCreateRoot();
 
     void beforeCalc();
     void afterCalc();
