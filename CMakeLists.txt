@@ -77,6 +77,7 @@ add_library(sead OBJECT
   modules/src/filedevice/seadPath.cpp
 
   include/framework/nx/seadGameFrameworkNx.h
+  include/framework/nx/seadPerformanceMgrNx.h
   include/framework/seadCalculateTask.h
   include/framework/seadFramework.h
   include/framework/seadHeapPolicies.h
@@ -94,6 +95,7 @@ add_library(sead OBJECT
   modules/src/framework/seadCalculateTask.cpp
   modules/src/framework/seadFramework.cpp
   modules/src/framework/seadGameFramework.cpp
+  modules/src/framework/seadPerformanceMgrNx.cpp
   modules/src/framework/seadMethodTree.cpp
   modules/src/framework/seadProcessMeterBar.cpp
   modules/src/framework/seadTask.cpp
