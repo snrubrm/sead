@@ -101,6 +101,7 @@ add_library(sead OBJECT
   modules/src/framework/seadGameFrameworkNx.cpp
   modules/src/framework/seadPerformanceMgrNx.cpp
   modules/src/framework/seadMethodTree.cpp
+  modules/src/framework/seadMethodTreeMgr.cpp
   modules/src/framework/seadProcessMeterBar.cpp
   modules/src/framework/seadTask.cpp
   modules/src/framework/seadTaskBase.cpp
