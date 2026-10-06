@@ -110,6 +110,7 @@ add_library(sead OBJECT
   include/gfx/seadPrimitiveRenderer.h
   include/gfx/seadPrimitiveRendererUtil.h
   include/gfx/seadProjection.h
+  include/gfx/seadRendering.h
   include/gfx/seadTexture.h
   modules/src/gfx/nin/seadGraphicsNvn.cpp
   modules/src/gfx/nvn/seadDebugFontMgrNvn.cpp
@@ -123,6 +124,7 @@ add_library(sead OBJECT
   modules/src/gfx/seadProjection.cpp
   modules/src/gfx/seadViewport.cpp
 
+  include/geom/seadCapsule.h
   include/geom/seadGeometry.h
   include/geom/seadSegment.h
   modules/src/geom/seadGeometry.cpp
