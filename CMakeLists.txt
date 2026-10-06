@@ -88,6 +88,7 @@ add_library(sead OBJECT
   include/framework/seadInfLoopChecker.h
   include/framework/seadMethodTree.h
   include/framework/seadMethodTreeMgr.h
+  include/framework/seadSingleScreenMethodTreeMgr.h
   include/framework/seadProcessMeter.h
   include/framework/seadProcessMeterBar.h
   include/framework/seadTask.h
@@ -102,6 +103,8 @@ add_library(sead OBJECT
   modules/src/framework/seadPerformanceMgrNx.cpp
   modules/src/framework/seadMethodTree.cpp
   modules/src/framework/seadMethodTreeMgr.cpp
+  modules/src/framework/seadSingleScreenMethodTreeMgr.cpp
+  modules/src/framework/seadProcessMeter.cpp
   modules/src/framework/seadProcessMeterBar.cpp
   modules/src/framework/seadTask.cpp
   modules/src/framework/seadTaskBase.cpp
