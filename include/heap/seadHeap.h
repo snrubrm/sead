@@ -79,6 +79,9 @@ public:
 
     virtual void pushBackChild_(Heap* child);
 
+    void destruct_();
+    void dispose_(const void* begin, const void* end);
+
     void appendDisposer_(IDisposer* disposer);
     void removeDisposer_(IDisposer* disposer);
     Heap* findContainHeap_(const void* ptr);
