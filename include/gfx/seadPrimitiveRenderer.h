@@ -58,6 +58,8 @@ public:
         void setBoundBox(const BoundBox3f& box);
 
     private:
+        friend class PrimitiveDrawer;
+
         Vector3f mCenter;
         Vector3f mSize;
         Color4f mColor0;
@@ -79,7 +81,7 @@ public:
 
     void prepareMgrFromBinary(Heap* heap, const void* bin_data, u32 bin_size);
     void createDrawMgrInstance_(Heap* heap);
-    void prepareMgr(Heap* heap, const SafeString& path);
+    static void prepareMgr(Heap* heap, const SafeString& path);
     void prepareMgrFromBinary(Heap*, const void*, u32, u32, bool);
     void prepareMgr(Heap*, const SafeString&, u32, bool);
     void setCamera(const Camera* camera);

@@ -110,6 +110,7 @@ add_library(sead OBJECT
   include/gfx/nin/seadDisplayBufferNvn.h
   include/gfx/nin/seadFrameBufferNvn.h
   include/gfx/nin/seadGraphicsNvn.h
+  include/gfx/nin/seadPrimitiveDrawMgrNvn.h
   include/gfx/nvn/seadDebugFontMgrNvn.h
   include/gfx/seadCamera.h
   include/gfx/seadColor.h
@@ -125,6 +126,8 @@ add_library(sead OBJECT
   modules/src/gfx/nin/seadDisplayBufferNvn.cpp
   modules/src/gfx/nin/seadFrameBufferNvn.cpp
   modules/src/gfx/nin/seadGraphicsNvn.cpp
+  modules/src/gfx/nin/seadPrimitiveDrawMgrNvn.cpp
+  modules/src/gfx/nin/seadPrimitiveDrawer.cpp
   modules/src/gfx/nvn/seadDebugFontMgrNvn.cpp
   modules/src/gfx/seadCamera.cpp
   modules/src/gfx/seadColor.cpp
