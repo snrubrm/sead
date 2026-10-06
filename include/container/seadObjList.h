@@ -68,6 +68,7 @@ public:
     bool isBufferReady() const { return mFreeList.work() != nullptr; }
 
     bool isFull() const { return size() >= mMaxNum; }
+    s32 getMaxNum() const { return mMaxNum; }
 
     T* front() const { return listNodeToObjWithNullCheck(ListImpl::front()); }
     T* back() const { return listNodeToObjWithNullCheck(ListImpl::back()); }
