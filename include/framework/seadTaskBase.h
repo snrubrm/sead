@@ -15,6 +15,8 @@
 namespace sead
 {
 class FaderTaskBase;
+class Framework;
+class MethodTreeMgr;
 class MethodTreeNode;
 class TaskEvent;
 class TaskMgr;
@@ -81,7 +83,7 @@ public:
 
     struct MgrTaskArg : public CreateArg
     {
-        explicit MgrTaskArg(const TaskClassID& classID);
+        explicit MgrTaskArg(const TaskClassID& classID) : CreateArg(classID) {}
     };
 
     struct SystemMgrTaskArg : public MgrTaskArg
@@ -114,8 +116,18 @@ public:
     virtual MethodTreeNode* getMethodTreeNode(s32 method_type) = 0;
     virtual void onDestroy();
 
-    DelegateThread* getFramework() const;  // seems to return mTaskMgr->mPrepareThread;
+    Framework* getFramework() const;
+    MethodTreeMgr* getMethodTreeMgr() const;
 
+    void attachCalcDraw();
+    void adjustHeapAll();
+    void doneDestroy();
+    void attachMethodWithCheck(s32 method_type, MethodTreeNode* node);
+
+protected:
+    void adjustHeapWithSlackWithoutLock_(s32 index, u32 slack);
+
+public:
     TaskParameter* mParameter;
     BitFlag32 mInternalFlag;
     ListNode mTaskListNode;

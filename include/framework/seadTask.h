@@ -1,5 +1,6 @@
 #pragma once
 
+#include <framework/seadCalculateTask.h>
 #include <framework/seadMethodTree.h>
 #include <framework/seadTaskBase.h>
 #include <prim/seadRuntimeTypeInfo.h>
@@ -8,7 +9,8 @@ namespace sead
 {
 class Task : public TaskBase
 {
-    SEAD_RTTI_OVERRIDE(Task, TaskBase);
+    // Task::getRuntimeTypeInfo (0x7a74a4) returns a typeinfo derived from the CalculateTask one, as in the original.
+    SEAD_RTTI_OVERRIDE(Task, CalculateTask);
 
 public:
     explicit Task(const TaskConstructArg& arg);
@@ -26,8 +28,8 @@ public:
     void detachDrawImpl() override;
     const RuntimeTypeInfo::Interface* getCorrespondingMethodTreeMgrTypeInfo() const override;
     MethodTreeNode* getMethodTreeNode(s32 method_type) override;
-    virtual void calc() {}
-    virtual void draw() {}
+    virtual void calc();
+    virtual void draw();
 
 protected:
     MethodTreeNode mCalcNode{nullptr};
