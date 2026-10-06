@@ -123,6 +123,10 @@ add_library(sead OBJECT
   modules/src/gfx/seadProjection.cpp
   modules/src/gfx/seadViewport.cpp
 
+  include/geom/seadGeometry.h
+  include/geom/seadSegment.h
+  modules/src/geom/seadGeometry.cpp
+
   include/heap/seadArena.h
   include/heap/seadDisposer.h
   include/heap/seadExpHeap.h
