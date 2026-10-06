@@ -21,7 +21,7 @@ class Projection
 
 public:
     Projection();
-    virtual ~Projection() = default;
+    virtual ~Projection();
 
     virtual f32 getNear() const = 0;
     virtual f32 getFar() const = 0;
@@ -72,7 +72,7 @@ class PerspectiveProjection : public Projection
 public:
     PerspectiveProjection();
     PerspectiveProjection(f32 near, f32 far, f32 fovy_rad, f32 aspect);
-    ~PerspectiveProjection() override;
+    ~PerspectiveProjection() override = default;
 
     f32 getNear() const override;
     f32 getFar() const override;
@@ -134,7 +134,7 @@ public:
     OrthoProjection(f32 near, f32 far, f32 top, f32 bottom, f32 left, f32 right);
     OrthoProjection(f32 near, f32 far, const BoundBox2f& boundBox);
     OrthoProjection(f32 near, f32 far, const Viewport& viewport);
-    ~OrthoProjection() override;
+    ~OrthoProjection() override = default;
 
     f32 getNear() const override;
     f32 getFar() const override;
@@ -167,7 +167,7 @@ public:
     FrustumProjection();
     FrustumProjection(f32 near, f32 far, f32 top, f32 bottom, f32 left, f32 right);
     FrustumProjection(f32 near, f32 far, const BoundBox2f& boundBox);
-    ~FrustumProjection() override;
+    ~FrustumProjection() override = default;
 
     f32 getNear() const override;
     f32 getFar() const override;
@@ -201,7 +201,7 @@ class DirectProjection : public Projection
 public:
     DirectProjection();
     DirectProjection(const Matrix44f& mtx, Graphics::DevicePosture posture);
-    ~DirectProjection() override;
+    ~DirectProjection() override = default;
 
     void setProjectionMatrix(const Matrix44f& mtx, Graphics::DevicePosture posture);
     f32 getNear() const override;
