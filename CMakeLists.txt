@@ -8,6 +8,9 @@ set_property(
 )
 
 add_library(sead OBJECT
+  include/audio/seadAudioResourceLoader.h
+  include/audio/seadAudioResourceLoaderCafe.h
+  modules/src/audio/seadAudioResourceLoaderCafe.cpp
   include/audio/seadAudioSettingParameter.h
   modules/src/audio/seadAudioSettingParameter.cpp
 
