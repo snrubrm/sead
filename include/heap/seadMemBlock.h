@@ -11,6 +11,8 @@ class MemBlock
 public:
     static MemBlock* FindManageArea(void* ptr);
 
+    MemBlock() : mListNode(), mHeapCheckTag(0), mOffset(0), mSize(0) {}
+
     static u32 getOffset() { return offsetof(MemBlock, mListNode); }
 
 protected:
