@@ -14,6 +14,13 @@ namespace sead
 // empty destructor drops it).
 GameFrameworkNx::~GameFrameworkNx() { ; }
 
+// 0x7100af842c
+void GameFrameworkNx::initialize(const Framework::InitializeArg& arg)
+{
+    GameFramework::initialize(arg);
+    PerformanceMgrNx::initialize();
+}
+
 // 0x7100af8fa8
 void GameFrameworkNx::procFrame_()
 {
