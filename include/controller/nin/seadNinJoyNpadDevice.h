@@ -2,6 +2,7 @@
 
 #include <nn/hid.h>
 
+#include "container/seadRingBuffer.h"
 #include "container/seadSafeArray.h"
 #include "controller/seadControlDevice.h"
 #include "controller/seadController.h"
@@ -27,7 +28,17 @@ public:
                               const nn::hid::VibrationValue& value);
 
     private:
-        u8 _fc[0x158];
+        struct Request
+        {
+            Request() {}
+            nn::hid::VibrationDeviceHandle handle;
+            nn::hid::VibrationValue value;
+        };
+        static_assert(sizeof(Request) == 0x14);
+
+        u8 _fc[4];
+        RingBuffer<Request> mRequests;
+        u8 _118[0x258 - 0x118];
         CriticalSection mCS;
     };
 

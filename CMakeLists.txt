@@ -141,6 +141,7 @@ add_library(sead OBJECT
   include/gfx/seadProjection.h
   include/gfx/seadRendering.h
   include/gfx/seadTexture.h
+  modules/src/controller/nin/seadNinJoyNpadDevice.cpp
   modules/src/gfx/nin/seadDisplayBufferNvn.cpp
   modules/src/gfx/nin/seadFrameBufferNvn.cpp
   modules/src/gfx/nin/seadGraphicsNvn.cpp
