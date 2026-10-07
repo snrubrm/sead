@@ -6,12 +6,27 @@ namespace sead
 {
 class Heap;
 
+// The memory functions that the message library (libms) is given while a message binary is opened or closed.
+// TODO: the rest of the class (the project: a message archive, 0x410+ bytes) is not declared.
+class MessageProject
+{
+public:
+    // 0x7101370060 / 0x7101370074: allocate on / free to the heap of the message set that is being opened.
+    static void* allocForLibms_(size_t size);
+    static void freeForLibms_(void* ptr);
+
+private:
+    friend class MessageSetBase;
+
+    static Heap* sHeap;
+};
+
 // Wrapper around a loaded message binary (libms, `LMS_*`). Only the parts that are used by the game are declared.
 class MessageSetBase
 {
 public:
     MessageSetBase() = default;
-    virtual ~MessageSetBase();  // 0x710136ffcc
+    virtual ~MessageSetBase();  // 0x710136ffcc (D2)
 
     // 0x710136ffd0: opens the message binary `data`; false if it is not valid.
     bool initialize(void* data, Heap* heap);

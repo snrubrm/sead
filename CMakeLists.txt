@@ -157,6 +157,7 @@ add_library(sead OBJECT
   # modules/src/gfx/seadPrimitiveRendererUtil.cpp
   modules/src/gfx/seadProjection.cpp
   modules/src/gfx/seadTextWriter.cpp
+  modules/src/message/seadMessageSet.cpp
   modules/src/gfx/seadViewport.cpp
 
   include/geom/seadCapsule.h
