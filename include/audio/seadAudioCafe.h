@@ -5,6 +5,7 @@
 #include <hostio/seadHostIONode.h>
 #include <thread/seadCriticalSection.h>
 #include <thread/seadAtomic.h>
+#include <nn/atk/SoundSystem.h>
 #include <thread/seadThread.h>
 #include <nn/atk/SoundArchivePlayer.h>
 
@@ -85,7 +86,11 @@ protected:
     virtual void initializeNw_();
 
 private:
-    u8 _10[0x9c - 0x10];
+    /// The memory that the sound library is initialised with (initializeNw_).
+    void* mSoundSystemMemory;
+    size_t mSoundSystemMemorySize;
+    nn::atk::SoundSystem::SoundSystemParam mSoundSystemParam;
+    u8 _90[0x9c - 0x90];
     bool mCompressor;
     u8 _9d[0xa0 - 0x9d];
     CriticalSection mCS;
@@ -100,7 +105,11 @@ private:
     OffsetList<ISoundFrameCallback> mSoundFrameCallbacks;
     CriticalSection mSoundFrameCallbackCS;
     AudioTaskThreadCafe* mTaskThread;
-    u8 _160[0x180 - 0x160];
+    /// Whether initialize creates the AudioTaskThreadCafe.
+    bool mUseTaskThread;
+    u8 _161[0x164 - 0x161];
+    s32 mTaskThreadPriority;
+    u8 _168[0x180 - 0x168];
     bool mIsSdkEnabled;
     u8 _181[0x188 - 0x181];
 };
