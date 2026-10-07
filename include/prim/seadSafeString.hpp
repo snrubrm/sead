@@ -262,7 +262,15 @@ inline bool SafeStringBase<T>::isEqual(const SafeStringBase<T>& str) const
     if (cstr() == str.cstr())
         return true;
 
+    // Reconstruction version boundary: Object::incrementLinkNum (0x7100d4cbf8)
+    // uses <= 0x80000 and returns false on exhaustion; AirOctaState::sub_71002FDE2C
+    // (both literal comparisons) uses < 0x80000 and returns true on exhaustion.
+    // These version labels are guesses. Keep the historical baseline by default.
+#if defined(SEAD_SAFE_STRING_COMPARE_VERSION) && SEAD_SAFE_STRING_COMPARE_VERSION == 2
+    for (s32 i = 0; i < cMaximumLength; i++)
+#else
     for (s32 i = 0; i <= cMaximumLength; i++)
+#endif
     {
         if (unsafeAt_(i) != str.unsafeAt_(i))
             return false;
@@ -271,8 +279,12 @@ inline bool SafeStringBase<T>::isEqual(const SafeStringBase<T>& str) const
             return true;
     }
 
+#if defined(SEAD_SAFE_STRING_COMPARE_VERSION) && SEAD_SAFE_STRING_COMPARE_VERSION == 2
+    return true;
+#else
     SEAD_ASSERT_MSG(false, "too long string\n");
     return false;
+#endif
 }
 
 template <typename T>
