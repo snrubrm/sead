@@ -9,6 +9,7 @@ namespace sead
 {
 class AudioFx;
 class AudioFxObject;
+class ISoundFrameCallback;
 class AudioMgr;
 class AudioResourceLoader;
 class SoundHandle;
@@ -43,6 +44,9 @@ public:
     virtual bool appendFxObject(AudioGlobal::AuxBus bus, AudioFxObject* effect) = 0;
     virtual void clearEffect(AudioGlobal::AuxBus bus, s32 unused) = 0;
     virtual bool isFinishedClearEffect(AudioGlobal::AuxBus bus) = 0;
+    virtual void appendSoundFrameCallback(ISoundFrameCallback& callback) = 0;
+    virtual void removeSoundFrameCallback(ISoundFrameCallback& callback) = 0;
+    virtual void clearSoundFrameCallback() = 0;
 };
 
 

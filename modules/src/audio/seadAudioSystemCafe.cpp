@@ -1,6 +1,8 @@
 #include <audio/seadAudioCafe.h>
 #include <nn/atk/SoundSystem.h>
 #include <nn/atk/detail/driver/HardwareManager.h>
+#include <nn/atk/detail/driver/SoundThread.h>
+#include <prim/seadScopedLock.h>
 
 namespace sead
 {
@@ -58,6 +60,56 @@ bool AudioSystemCafe::isFinishedClearEffect(AudioGlobal::AuxBus bus)
     if (mIsSdkEnabled)
         return nn::atk::SoundSystem::IsClearEffectFinished(convertAuxBus(bus), nn::atk::OutputDevice(0));
     return true;
+}
+
+// 0x7100b994c0
+void AudioSystemCafe::setHeap(Heap* heap)
+{
+    mHeap = heap;
+}
+
+// 0x7100b994c8
+void AudioSystemCafe::setCompressor(bool enable)
+{
+    ScopedLock<CriticalSection> lock(&mCS);
+    mCompressor = enable;
+}
+
+// 0x7100b99504
+void AudioSystemCafe::initializeSdk_() {}
+
+// 0x7100b99508
+void AudioSystemCafe::finalizeSdk_() {}
+
+// 0x7100b99524
+void AudioSystemCafe::appendSoundFrameCallback(ISoundFrameCallback&) {}
+
+// 0x7100b99528
+void AudioSystemCafe::removeSoundFrameCallback(ISoundFrameCallback& callback)
+{
+    if (!mIsSdkEnabled)
+        return;
+
+    {
+        ScopedLock<CriticalSection> lock(&mSoundFrameCallbackCS);
+        if (mSoundFrameCallbacks.indexOf(&callback) >= 0)
+            mSoundFrameCallbacks.erase(&callback);
+    }
+    if (mSoundFrameCallbacks.size() == 0)
+        nn::atk::detail::driver::SoundThread::GetInstance().ClearSoundFrameUserCallback();
+}
+
+// 0x7100b995c0
+void AudioSystemCafe::clearSoundFrameCallback()
+{
+    if (!mIsSdkEnabled)
+        return;
+
+    {
+        ScopedLock<CriticalSection> lock(&mSoundFrameCallbackCS);
+        mSoundFrameCallbacks.clear();
+    }
+    nn::atk::detail::driver::SoundThread::GetInstance().ClearSoundFrameUserCallback();
 }
 
 // 0x7100b992d4

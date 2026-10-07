@@ -1,6 +1,8 @@
 #pragma once
 
 #include <audio/seadAudioMgr.h>
+#include <container/seadOffsetList.h>
+#include <thread/seadCriticalSection.h>
 #include <nn/atk/SoundArchivePlayer.h>
 
 namespace sead
@@ -24,12 +26,35 @@ public:
     /// 0x7100b99454 / 0x7100b99488
     void clearEffect(AudioGlobal::AuxBus bus, s32 unused) override;
     bool isFinishedClearEffect(AudioGlobal::AuxBus bus) override;
+    /// 0x7100b99524 / 0x7100b99528 / 0x7100b995c0
+    void appendSoundFrameCallback(ISoundFrameCallback& callback) override;
+    void removeSoundFrameCallback(ISoundFrameCallback& callback) override;
+    void clearSoundFrameCallback() override;
+
+    /// 0x7100b994c0 / 0x7100b994c8
+    void setHeap(Heap* heap);
+    void setCompressor(bool enable);
 
     /// False if the sound library (nn::atk) is not used (the system then only keeps the settings).
     bool isSdkEnabled() const { return mIsSdkEnabled; }
 
+protected:
+    /// 0x7100b99504 / 0x7100b99508 / 0x7100b9950c (initializeNw_ declared only)
+    virtual void initializeSdk_();
+    virtual void finalizeSdk_();
+    virtual void initializeNw_();
+
 private:
-    u8 _8[0x180 - 0x8];
+    u8 _8[0x9c - 0x8];
+    bool mCompressor;
+    u8 _9d[0xa0 - 0x9d];
+    CriticalSection mCS;
+    u8 _e0[0xe8 - 0xe0];
+    Heap* mHeap;
+    u8 _f0[0x100 - 0xf0];
+    OffsetList<ISoundFrameCallback> mSoundFrameCallbacks;
+    CriticalSection mSoundFrameCallbackCS;
+    u8 _158[0x180 - 0x158];
     bool mIsSdkEnabled;
     u8 _181[0x188 - 0x181];
 };
