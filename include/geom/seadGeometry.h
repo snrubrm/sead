@@ -33,6 +33,11 @@ public:
     static f32 calcSquaredDistancePointToSegment(const Vector3f& point, const Segment<Vector3f>& segment,
                                                  f32* t);
 
+    // Original B20B34 is the segment-pair squared-distance entry point; original spelling is unknown.
+    // Both optional outputs receive the closest-point parameters on the respective segments.
+    static f32 sub_7100B20B34(const Segment<Vector3f>& first, const Segment<Vector3f>& second,
+                             f32* first_t, f32* second_t);
+
     static s32 calcIntersectionSegmentToPlane(const Segment<Vector3f>& segment, const Plane3<f32>& plane,
                                               f32* t);
     /// Ray parameters of the (up to two) intersections, in increasing order.

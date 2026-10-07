@@ -8,11 +8,13 @@ namespace sead
 class PtrUtil
 {
 public:
-    // XXX: these probably do not match Nintendo's implementation
+    // XXX: the remaining generic/downward routines still need original-source verification.
 
     static void* roundUpPow2(const void* ptr, u32 n)
     {
-        const uintptr_t result = uintptr_t(ptr) + (n - uintptr_t(ptr) % n) % n;
+        // DisplayList constructor b34298 and setControlMemory b342e8 independently
+        // use the original power-of-two rounding form for their control buffer.
+        const uintptr_t result = (uintptr_t(ptr) + n - 1) & ~(uintptr_t(n) - 1);
         return reinterpret_cast<void*>(result);
     }
 
