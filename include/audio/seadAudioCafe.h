@@ -2,13 +2,14 @@
 
 #include <audio/seadAudioMgr.h>
 #include <container/seadOffsetList.h>
+#include <hostio/seadHostIONode.h>
 #include <thread/seadCriticalSection.h>
 #include <nn/atk/SoundArchivePlayer.h>
 
 namespace sead
 {
 /// TODO: only the constructor is declared (0x7100b99018); the class is 0x188 bytes.
-class AudioSystemCafe : public AudioSystem
+class AudioSystemCafe : public AudioSystem, public hostio::Node
 {
     SEAD_RTTI_OVERRIDE(AudioSystemCafe, AudioSystem)
 public:
@@ -45,7 +46,7 @@ protected:
     virtual void initializeNw_();
 
 private:
-    u8 _8[0x9c - 0x8];
+    u8 _10[0x9c - 0x10];
     bool mCompressor;
     u8 _9d[0xa0 - 0x9d];
     CriticalSection mCS;

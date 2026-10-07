@@ -62,6 +62,10 @@ bool AudioSystemCafe::isFinishedClearEffect(AudioGlobal::AuxBus bus)
     return true;
 }
 
+// The body keeps the vtable pointer stores of the destructor (a defaulted or empty destructor does not store them).
+// 0x7100b99738 (D2) / 0x7100b99774 (D0)
+AudioSystemCafe::~AudioSystemCafe() { ; }
+
 // 0x7100b994c0
 void AudioSystemCafe::setHeap(Heap* heap)
 {
