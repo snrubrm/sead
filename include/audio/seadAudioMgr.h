@@ -31,6 +31,7 @@ public:
     virtual void initialize() = 0;
     virtual void finalize() = 0;
     virtual bool setOutputMode(AudioGlobal::OutputMode mode) = 0;
+    virtual AudioGlobal::OutputMode getOutputMode() const = 0;
 };
 
 
