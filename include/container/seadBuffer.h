@@ -401,22 +401,85 @@ public:
     /// Sort elements with indices in [start_idx .. end_idx] using heapsort.
     void heapSort(s32 start_idx, s32 end_idx)
     {
-        if (start_idx >= mSize || end_idx >= mSize || end_idx - start_idx < 1)
+        if (!isIndexValid(start_idx) || !isIndexValid(end_idx) || end_idx - start_idx < 1)
             return;
-        // FIXME: Nintendo implemented heap sort manually without using <algorithm>
-        std::make_heap(mBuffer + start_idx, mBuffer + end_idx);
-        std::sort_heap(mBuffer + start_idx, mBuffer + end_idx);
+
+        // The classic heapsort on 1-based heap indices.
+        T* a = mBuffer + start_idx;
+        const s32 last = end_idx - start_idx;
+        const s32 n = last + 1;
+        for (s32 i = n / 2; i >= 1; --i) {
+            const T top = a[i - 1];
+            s32 j = i;
+            while (j * 2 <= n) {
+                s32 child = j * 2;
+                if (child <= last && a[child - 1] < a[child])
+                    ++child;
+                if (!(top < a[child - 1]))
+                    break;
+                a[j - 1] = a[child - 1];
+                j = child;
+            }
+            a[j - 1] = top;
+        }
+
+        for (s32 end = n; end >= 2; --end) {
+            const T top = a[end - 1];
+            a[end - 1] = a[0];
+            s32 j = 1;
+            while (j * 2 < end) {
+                s32 child = j * 2;
+                if (child < end - 1 && a[child - 1] < a[child])
+                    ++child;
+                if (!(top < a[child - 1]))
+                    break;
+                a[j - 1] = a[child - 1];
+                j = child;
+            }
+            a[j - 1] = top;
+        }
     }
 
     /// Sort elements with indices in [start_idx .. end_idx] using heapsort.
     void heapSort(s32 start_idx, s32 end_idx, CompareCallback cmp)
     {
-        if (start_idx >= mSize || end_idx >= mSize || end_idx - start_idx < 1)
+        if (!isIndexValid(start_idx) || !isIndexValid(end_idx) || end_idx - start_idx < 1)
             return;
-        // FIXME: Nintendo implemented heap sort manually without using <algorithm>
-        const auto cmp_ = [cmp](const T& a, const T& b) { return cmp(&a, &b) < 0; };
-        std::make_heap(mBuffer + start_idx, mBuffer + end_idx, cmp_);
-        std::sort_heap(mBuffer + start_idx, mBuffer + end_idx, cmp_);
+
+        // The classic heapsort on 1-based heap indices.
+        T* a = mBuffer + start_idx;
+        const s32 last = end_idx - start_idx;
+        const s32 n = last + 1;
+        for (s32 i = n / 2; i >= 1; --i) {
+            const T top = a[i - 1];
+            s32 j = i;
+            while (j * 2 <= n) {
+                s32 child = j * 2;
+                if (child <= last && cmp(&a[child - 1], &a[child]) < 0)
+                    ++child;
+                if (!(cmp(&top, &a[child - 1]) < 0))
+                    break;
+                a[j - 1] = a[child - 1];
+                j = child;
+            }
+            a[j - 1] = top;
+        }
+
+        for (s32 end = n; end >= 2; --end) {
+            const T top = a[end - 1];
+            a[end - 1] = a[0];
+            s32 j = 1;
+            while (j * 2 < end) {
+                s32 child = j * 2;
+                if (child < end - 1 && cmp(&a[child - 1], &a[child]) < 0)
+                    ++child;
+                if (!(cmp(&top, &a[child - 1]) < 0))
+                    break;
+                a[j - 1] = a[child - 1];
+                j = child;
+            }
+            a[j - 1] = top;
+        }
     }
 
 protected:

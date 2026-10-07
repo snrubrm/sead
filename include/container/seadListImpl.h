@@ -59,6 +59,33 @@ protected:
                                                   cmp);
     }
 
+    /// Insertion sort: every node (starting with the second one) that is "greater" than its predecessor
+    /// (`cmp(predecessor, node) > 0`) is moved in front of the nodes that are greater than it.
+    /// The name is a guess (the binary has this loop inlined in its users).
+    template <class T, class ComparePredicate>
+    void insertionSort(s32 offset, const ComparePredicate& cmp)
+    {
+        if (size() < 2)
+            return;
+
+        ListNode* node = nth(1);
+        while (node != &mStartEnd) {
+            ListNode* prev = node->mPrev;
+            ListNode* next = node->mNext;
+            const T* obj = reinterpret_cast<const T*>(reinterpret_cast<const u8*>(node) - offset);
+            if (cmp(reinterpret_cast<const T*>(reinterpret_cast<const u8*>(prev) - offset), obj) > 0) {
+                ListNode* pos = prev->mPrev;
+                while (pos != &mStartEnd &&
+                       cmp(reinterpret_cast<const T*>(reinterpret_cast<const u8*>(pos) - offset), obj) > 0) {
+                    pos = pos->mPrev;
+                }
+                node->erase_();
+                pos->insertBack_(node);
+            }
+            node = next;
+        }
+    }
+
     void pushBack(ListNode* item)
     {
         mStartEnd.insertFront_(item);

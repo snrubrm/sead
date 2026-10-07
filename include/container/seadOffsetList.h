@@ -87,6 +87,12 @@ public:
 
     void sort() { sort(compareT); }
     void sort(CompareCallback cmp) { ListImpl::sort<T>(mOffset, cmp); }
+    /// Insertion sort with a predicate: `cmp(a, b) > 0` means that `a` has to come after `b`.
+    template <class ComparePredicate>
+    void insertionSort(const ComparePredicate& cmp)
+    {
+        ListImpl::insertionSort<T>(mOffset, cmp);
+    }
     void mergeSort() { mergeSort(compareT); }
     void mergeSort(CompareCallback cmp) { ListImpl::mergeSort<T>(mOffset, cmp); }
 
