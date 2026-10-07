@@ -1,6 +1,7 @@
 #pragma once
 
 #include <audio/seadAudioMgr.h>
+#include <nn/atk/SoundArchivePlayer.h>
 
 namespace sead
 {
@@ -15,14 +16,18 @@ public:
     void initialize() override;
     void finalize() override;
 
+    /// False if the sound library (nn::atk) is not used (the system then only keeps the settings).
+    bool isSdkEnabled() const { return mIsSdkEnabled; }
+
 private:
-    u8 _8[0x188 - 0x8];
+    u8 _8[0x180 - 0x8];
+    bool mIsSdkEnabled;
+    u8 _181[0x188 - 0x181];
 };
 static_assert(sizeof(AudioSystemCafe) == 0x188);
 
-/// TODO: only the constructor is declared (0x7100bb82b4); the class is 0x3c8 bytes (it also derives from the sound
-/// library's SoundStartable at offset 8).
-class AudioPlayerCafe : public AudioPlayer
+/// TODO: only the constructor is declared (0x7100bb82b4); the class is 0x3c8 bytes.
+class AudioPlayerCafe : public AudioPlayer, public nn::atk::SoundArchivePlayer
 {
     SEAD_RTTI_OVERRIDE(AudioPlayerCafe, AudioPlayer)
 public:
@@ -39,7 +44,9 @@ public:
     void unpauseAll(s32 frames);
 
 private:
-    u8 _8[0x3c8 - 0x8];
+    u8 _2f0[0x310 - 0x2f0];
+    bool mIsPaused;
+    u8 _311[0x3c8 - 0x311];
 };
 static_assert(sizeof(AudioPlayerCafe) == 0x3c8);
 
