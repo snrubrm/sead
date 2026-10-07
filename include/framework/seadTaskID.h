@@ -46,6 +46,11 @@ public:
 
     TaskBase* create(const TaskConstructArg& arg) const;
 
+    /// The game registers the creators of the tasks that are identified by a number / a name (data symbols have the
+    /// names of the members, the addresses are the ones of the original).
+    static TaskBase* (*sCreateFromInt)(s32, const TaskConstructArg&);
+    static TaskBase* (*sCreateFromString)(const char*, const TaskConstructArg&);
+
 public:
     Type mType = Type::cInvalid;
     union

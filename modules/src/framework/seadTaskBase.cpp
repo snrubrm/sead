@@ -5,6 +5,26 @@
 
 namespace sead
 {
+// 0x7100afcc00
+TaskBase* TaskClassID::create(const TaskConstructArg& arg) const
+{
+    switch (mType)
+    {
+    case Type::cInt:
+        if (sCreateFromInt)
+            return sCreateFromInt(mID.mInt, arg);
+        return nullptr;
+    case Type::cFactory:
+        return mID.mFactory(arg);
+    case Type::cString:
+        if (sCreateFromString)
+            return sCreateFromString(mID.mString, arg);
+        return nullptr;
+    default:
+        return nullptr;
+    }
+}
+
 TaskBase::CreateArg::CreateArg() = default;
 
 TaskBase::CreateArg::CreateArg(const TaskClassID& factory) : factory(factory) {}
