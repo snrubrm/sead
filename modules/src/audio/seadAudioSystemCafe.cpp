@@ -141,6 +141,17 @@ void AudioSystemCafe::initializeSdk_() {}
 // 0x7100b99508
 void AudioSystemCafe::finalizeSdk_() {}
 
+// 0x7100b9950c
+void AudioSystemCafe::initializeNw_()
+{
+    if (mIsSdkEnabled)
+    {
+        const uintptr_t memory = reinterpret_cast<uintptr_t>(mSoundSystemMemory);
+        const size_t size = mSoundSystemMemorySize;
+        nn::atk::SoundSystem::Initialize(mSoundSystemParam, memory, size);
+    }
+}
+
 // 0x7100b99524
 void AudioSystemCafe::appendSoundFrameCallback(ISoundFrameCallback&) {}
 
