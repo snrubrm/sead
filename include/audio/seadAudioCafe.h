@@ -16,7 +16,7 @@ class AudioTask
 {
 public:
     /// `is_quitting`: the thread is quitting.
-    virtual void run(bool is_quitting) = 0;
+    virtual void taskThreadProc_(bool is_quitting) = 0;
 
     /// The number of times the task was sent to a thread and has not been run yet.
     Atomic<s32> mNumPending;
@@ -48,7 +48,20 @@ private:
 };
 static_assert(sizeof(AudioTaskThreadCafe) == 0x108);
 
-/// TODO: only the constructor is declared (0x7100b99018); the class is 0x188 bytes.
+/// The control of the virtual surround of the DRC (purpose of the class is not known: it is an AudioTask that does
+/// nothing).
+class AudioDrcVsCtrlCafe : public hostio::Node, public AudioTask
+{
+public:
+    AudioDrcVsCtrlCafe() = default;
+    virtual ~AudioDrcVsCtrlCafe();
+
+    /// 0x7100b997c0
+    void taskThreadProc_(bool is_quitting) override;
+};
+static_assert(sizeof(AudioDrcVsCtrlCafe) == 0x18);
+
+/// The audio system of the Cafe sound library (nn::atk).
 class AudioSystemCafe : public AudioSystem, public hostio::Node
 {
     SEAD_RTTI_OVERRIDE(AudioSystemCafe, AudioSystem)
@@ -90,13 +103,16 @@ private:
     void* mSoundSystemMemory;
     size_t mSoundSystemMemorySize;
     nn::atk::SoundSystem::SoundSystemParam mSoundSystemParam;
-    u8 _90[0x9c - 0x90];
+    u32 _90;
+    u32 _94;
+    u32 _98;
     bool mCompressor;
     u8 _9d[0xa0 - 0x9d];
     CriticalSection mCS;
     /// Whether the sound library is shut down by someone else (finalize then only frees the memory).
     bool mIsExternal;
-    u8 _e1[0xe8 - 0xe1];
+    u8 _e1[0xe4 - 0xe1];
+    u32 _e4;
     Heap* mHeap;
     /// The memory of the sound library.
     u8* mSoundMemory;
@@ -109,7 +125,7 @@ private:
     bool mUseTaskThread;
     u8 _161[0x164 - 0x161];
     s32 mTaskThreadPriority;
-    u8 _168[0x180 - 0x168];
+    AudioDrcVsCtrlCafe mDrcVsCtrl;
     bool mIsSdkEnabled;
     u8 _181[0x188 - 0x181];
 };

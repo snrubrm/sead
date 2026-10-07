@@ -29,6 +29,24 @@ inline nn::atk::AuxBus convertAuxBus(AudioGlobal::AuxBus bus)
 }
 }  // namespace
 
+// 0x7100b997b8 (D2) / 0x7100b997bc (D0)
+AudioDrcVsCtrlCafe::~AudioDrcVsCtrlCafe() = default;
+
+// 0x7100b997c0 (and the thunk 0x7100b997c4)
+void AudioDrcVsCtrlCafe::taskThreadProc_(bool) {}
+
+// NON_MATCHING: same stores; the original writes the two flags at 0x94 / 0x98 after the constructor of the first
+// critical section and sets up the callback list with one pair store.
+// 0x7100b99018
+AudioSystemCafe::AudioSystemCafe()
+    : mSoundSystemMemory(nullptr), mSoundSystemMemorySize(0), mSoundSystemParam(), _90(0), _94(1), _98(1),
+      mCompressor(true), mCS(), mIsExternal(true), _e4(0), mHeap(nullptr), mSoundMemory(nullptr), mIsInitialized(false),
+      mSoundFrameCallbacks(), mSoundFrameCallbackCS(), mTaskThread(nullptr), mUseTaskThread(false),
+      mTaskThreadPriority(Thread::cDefaultPriority + 1), mDrcVsCtrl(), mIsSdkEnabled(true)
+{
+    mSoundFrameCallbacks.initOffset(8);
+}
+
 // NON_MATCHING: same logic; the original sets the false result and a copy of `this` first, before the checks
 // (here each early exit sets its own result).
 // 0x7100b99284

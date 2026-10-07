@@ -31,7 +31,7 @@ void AudioTaskThreadCafe::calc_(MessageQueue::Element msg)
             mCallback->beforeMessage();
 
         auto* task = reinterpret_cast<AudioTask*>(msg);
-        task->run(mState == State::cQuitting);
+        task->taskThreadProc_(mState == State::cQuitting);
         task->mNumPending.decrement();
 
         if (mCallback)
