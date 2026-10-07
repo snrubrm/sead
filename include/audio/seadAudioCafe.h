@@ -89,12 +89,18 @@ private:
     bool mCompressor;
     u8 _9d[0xa0 - 0x9d];
     CriticalSection mCS;
-    u8 _e0[0xe8 - 0xe0];
+    /// Whether the sound library is shut down by someone else (finalize then only frees the memory).
+    bool mIsExternal;
+    u8 _e1[0xe8 - 0xe1];
     Heap* mHeap;
-    u8 _f0[0x100 - 0xf0];
+    /// The memory of the sound library.
+    u8* mSoundMemory;
+    bool mIsInitialized;
+    u8 _f9[0x100 - 0xf9];
     OffsetList<ISoundFrameCallback> mSoundFrameCallbacks;
     CriticalSection mSoundFrameCallbackCS;
-    u8 _158[0x180 - 0x158];
+    AudioTaskThreadCafe* mTaskThread;
+    u8 _160[0x180 - 0x160];
     bool mIsSdkEnabled;
     u8 _181[0x188 - 0x181];
 };

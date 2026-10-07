@@ -103,6 +103,31 @@ void AudioTaskThreadCafe::calc_(MessageQueue::Element msg)
     }
 }
 
+// 0x7100b991f8
+void AudioSystemCafe::finalize()
+{
+    if (mIsInitialized)
+    {
+        if (!mIsExternal)
+        {
+            if (mTaskThread)
+                mTaskThread->quitAndWaitDoneSingleThread(false);
+            if (mIsSdkEnabled)
+                nn::atk::SoundSystem::Finalize();
+            finalizeSdk_();
+        }
+        if (mSoundMemory)
+            delete[] mSoundMemory;
+        mSoundMemory = nullptr;
+        if (mTaskThread)
+        {
+            delete mTaskThread;
+            mTaskThread = nullptr;
+        }
+        mIsInitialized = false;
+    }
+}
+
 // 0x7100b994c0
 void AudioSystemCafe::setHeap(Heap* heap)
 {
