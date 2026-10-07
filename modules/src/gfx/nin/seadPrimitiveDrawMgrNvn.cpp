@@ -1,5 +1,7 @@
 #include "gfx/nin/seadPrimitiveDrawMgrNvn.h"
 #include <nvn/nvn_FuncPtrInline.h>
+#include "filedevice/seadFileDevice.h"
+#include "filedevice/seadFileDeviceMgr.h"
 #include "gfx/seadDrawContext.h"
 #include "math/seadMatrix.hpp"
 #include "math/seadMatrixCalcCommon.hpp"
@@ -14,6 +16,19 @@ PrimitiveDrawMgrNvn::PrimitiveDrawMgrNvn() : _7b0(nullptr), mUniformBlockBuffer(
 }
 
 PrimitiveDrawMgrNvn::~PrimitiveDrawMgrNvn() = default;
+
+// 0x7100b02108
+void PrimitiveDrawMgrNvn::prepareImpl(Heap* heap, const SafeString& path)
+{
+    FileDevice::LoadArg arg;
+    arg.path = path;
+    arg.heap = heap;
+    arg.alignment = 0x1000;
+    arg.buffer_size_alignment = 0x1000;
+
+    const void* file = FileDeviceMgr::instance()->tryLoad(arg);
+    prepareFromBinaryImpl(heap, file, arg.read_size);
+}
 
 // NON_MATCHING: the projection * camera multiplication is inlined (vectorised) in the original; here it stays a call
 // 0x7100b021d8
