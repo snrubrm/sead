@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <math/seadMathCalcCommon.h>
 #include "basis/seadNew.h"
 #include "basis/seadRawPrint.h"
 #include "basis/seadTypes.h"
@@ -16,6 +17,19 @@ class ObjList : public ListImpl
 public:
     ObjList() = default;
     ObjList(s32 max_num, void* buf) { setBuffer(max_num, buf); }
+
+    // Original assignment38520C clears and copies up to the destination capacity.
+    ObjList& operator=(const ObjList& other)
+    {
+        if (this == &other)
+            return *this;
+        s32 remaining = Mathi::min(mMaxNum, other.size());
+        clear();
+        const T* item = other.front();
+        for (; remaining > 0 && item; --remaining, item = other.next(item))
+            emplaceBack(*item);
+        return *this;
+    }
 
     void allocBuffer(s32 capacity, Heap* heap, s32 alignment = sizeof(void*))
     {
@@ -230,6 +244,16 @@ class FixedObjList : public ObjList<T>
 {
 public:
     FixedObjList() : ObjList<T>(N, &mWork) {}
+    // Original callers4B697C and45F9F4 construct fresh storage before deep assignment.
+    FixedObjList(const FixedObjList& other) : ObjList<T>(N, &mWork)
+    {
+        ObjList<T>::operator=(other);
+    }
+    FixedObjList& operator=(const FixedObjList& other)
+    {
+        ObjList<T>::operator=(other);
+        return *this;
+    }
 
     // These do not make sense for a *fixed* array.
     void setBuffer(s32 ptrNumMax, void* buf) = delete;
