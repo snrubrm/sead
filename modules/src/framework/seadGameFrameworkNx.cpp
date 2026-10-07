@@ -1,5 +1,9 @@
 #include <framework/nx/seadGameFrameworkNx.h>
 #include <framework/nx/seadPerformanceMgrNx.h>
+#include <framework/seadSingleScreenMethodTreeMgr.h>
+#include <gfx/nin/seadDisplayBufferNvn.h>
+#include <nn/os.h>
+#include <time/seadTickSpan.h>
 
 namespace sead
 {
@@ -24,6 +28,20 @@ void GameFrameworkNx::presentAsync_(Thread*, long)
 void GameFrameworkNx::requestChangeUseGPU(bool use_gpu)
 {
     mUseGPURequest = use_gpu ? 1 : 2;
+}
+
+// 0x7100af8f18
+void GameFrameworkNx::runImpl_()
+{
+    waitStartDisplayLoop_();
+    mPrevFrameTick = nn::os::GetSystemTick().value;
+    mainLoop_();
+}
+
+// 0x7100af8f54
+MethodTreeMgr* GameFrameworkNx::createMethodTreeMgr_(Heap* heap)
+{
+    return new (heap, 8) SingleScreenMethodTreeMgr;
 }
 
 // 0x7100af8f14
@@ -52,6 +70,19 @@ LogicalFrameBuffer* GameFrameworkNx::getMethodLogicalFrameBuffer(int method) con
 {
     return method >= 2 && method <= 4 ? const_cast<LogicalFrameBuffer*>(&mMethodLogicalFrameBuffer) :
                                         nullptr;
+}
+
+// 0x7100af9520
+void GameFrameworkNx::swapBuffer_()
+{
+    if (mDisplayStarted == 2)
+        mDisplayBuffer->presentTextureAndAcquireNext();
+}
+
+// 0x7100af9a34
+float GameFrameworkNx::calcFps()
+{
+    return static_cast<f32>(TickSpan::makeFromSeconds(1).toS64()) / static_cast<f32>(static_cast<s64>(mFrameDuration));
 }
 
 // 0x7100af9a60

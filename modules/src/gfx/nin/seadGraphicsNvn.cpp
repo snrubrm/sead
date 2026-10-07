@@ -74,6 +74,13 @@ void GraphicsNvn::setScissorImpl(f32, f32, f32, f32) {}
 void GraphicsNvn::setDepthTestEnableImpl(bool) {}
 void GraphicsNvn::setDepthWriteEnableImpl(bool) {}
 void GraphicsNvn::setDepthFuncImpl(Graphics::DepthFunc) {}
+// 0x7100b00fe4
+bool GraphicsNvn::setVBlankWaitIntervalImpl(u32 interval)
+{
+    mVBlankWaitInterval = interval;
+    return true;
+}
+
 void GraphicsNvn::setCullingModeImpl(Graphics::CullingMode) {}
 void GraphicsNvn::setBlendEnableImpl(bool) {}
 void GraphicsNvn::setBlendEnableMRTImpl(u32, bool) {}

@@ -50,7 +50,7 @@ public:
     virtual void setDepthTestEnableImpl(bool) = 0;
     virtual void setDepthWriteEnableImpl(bool) = 0;
     virtual void setDepthFuncImpl(Graphics::DepthFunc) = 0;
-    virtual void setVBlankWaitIntervalImpl(u32) = 0;
+    virtual bool setVBlankWaitIntervalImpl(u32) = 0;
     virtual void setCullingModeImpl(Graphics::CullingMode) = 0;
     virtual void setBlendEnableImpl(bool) = 0;
     virtual void setBlendEnableMRTImpl(u32, bool) = 0;

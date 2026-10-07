@@ -49,14 +49,12 @@ private:
     Projection* mProjection;
     Camera* mCamera;
     FontBase* mFont;
-    sead::Vector2i mCursor;
+    Vector2f mCursor;
     Vector2f mScale;
     Color4f mColor;
     int _48;
     float mLineSpace;
     BoundBox2f mBoundBox2;
-    float _60;
-    int _64;
     char16_t* mFormatBuffer;
     int mFormatBufferSize;
     bool mEndedDrawing;

@@ -59,7 +59,7 @@ public:
     void setDepthTestEnableImpl(bool) override;
     void setDepthWriteEnableImpl(bool) override;
     void setDepthFuncImpl(Graphics::DepthFunc) override;
-    void setVBlankWaitIntervalImpl(u32) override;
+    bool setVBlankWaitIntervalImpl(u32) override;
     void setCullingModeImpl(Graphics::CullingMode) override;
     void setBlendEnableImpl(bool) override;
     void setBlendEnableMRTImpl(u32, bool) override;
