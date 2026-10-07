@@ -18,6 +18,33 @@ Viewport::Viewport(float left, float top, float width, float height)
 {
 }
 
+// 0x7100b2008c (the constructor inlines setByFrameBuffer)
+Viewport::Viewport(const LogicalFrameBuffer& buffer)
+    : mDevicePosture(Graphics::sDefaultDevicePosture), mMinDepth(0.0f), mMaxDepth(1.0f)
+{
+    setByFrameBuffer(buffer);
+}
+
+void Viewport::setByFrameBuffer(const LogicalFrameBuffer& buffer)
+{
+    const Vector2f& size = buffer.getVirtualSize();
+    switch (mDevicePosture)
+    {
+    case Graphics::cDevicePosture_Same:
+    case Graphics::cDevicePosture_FlipX:
+    case Graphics::cDevicePosture_FlipY:
+    case Graphics::cDevicePosture_FlipXY:
+        set(0.0f, 0.0f, size.x, size.y);
+        break;
+    case Graphics::cDevicePosture_RotateRight:
+    case Graphics::cDevicePosture_RotateLeft:
+        set(0.0f, 0.0f, size.y, size.x);
+        break;
+    default:
+        break;
+    }
+}
+
 Viewport::~Viewport() = default;
 
 // NON_MATCHING: equivalent projection, with different input and bounds load scheduling.
