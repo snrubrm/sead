@@ -162,7 +162,11 @@ add_library(sead OBJECT
 
   include/geom/seadCapsule.h
   include/geom/seadGeometry.h
+  include/geom/seadLine.h
+  include/geom/seadPlane.h
+  include/geom/seadRay.h
   include/geom/seadSegment.h
+  include/geom/seadSphere.h
   modules/src/geom/seadGeometry.cpp
 
   include/heap/seadArena.h
