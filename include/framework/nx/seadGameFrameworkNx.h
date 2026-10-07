@@ -116,7 +116,7 @@ private:
     u8 _209;
     /// Two flag bits; the GPU time stamps are converted unless both are set.
     u8 mGpuTimeStampFlags;
-    u8 _20b;
+    u8 mUseGPU;
     /// 1: use the GPU, 2: do not (requestChangeUseGPU).
     u8 mUseGPURequest;
 };

@@ -1,6 +1,7 @@
 #include <framework/nx/seadGameFrameworkNx.h>
 #include <framework/nx/seadPerformanceMgrNx.h>
 #include <framework/seadSingleScreenMethodTreeMgr.h>
+#include <framework/seadTaskMgr.h>
 #include <gfx/nin/seadDisplayBufferNvn.h>
 #include <gfx/nin/seadGraphicsNvn.h>
 #include <nn/os.h>
@@ -12,6 +13,49 @@ namespace sead
 // The body keeps the store of the GameFrameworkNx vtable pointer before the tail call to ~GameFramework (a defaulted or
 // empty destructor drops it).
 GameFrameworkNx::~GameFrameworkNx() { ; }
+
+// 0x7100af8fa8
+void GameFrameworkNx::procFrame_()
+{
+    if ((mGpuTimeStampFlags & 3) != 1)
+    {
+        if (mUseGPURequest != 0)
+        {
+            if (mUseGPURequest == 1)
+                mUseGPU = 1;
+            else if (mUseGPURequest == 2)
+                mUseGPU = 0;
+            mUseGPURequest = 0;
+        }
+
+        if (mDisplayStarted == 1)
+            mDisplayStarted = 2;
+    }
+
+    mTaskMgr->afterCalc();
+    procDraw_();
+    procCalc_();
+    procReset_();
+    waitForGpuDone_();
+    nn::os::GetSystemTick();
+    setGpuTimeStamp_();
+
+    if ((mGpuTimeStampFlags & 3) != 3)
+    {
+        mFrameDuration = nn::os::GetSystemTick().value - mPrevFrameTick;
+        mPrevFrameTick = nn::os::GetSystemTick().value;
+    }
+
+    if (mGpuTimeStampFlags & 1)
+        mGpuTimeStampFlags ^= 2;
+}
+
+// 0x7100af9380
+void GameFrameworkNx::procCalc_()
+{
+    mTaskMgr->beforeCalc();
+    DynamicCast<SingleScreenMethodTreeMgr>(mMethodTreeMgr)->calc();
+}
 
 // 0x7100af9828
 void GameFrameworkNx::setGpuTimeStamp_()
