@@ -13,7 +13,16 @@ class SoundHandle;
 class AudioSettingParameter;
 class Heap;
 
-/// The low level audio system (the sound library). TODO: only the virtual functions that the AudioMgr calls.
+struct AudioGlobal
+{
+    /// The names of the values are not known (aal::Settings converts its output mode with the table {1, 0, 2}; 4 is
+    /// returned for values that are out of range).
+    enum OutputMode : u32
+    {
+    };
+};
+
+/// The low level audio system (the sound library). TODO: only the virtual functions up to setOutputMode.
 class AudioSystem
 {
     SEAD_RTTI_BASE(AudioSystem)
@@ -21,7 +30,9 @@ public:
     virtual ~AudioSystem() = default;
     virtual void initialize() = 0;
     virtual void finalize() = 0;
+    virtual bool setOutputMode(AudioGlobal::OutputMode mode) = 0;
 };
+
 
 /// Plays the sounds. The base class does nothing (no sound can be started).
 class AudioPlayer

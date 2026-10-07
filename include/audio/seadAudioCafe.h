@@ -15,6 +15,8 @@ public:
 
     void initialize() override;
     void finalize() override;
+    /// 0x7100b99284 (declared only)
+    bool setOutputMode(AudioGlobal::OutputMode mode) override;
 
     /// False if the sound library (nn::atk) is not used (the system then only keeps the settings).
     bool isSdkEnabled() const { return mIsSdkEnabled; }
