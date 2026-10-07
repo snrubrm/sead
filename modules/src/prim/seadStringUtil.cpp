@@ -1,4 +1,5 @@
 #include <prim/seadStringUtil.h>
+#include <limits.h>
 
 namespace sead::StringUtil
 {
@@ -100,3 +101,55 @@ char16 replace(char16 c, const Buffer<const Char16Pair>& sorted_table)
     return sorted_table[idx].after;
 }
 }  // namespace sead::StringUtil
+
+namespace sead::StringUtil
+{
+s32 vsnprintf(char* s, size_t n, const char* format, va_list args) {
+    if (!n)
+        return -1;
+    const s32 result = ::vsnprintf(s, n, format, args);
+    if (result < 0 || size_t(result) >= n)
+        s[n - 1] = SafeString::cNullChar;
+    return size_t(result) < n ? result : s32(n - 1);
+}
+// NON_MATCHING: output-count registers and capacity-exhaustion scheduling differ.
+s32 convertUtf8ToUtf16(char16* dst, u32 dst_len, const char* src, s32 src_len) {
+    size_t written = 0;
+    if (!dst_len || src_len < -1)
+        return written;
+    if (src_len == -1)
+        src_len = INT_MAX;
+    s32 read = 0;
+    while (src_len > read) {
+        const char* current = src + read;
+        u32 codepoint = u8(*current);
+        if (!codepoint)
+            break;
+        s32 bytes = 1;
+        if (codepoint & 0x80) {
+            if ((codepoint & 0xe0) == 0xc0) {
+                if (!current[1])
+                    break;
+                codepoint = ((codepoint & 0x1f) << 6) | (u8(current[1]) & 0x3f);
+                bytes = 2;
+            } else if ((codepoint & 0xf0) == 0xe0) {
+                if (!current[1] || !current[2])
+                    break;
+                codepoint = (codepoint << 12) | ((u8(current[1]) & 0x3f) << 6) |
+                            (u8(current[2]) & 0x3f);
+                bytes = 3;
+            } else {
+                break;
+            }
+        }
+        dst[written++] = codepoint;
+        read += bytes;
+        if (written >= dst_len) {
+            --written;
+            break;
+        }
+    }
+    dst[written] = 0;
+    return written;
+}
+}
