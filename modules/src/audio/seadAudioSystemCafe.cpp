@@ -86,6 +86,23 @@ bool AudioTaskThreadCafe::start()
     return Thread::start();
 }
 
+// 0x7100b99968
+void AudioTaskThreadCafe::calc_(MessageQueue::Element msg)
+{
+    if (msg)
+    {
+        if (mCallback)
+            mCallback->beforeMessage();
+
+        auto* task = reinterpret_cast<AudioTask*>(msg);
+        task->run(mState == State::cQuitting);
+        task->mNumPending.decrement();
+
+        if (mCallback)
+            mCallback->afterMessage();
+    }
+}
+
 // 0x7100b994c0
 void AudioSystemCafe::setHeap(Heap* heap)
 {

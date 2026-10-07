@@ -4,11 +4,32 @@
 #include <container/seadOffsetList.h>
 #include <hostio/seadHostIONode.h>
 #include <thread/seadCriticalSection.h>
+#include <thread/seadAtomic.h>
 #include <thread/seadThread.h>
 #include <nn/atk/SoundArchivePlayer.h>
 
 namespace sead
 {
+/// A task of the AudioTaskThreadCafe (a message of the thread is a pointer to the task).
+class AudioTask
+{
+public:
+    /// `is_quitting`: the thread is quitting.
+    virtual void run(bool is_quitting) = 0;
+
+    /// The number of times the task was sent to a thread and has not been run yet.
+    Atomic<s32> mNumPending;
+};
+
+/// Is called by the AudioTaskThreadCafe around every message (purpose unknown).
+class AudioTaskThreadCallback
+{
+public:
+    virtual ~AudioTaskThreadCallback() = default;
+    virtual void beforeMessage() = 0;
+    virtual void afterMessage() = 0;
+};
+
 /// The thread that the audio system runs its tasks on.
 class AudioTaskThreadCafe : public Thread
 {
@@ -22,8 +43,7 @@ protected:
     void calc_(MessageQueue::Element msg) override;
 
 private:
-    /// Called before and after each task (purpose unknown).
-    void* mTaskCallback = nullptr;
+    AudioTaskThreadCallback* mCallback = nullptr;
 };
 static_assert(sizeof(AudioTaskThreadCafe) == 0x108);
 
