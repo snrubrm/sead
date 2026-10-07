@@ -2,29 +2,14 @@
 #include <cstring>
 
 #include <gfx/seadPrimitiveRendererUtil.h>
+#include <math/seadMathCalcCommon.h>
 #include <prim/seadMemUtil.h>
 
 namespace sead
 {
-namespace PrimitiveRendererUtil
+namespace PrimitiveDrawUtil
 {
-void setQuadVertex(Vertex* vtx, u16* idx)
-{
-    static const Vertex cVtx[4] = {
-        Vertex(Vector3f(-0.5f, 0.5f, 0.0f), Vector2f(0.0f, 1.0f), Color4f(0.0f, 0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, 0.5f, 0.0f), Vector2f(1.0f, 1.0f), Color4f(0.0f, 0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(-0.5f, -0.5f, 0.0f), Vector2f(0.0f, 0.0f), Color4f(1.0f, 0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, -0.5f, 0.0f), Vector2f(1.0f, 0.0f), Color4f(1.0f, 0.0f, 0.0f, 0.0f))};
-
-    static const u16 cIdx[6] = {0, 2, 1, 1, 2, 3};
-
-    if (vtx != NULL)
-        MemUtil::copy(vtx, cVtx, sizeof(cVtx));
-
-    if (idx != NULL)
-        MemUtil::copy(idx, cIdx, sizeof(cIdx));
-}
-
+// NON_MATCHING: the original stores the constants of the static vertices with 64-bit stores (merged); here every float is stored on its own.
 void setLineVertex(Vertex* vtx, u16* idx)
 {
     static const Vertex cVtx[2] = {
@@ -40,6 +25,7 @@ void setLineVertex(Vertex* vtx, u16* idx)
         MemUtil::copy(idx, cIdx, sizeof(cIdx));
 }
 
+// NON_MATCHING: same difference as setLineVertex.
 void setCubeVertex(Vertex* vtx, u16* idx)
 {
     static const Vertex cVtx[8] = {
@@ -87,7 +73,7 @@ void setSphereVertex(Vertex* vtx, u16* idx, s32 x, s32 y)
     {
         for (s32 i = 0; i < y; i++)
         {
-            f32 angle_y = ((i + 1) / (y + 1.0f) - 0.5f) * M_PI;
+            f32 angle_y = ((i + 1) / (y + 1.0f) - 0.5f) * Mathf::pi();
 
             f32 pos_y = sinf(angle_y) * 0.5f;
             f32 radius = cosf(angle_y) * 0.5f;
@@ -95,9 +81,9 @@ void setSphereVertex(Vertex* vtx, u16* idx, s32 x, s32 y)
             for (s32 j = 0; j < x; j++)
             {
                 s32 pos = i * x + j;
-                f32 angle_x = (M_PI * 2.0f) * j / x;
+                f32 angle_x = (Mathf::pi() * 2.0f) * j / x;
                 if (i % 2 == 0)
-                    angle_x -= (M_PI * 2.0f) / x / 2;
+                    angle_x -= (Mathf::pi() * 2.0f) / x / 2;
 
                 f32 pos_x = cosf(angle_x) * radius;
                 f32 pos_z = sinf(angle_x) * radius;
@@ -176,7 +162,7 @@ void setDiskVertex(Vertex* vtx, u16* idx, s32 div)
     {
         for (s32 i = 0; i < div; i++)
         {
-            f32 angle = (M_PI * 2.0f) * i / div;
+            f32 angle = (Mathf::pi() * 2.0f) * i / div;
 
             vtx[i].pos.x = cosf(angle) * 0.5f;
             vtx[i].pos.y = sinf(angle) * 0.5f;
@@ -207,13 +193,14 @@ void setDiskVertex(Vertex* vtx, u16* idx, s32 div)
         }
 }
 
+// NON_MATCHING: the original hoists `div + 1` out of the vertex loop (and keeps it in a register for the index loops).
 void setCylinderVertex(Vertex* vtx, u16* idx, s32 div)
 {
     if (vtx != NULL)
     {
         for (s32 i = 0; i < div; i++)
         {
-            f32 angle = (M_PI * 2.0f) * i / div;
+            f32 angle = (Mathf::pi() * 2.0f) * i / div;
 
             vtx[i].pos.x = cosf(angle) * 0.5f;
             vtx[i].pos.z = -sinf(angle) * 0.5f;
@@ -283,5 +270,5 @@ void setCylinderVertex(Vertex* vtx, u16* idx, s32 div)
     }
 }
 
-}  // namespace PrimitiveRendererUtil
+}  // namespace PrimitiveDrawUtil
 }  // namespace sead

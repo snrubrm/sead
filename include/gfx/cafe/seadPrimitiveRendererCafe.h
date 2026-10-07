@@ -56,10 +56,10 @@ public:
     virtual ~PrimitiveRendererCafe() {}
 
     void drawTriangles_(const Matrix34f& model_mtx, const Color4f& c0, const Color4f& c1,
-                        PrimitiveRendererUtil::Vertex* vtx, u32 vtx_num, u16* idx, u32 idx_num,
+                        PrimitiveDrawUtil::Vertex* vtx, u32 vtx_num, u16* idx, u32 idx_num,
                         const GX2Texture* tex);
     void drawLines_(const Matrix34f& model_mtx, const Color4f& c0, const Color4f& c1,
-                    PrimitiveRendererUtil::Vertex* vtx, u32 vtx_num, u16* idx, u32 idx_num);
+                    PrimitiveDrawUtil::Vertex* vtx, u32 vtx_num, u16* idx, u32 idx_num);
 
     Matrix34f mCameraMtx;
     Matrix44f mProjectionMtx;
@@ -80,44 +80,44 @@ public:
     GX2Sampler mDrawQuadSampler;
 
     // Quad, Box
-    PrimitiveRendererUtil::Vertex* mQuadVertexBuf;
+    PrimitiveDrawUtil::Vertex* mQuadVertexBuf;
     u16* mQuadIndexBuf;
     u16* mBoxIndexBuf;
 
     // Line
-    PrimitiveRendererUtil::Vertex* mLineVertexBuf;
+    PrimitiveDrawUtil::Vertex* mLineVertexBuf;
     u16* mLineIndexBuf;
 
     // Cube
-    PrimitiveRendererUtil::Vertex* mCubeVertexBuf;
+    PrimitiveDrawUtil::Vertex* mCubeVertexBuf;
     u16* mCubeIndexBuf;
 
     // WireCube
-    PrimitiveRendererUtil::Vertex* mWireCubeVertexBuf;
+    PrimitiveDrawUtil::Vertex* mWireCubeVertexBuf;
     u16* mWireCubeIndexBuf;
 
     // SphereS
-    PrimitiveRendererUtil::Vertex* mSphereSVertexBuf;
+    PrimitiveDrawUtil::Vertex* mSphereSVertexBuf;
     u16* mSphereSIndexBuf;
 
     // SphereL
-    PrimitiveRendererUtil::Vertex* mSphereLVertexBuf;
+    PrimitiveDrawUtil::Vertex* mSphereLVertexBuf;
     u16* mSphereLIndexBuf;
 
     // DiskS, DiskL, CircleS, CircleL
-    PrimitiveRendererUtil::Vertex* mDiskSVertexBuf;
+    PrimitiveDrawUtil::Vertex* mDiskSVertexBuf;
     u16* mDiskSIndexBuf;
-    PrimitiveRendererUtil::Vertex* mDiskLVertexBuf;
+    PrimitiveDrawUtil::Vertex* mDiskLVertexBuf;
     u16* mDiskLIndexBuf;
     u16* mCircleSIndexBuf;
     u16* mCircleLIndexBuf;
 
     // CylinderS
-    PrimitiveRendererUtil::Vertex* mCylinderSVertexBuf;
+    PrimitiveDrawUtil::Vertex* mCylinderSVertexBuf;
     u16* mCylinderSIndexBuf;
 
     // CylinderL
-    PrimitiveRendererUtil::Vertex* mCylinderLVertexBuf;
+    PrimitiveDrawUtil::Vertex* mCylinderLVertexBuf;
     u16* mCylinderLIndexBuf;
 };
 

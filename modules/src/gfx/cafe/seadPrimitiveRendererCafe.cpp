@@ -60,11 +60,11 @@ void PrimitiveRendererCafe::prepareFromBinaryImpl(Heap* heap, const void* bin_da
 
     {
         // Quad
-        mQuadVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(
-            heap->alloc(4 * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mQuadVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(
+            heap->alloc(4 * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mQuadIndexBuf = static_cast<u16*>(heap->alloc(6 * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
 
-        PrimitiveRendererUtil::setQuadVertex(mQuadVertexBuf, mQuadIndexBuf);
+        PrimitiveDrawUtil::setQuadVertex(mQuadVertexBuf, mQuadIndexBuf);
         mQuadVertexBuf[0].uv.x = 0.0f;
         mQuadVertexBuf[0].uv.y = 0.0f;
         mQuadVertexBuf[1].uv.x = 1.0f;
@@ -75,7 +75,7 @@ void PrimitiveRendererCafe::prepareFromBinaryImpl(Heap* heap, const void* bin_da
         mQuadVertexBuf[3].uv.y = 1.0f;
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mQuadVertexBuf,
-                      4 * sizeof(PrimitiveRendererUtil::Vertex));
+                      4 * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mQuadIndexBuf, 6 * sizeof(u16));
     }
 
@@ -90,93 +90,93 @@ void PrimitiveRendererCafe::prepareFromBinaryImpl(Heap* heap, const void* bin_da
 
     {
         // Line
-        mLineVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(
-            heap->alloc(4 * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mLineVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(
+            heap->alloc(4 * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mLineIndexBuf = static_cast<u16*>(heap->alloc(6 * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setLineVertex(mLineVertexBuf, mLineIndexBuf);
+        PrimitiveDrawUtil::setLineVertex(mLineVertexBuf, mLineIndexBuf);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mLineVertexBuf,
-                      4 * sizeof(PrimitiveRendererUtil::Vertex));
+                      4 * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mLineIndexBuf, 6 * sizeof(u16));
     }
 
     {
         // Cube
-        mCubeVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(
-            heap->alloc(8 * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mCubeVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(
+            heap->alloc(8 * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mCubeIndexBuf =
             static_cast<u16*>(heap->alloc(36 * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setCubeVertex(mCubeVertexBuf, mCubeIndexBuf);
+        PrimitiveDrawUtil::setCubeVertex(mCubeVertexBuf, mCubeIndexBuf);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCubeVertexBuf,
-                      8 * sizeof(PrimitiveRendererUtil::Vertex));
+                      8 * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCubeIndexBuf, 36 * sizeof(u16));
     }
 
     {
         // WireCube
-        mWireCubeVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(
-            heap->alloc(8 * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mWireCubeVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(
+            heap->alloc(8 * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mWireCubeIndexBuf =
             static_cast<u16*>(heap->alloc(17 * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setWireCubeVertex(mWireCubeVertexBuf, mWireCubeIndexBuf);
+        PrimitiveDrawUtil::setWireCubeVertex(mWireCubeVertexBuf, mWireCubeIndexBuf);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mWireCubeVertexBuf,
-                      8 * sizeof(PrimitiveRendererUtil::Vertex));
+                      8 * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mWireCubeIndexBuf, 17 * sizeof(u16));
     }
 
     {
         // SphereS
-        mSphereSVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (4 * 8 + 2) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mSphereSVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (4 * 8 + 2) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mSphereSIndexBuf =
             static_cast<u16*>(heap->alloc((4 * 8 * 6) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setSphereVertex(mSphereSVertexBuf, mSphereSIndexBuf, 8, 4);
+        PrimitiveDrawUtil::setSphereVertex(mSphereSVertexBuf, mSphereSIndexBuf, 8, 4);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mSphereSVertexBuf,
-                      (4 * 8 + 2) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (4 * 8 + 2) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mSphereSIndexBuf,
                       (4 * 8 * 6) * sizeof(u16));
     }
 
     {
         // SphereL
-        mSphereLVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (8 * 16 + 2) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mSphereLVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (8 * 16 + 2) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mSphereLIndexBuf =
             static_cast<u16*>(heap->alloc((8 * 16 * 6) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setSphereVertex(mSphereLVertexBuf, mSphereLIndexBuf, 16, 8);
+        PrimitiveDrawUtil::setSphereVertex(mSphereLVertexBuf, mSphereLIndexBuf, 16, 8);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mSphereLVertexBuf,
-                      (8 * 16 + 2) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (8 * 16 + 2) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mSphereLIndexBuf,
                       (8 * 16 * 6) * sizeof(u16));
     }
 
     {
         // DiskS
-        mDiskSVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (16 + 1) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mDiskSVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (16 + 1) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mDiskSIndexBuf =
             static_cast<u16*>(heap->alloc((8 * 6) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setDiskVertex(mDiskSVertexBuf, mDiskSIndexBuf, 16);
+        PrimitiveDrawUtil::setDiskVertex(mDiskSVertexBuf, mDiskSIndexBuf, 16);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mDiskSVertexBuf,
-                      (16 + 1) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (16 + 1) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mDiskSIndexBuf, (8 * 6) * sizeof(u16));
     }
 
     {
         // DiskL
-        mDiskLVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (32 + 1) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mDiskLVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (32 + 1) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mDiskLIndexBuf =
             static_cast<u16*>(heap->alloc((16 * 6) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setDiskVertex(mDiskLVertexBuf, mDiskLIndexBuf, 32);
+        PrimitiveDrawUtil::setDiskVertex(mDiskLVertexBuf, mDiskLIndexBuf, 32);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mDiskLVertexBuf,
-                      (32 + 1) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (32 + 1) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mDiskLIndexBuf, (16 * 6) * sizeof(u16));
     }
 
@@ -200,28 +200,28 @@ void PrimitiveRendererCafe::prepareFromBinaryImpl(Heap* heap, const void* bin_da
 
     {
         // CylinderS
-        mCylinderSVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (16 * 2 + 2) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mCylinderSVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (16 * 2 + 2) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mCylinderSIndexBuf =
             static_cast<u16*>(heap->alloc((16 * 12) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setCylinderVertex(mCylinderSVertexBuf, mCylinderSIndexBuf, 16);
+        PrimitiveDrawUtil::setCylinderVertex(mCylinderSVertexBuf, mCylinderSIndexBuf, 16);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCylinderSVertexBuf,
-                      (16 * 2 + 2) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (16 * 2 + 2) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCylinderSIndexBuf,
                       (16 * 12) * sizeof(u16));
     }
 
     {
         // CylinderL
-        mCylinderLVertexBuf = static_cast<PrimitiveRendererUtil::Vertex*>(heap->alloc(
-            (32 * 2 + 2) * sizeof(PrimitiveRendererUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
+        mCylinderLVertexBuf = static_cast<PrimitiveDrawUtil::Vertex*>(heap->alloc(
+            (32 * 2 + 2) * sizeof(PrimitiveDrawUtil::Vertex), GX2_VERTEX_BUFFER_ALIGNMENT));
         mCylinderLIndexBuf =
             static_cast<u16*>(heap->alloc((32 * 12) * sizeof(u16), GX2_INDEX_BUFFER_ALIGNMENT));
-        PrimitiveRendererUtil::setCylinderVertex(mCylinderLVertexBuf, mCylinderLIndexBuf, 32);
+        PrimitiveDrawUtil::setCylinderVertex(mCylinderLVertexBuf, mCylinderLIndexBuf, 32);
 
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCylinderLVertexBuf,
-                      (32 * 2 + 2) * sizeof(PrimitiveRendererUtil::Vertex));
+                      (32 * 2 + 2) * sizeof(PrimitiveDrawUtil::Vertex));
         GX2Invalidate(GX2_INVALIDATE_CPU_ATTRIB_BUFFER, mCylinderLIndexBuf,
                       (32 * 12) * sizeof(u16));
     }
@@ -353,7 +353,7 @@ void PrimitiveRendererCafe::drawCylinder32Impl(const Matrix34f& model_mtx, const
 }
 
 void PrimitiveRendererCafe::drawTriangles_(const Matrix34f& model_mtx, const Color4f& c0,
-                                           const Color4f& c1, PrimitiveRendererUtil::Vertex* vtx,
+                                           const Color4f& c1, PrimitiveDrawUtil::Vertex* vtx,
                                            u32 vtx_num, u16* idx, u32 idx_num,
                                            const GX2Texture* tex)
 {
@@ -371,21 +371,21 @@ void PrimitiveRendererCafe::drawTriangles_(const Matrix34f& model_mtx, const Col
     else
         GX2SetPixelUniformReg(mParamRateOffset, 4, &Vector4f::zero);
 
-    GX2SetAttribBuffer(0, vtx_num * sizeof(PrimitiveRendererUtil::Vertex),
-                       sizeof(PrimitiveRendererUtil::Vertex), vtx);
+    GX2SetAttribBuffer(0, vtx_num * sizeof(PrimitiveDrawUtil::Vertex),
+                       sizeof(PrimitiveDrawUtil::Vertex), vtx);
     GX2DrawIndexed(GX2_PRIMITIVE_TRIANGLES, idx_num, GX2_INDEX_FORMAT_U16, idx);
 }
 
 void PrimitiveRendererCafe::drawLines_(const Matrix34f& model_mtx, const Color4f& c0,
-                                       const Color4f& c1, PrimitiveRendererUtil::Vertex* vtx,
+                                       const Color4f& c1, PrimitiveDrawUtil::Vertex* vtx,
                                        u32 vtx_num, u16* idx, u32 idx_num)
 {
     GX2SetVertexUniformReg(mParamUserOffset, 12, &model_mtx);
     GX2SetVertexUniformReg(mParamColor0Offset, 4, &c0);
     GX2SetVertexUniformReg(mParamColor1Offset, 4, &c1);
     GX2SetPixelUniformReg(mParamRateOffset, 4, &Vector4f::zero);
-    GX2SetAttribBuffer(0, vtx_num * sizeof(PrimitiveRendererUtil::Vertex),
-                       sizeof(PrimitiveRendererUtil::Vertex), vtx);
+    GX2SetAttribBuffer(0, vtx_num * sizeof(PrimitiveDrawUtil::Vertex),
+                       sizeof(PrimitiveDrawUtil::Vertex), vtx);
     GX2DrawIndexed(GX2_PRIMITIVE_LINE_LOOP, idx_num, GX2_INDEX_FORMAT_U16, idx);
 }
 

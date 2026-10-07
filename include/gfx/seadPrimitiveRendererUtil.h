@@ -7,7 +7,7 @@
 
 namespace sead
 {
-namespace PrimitiveRendererUtil
+namespace PrimitiveDrawUtil
 {
 class Vertex
 {
@@ -30,7 +30,7 @@ void setSphereVertex(Vertex* vtx, u16* idx, s32 x, s32 y);
 void setDiskVertex(Vertex* vtx, u16* idx, s32 div);
 void setCylinderVertex(Vertex* vtx, u16* idx, s32 div);
 
-}  // namespace PrimitiveRendererUtil
+}  // namespace PrimitiveDrawUtil
 }  // namespace sead
 
 #endif  // SEAD_PRIMITIVE_RENDERER_UTIL_H_

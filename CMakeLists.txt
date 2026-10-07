@@ -154,7 +154,7 @@ add_library(sead OBJECT
   modules/src/gfx/seadFrameBuffer.cpp
   modules/src/gfx/seadGraphics.cpp
   # modules/src/gfx/seadPrimitiveRenderer.cpp
-  # modules/src/gfx/seadPrimitiveRendererUtil.cpp
+  modules/src/gfx/seadPrimitiveRendererUtil.cpp
   modules/src/gfx/seadProjection.cpp
   modules/src/gfx/seadTextWriter.cpp
   modules/src/message/seadMessageSet.cpp
