@@ -14,6 +14,8 @@ add_library(sead OBJECT
   modules/src/audio/seadAudioPlayerCafe.cpp
   modules/src/audio/seadAudioResetter.cpp
   modules/src/audio/seadAudioResetterCafe.cpp
+  modules/src/audio/seadAudioSoundDataMgrCafe.cpp
+  modules/src/audio/seadAudioSoundHeapCafe.cpp
   modules/src/audio/seadAudioSystemCafe.cpp
   modules/src/audio/seadAudioTaskThreadCafe.cpp
   include/audio/seadAudioResourceLoader.h

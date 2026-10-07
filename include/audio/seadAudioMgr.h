@@ -133,6 +133,7 @@ public:
     void calc();
 
     AudioSystem* getAudioSystem() const { return mAudioSystem; }
+    AudioResetter* getResetter() const { return mResetter; }
     AudioPlayer* getPlayer() const { return mPlayer; }
 
 private:

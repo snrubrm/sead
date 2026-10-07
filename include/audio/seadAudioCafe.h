@@ -7,7 +7,12 @@
 #include <thread/seadAtomic.h>
 #include <nn/atk/SoundSystem.h>
 #include <thread/seadThread.h>
+#include <nn/atk/SoundArchive.h>
 #include <nn/atk/SoundArchivePlayer.h>
+#include <nn/atk/SoundDataManager.h>
+#include <nn/atk/SoundHandle.h>
+#include <nn/atk/SoundHeap.h>
+#include <aal/aalMemoryPool.h>
 
 namespace sead
 {
@@ -131,27 +136,190 @@ private:
 };
 static_assert(sizeof(AudioSystemCafe) == 0x188);
 
-/// TODO: only the constructor is declared (0x7100bb82b4); the class is 0x3c8 bytes.
-class AudioPlayerCafe : public AudioPlayer, public nn::atk::SoundArchivePlayer
+/// A handle to a sound of the audio player.
+class SoundHandle : public nn::atk::SoundHandle
+{
+};
+
+/// A sound archive of the audio system (the base of the file system and the memory archives).
+class AudioSoundArchiveBaseCafe
+{
+    SEAD_RTTI_BASE(AudioSoundArchiveBaseCafe)
+public:
+    enum class Type : s32
+    {
+        Fs = 0,
+        Memory = 1,
+    };
+
+    explicit AudioSoundArchiveBaseCafe(Type type) : mType(type) {}
+    virtual ~AudioSoundArchiveBaseCafe() = default;
+
+    virtual bool open(const void* data) = 0;
+    virtual void close() = 0;
+
+    Type getType() const { return mType; }
+
+private:
+    Type mType;
+};
+static_assert(sizeof(AudioSoundArchiveBaseCafe) == 0x10);
+
+/// A sound archive that is read from a file (0x658 bytes).
+class AudioFsSoundArchiveCafe : public AudioSoundArchiveBaseCafe, public nn::atk::FsSoundArchive
+{
+    SEAD_RTTI_OVERRIDE(AudioFsSoundArchiveCafe, AudioSoundArchiveBaseCafe)
+public:
+    explicit AudioFsSoundArchiveCafe(Heap* heap)
+        : AudioSoundArchiveBaseCafe(Type::Fs), mHeap(heap), mInfoBlock(nullptr), mStringBlock(nullptr),
+          mContentRoot("/vol/content"), _650(false)
+    {
+    }
+    ~AudioFsSoundArchiveCafe() override;
+
+    /// 0x7100b97e00 / 0x7100b97eb8: `data` is the path of the archive file.
+    bool open(const void* data) override;
+    void close() override;
+
+    Heap* mHeap;
+    u8* mInfoBlock;
+    u8* mStringBlock;
+    /// Whether the label strings are loaded too.
+    bool mLoadStrings;
+    const char* mContentRoot;
+    bool _650;
+};
+static_assert(sizeof(AudioFsSoundArchiveCafe) == 0x658);
+
+/// A sound archive that is in memory (0x308 bytes).
+class AudioMemorySoundArchiveCafe : public AudioSoundArchiveBaseCafe, public nn::atk::MemorySoundArchive
+{
+    SEAD_RTTI_OVERRIDE(AudioMemorySoundArchiveCafe, AudioSoundArchiveBaseCafe)
+public:
+    AudioMemorySoundArchiveCafe() : AudioSoundArchiveBaseCafe(Type::Memory) {}
+    ~AudioMemorySoundArchiveCafe() override;
+
+    /// 0x7100b98030 / 0x7100b9804c: `data` is the archive.
+    bool open(const void* data) override;
+    void close() override;
+};
+static_assert(sizeof(AudioMemorySoundArchiveCafe) == 0x308);
+
+class AudioSoundHeapCafe;
+
+/// Manages the data of the sound archive (0x268 bytes).
+class AudioSoundDataMgrCafe : public nn::atk::SoundDataManager
+{
+public:
+    AudioSoundDataMgrCafe();
+    ~AudioSoundDataMgrCafe() override;
+
+    /// 0x7100b982b0 / 0x7100b98388
+    void connectSoundHeap(AudioSoundHeapCafe* heap);
+    nn::atk::SoundArchive* getSoundArchive() const;
+    /// 0x7100b98508: the root directory of the content (the default is "/vol/content").
+    void setContentRootPath(const char* path);
+    /// 0x7100b98510 / 0x7100b98790 / 0x7100b988b8 / 0x7100b9898c
+    bool mountSoundArchiveFromFs(const SafeString& path, Heap* heap, bool unknown, bool load_strings);
+    bool mountSoundArchiveFromMemory(const void* data, Heap* heap);
+    void unmountSoundArchive();
+    bool loadData(const char* label, u32 load_flag, u32 unknown, AudioSoundHeapCafe* heap);
+
+private:
+    /// 0x7100b98690
+    bool setupManager_(Heap* heap);
+
+    AudioSoundArchiveBaseCafe* mArchive;
+    u8* mMemory;
+    AudioSoundHeapCafe* mSoundHeap;
+    const char* mContentRootPath;
+    bool mIsInitialized;
+};
+static_assert(sizeof(AudioSoundDataMgrCafe) == 0x268);
+
+/// The heap that the sound data is loaded to (0x60 bytes).
+class AudioSoundHeapCafe : public nn::atk::SoundHeap, public hostio::Node
+{
+public:
+    /// Uses the largest free block of the heap (the current heap if `heap` is null) if `size` is 0.
+    AudioSoundHeapCafe(size_t size, Heap* heap);
+    ~AudioSoundHeapCafe() override;
+
+    /// 0x7100b99010
+    void setSoundDataManagement(nn::atk::SoundDataManager& data_manager, nn::atk::SoundArchive& archive);
+
+private:
+    u8* mMemory;
+    nn::atk::SoundDataManager* mDataManager;
+    nn::atk::SoundArchive* mArchive;
+};
+static_assert(sizeof(AudioSoundHeapCafe) == 0x60);
+
+/// The player of the audio system (0x3c8 bytes).
+class AudioPlayerCafe : public AudioPlayer, public nn::atk::SoundArchivePlayer, public hostio::Node
 {
     SEAD_RTTI_OVERRIDE(AudioPlayerCafe, AudioPlayer)
 public:
+    /// The sizes of the buffers of setupDataManagement.
+    struct DataManagementSetupParam
+    {
+        /// The size of the stream buffer is the size that the sound library needs multiplied by this.
+        f32 stream_buffer_scale;
+        u32 _4;
+        u32 _8;
+        Heap* heap;
+    };
+    static_assert(sizeof(DataManagementSetupParam) == 0x18);
+
     AudioPlayerCafe();
     ~AudioPlayerCafe() override;
 
     void initialize() override;
     void finalize() override;
     void calc() override;
+    bool startSound(SoundHandle* handle, u32 id) override;
+    bool startSound(SoundHandle* handle, const char* label) override;
+    bool holdSound(SoundHandle* handle, u32 id) override;
+    bool holdSound(SoundHandle* handle, const char* label) override;
+    u32 getSoundCount() const override;
+    const char* getSoundName(u32 id) const override;
+    u32 getSoundId(const char* label) const override;
+    nn::Result detail_SetupSound(nn::atk::SoundHandle* handle, u32 sound_id, bool hold, const char* label,
+                                 const StartInfo* start_info) override;
 
     /// 0x7100bb8510
     void stopAll(s32 frames);
     /// 0x7100bb8f50
     void unpauseAll(s32 frames);
 
+    /// 0x7100bb8840 / 0x7100bb91cc / 0x7100bb92b0 / 0x7100bb95ac
+    void shutdownDataManagement();
+    void createSoundHeap(size_t size, Heap* heap);
+    bool setupDataManagement(u32 stream_buffer_size, u32 stream_cache_size, u32 setup_size, Heap* heap);
+    bool setupDataManagement(const DataManagementSetupParam& param);
+
+    AudioSoundDataMgrCafe* getDataManager() const { return mDataMgr; }
+
 private:
-    u8 _2f0[0x310 - 0x2f0];
+    /// 0x7100bb93bc
+    bool setupDataManagementInner_(const nn::atk::SoundArchive& archive, u32 stream_buffer_size,
+                                   u32 stream_cache_size, u32 setup_size, Heap* heap);
+
+    void* mSetupBuffer;
+    u32 mSetupBufferSize;
+    void* mStreamBuffer;
+    u32 mStreamBufferSize;
+    u32 mRequiredStreamBufferSize;
+    void* mStreamCacheBuffer;
+    u32 mStreamCacheBufferSize;
+    AudioSoundDataMgrCafe* mDataMgr;
+    AudioSoundHeapCafe* mSoundHeap;
     bool mIsPaused;
-    u8 _311[0x3c8 - 0x311];
+    /// While it is set, no sound can be started.
+    bool _311;
+    CriticalSection mCS;
+    bool mUseCS;
+    aal::MemoryPool mMemoryPool;
 };
 static_assert(sizeof(AudioPlayerCafe) == 0x3c8);
 
