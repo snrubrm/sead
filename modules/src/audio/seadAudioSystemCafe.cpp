@@ -1,4 +1,5 @@
 #include <audio/seadAudioCafe.h>
+#include <nn/atk/SoundSystem.h>
 #include <nn/atk/detail/driver/HardwareManager.h>
 
 namespace sead
@@ -15,6 +16,14 @@ inline u32 convertOutputMode(s32 mode)
 {
     static const u32 cOutputModes[3] = {1, 0, 2};
     return cOutputModes[mode];
+}
+
+inline nn::atk::AuxBus convertAuxBus(AudioGlobal::AuxBus bus)
+{
+    static const nn::atk::AuxBus cAuxBuses[6] = {
+        nn::atk::AuxBus::AuxBus_A, nn::atk::AuxBus::AuxBus_B, nn::atk::AuxBus::AuxBus_C,
+        nn::atk::AuxBus::AuxBus_A, nn::atk::AuxBus::AuxBus_B, nn::atk::AuxBus::AuxBus_C};
+    return bus <= 5 ? cAuxBuses[static_cast<s32>(bus)] : nn::atk::AuxBus::AuxBus_A;
 }
 }  // namespace
 
@@ -34,6 +43,21 @@ bool AudioSystemCafe::setOutputMode(AudioGlobal::OutputMode mode)
         }
     }
     return result;
+}
+
+// 0x7100b99454
+void AudioSystemCafe::clearEffect(AudioGlobal::AuxBus bus, s32)
+{
+    if (mIsSdkEnabled)
+        nn::atk::SoundSystem::ClearEffect(convertAuxBus(bus), nn::atk::OutputDevice(0));
+}
+
+// 0x7100b99488
+bool AudioSystemCafe::isFinishedClearEffect(AudioGlobal::AuxBus bus)
+{
+    if (mIsSdkEnabled)
+        return nn::atk::SoundSystem::IsClearEffectFinished(convertAuxBus(bus), nn::atk::OutputDevice(0));
+    return true;
 }
 
 // 0x7100b992d4

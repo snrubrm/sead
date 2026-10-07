@@ -18,6 +18,12 @@ public:
     /// 0x7100b99284 / 0x7100b992d4
     bool setOutputMode(AudioGlobal::OutputMode mode) override;
     AudioGlobal::OutputMode getOutputMode() const override;
+    /// 0x7100b99318 / 0x7100b993ec (declared only)
+    bool appendEffect(AudioGlobal::AuxBus bus, AudioFx* effect) override;
+    bool appendFxObject(AudioGlobal::AuxBus bus, AudioFxObject* effect) override;
+    /// 0x7100b99454 / 0x7100b99488
+    void clearEffect(AudioGlobal::AuxBus bus, s32 unused) override;
+    bool isFinishedClearEffect(AudioGlobal::AuxBus bus) override;
 
     /// False if the sound library (nn::atk) is not used (the system then only keeps the settings).
     bool isSdkEnabled() const { return mIsSdkEnabled; }

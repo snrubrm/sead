@@ -7,6 +7,8 @@
 
 namespace sead
 {
+class AudioFx;
+class AudioFxObject;
 class AudioMgr;
 class AudioResourceLoader;
 class SoundHandle;
@@ -18,6 +20,11 @@ struct AudioGlobal
     /// The names of the values are not known (aal::Settings converts its output mode with the table {1, 0, 2}; 4 is
     /// returned for values that are out of range).
     enum OutputMode : u32
+    {
+    };
+
+    /// The auxiliary buses (0 - 2 of the main output, 3 - 5 of the other output; the names are not known).
+    enum AuxBus : u32
     {
     };
 };
@@ -32,6 +39,10 @@ public:
     virtual void finalize() = 0;
     virtual bool setOutputMode(AudioGlobal::OutputMode mode) = 0;
     virtual AudioGlobal::OutputMode getOutputMode() const = 0;
+    virtual bool appendEffect(AudioGlobal::AuxBus bus, AudioFx* effect) = 0;
+    virtual bool appendFxObject(AudioGlobal::AuxBus bus, AudioFxObject* effect) = 0;
+    virtual void clearEffect(AudioGlobal::AuxBus bus, s32 unused) = 0;
+    virtual bool isFinishedClearEffect(AudioGlobal::AuxBus bus) = 0;
 };
 
 
