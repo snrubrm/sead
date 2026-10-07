@@ -66,6 +66,26 @@ bool AudioSystemCafe::isFinishedClearEffect(AudioGlobal::AuxBus bus)
 // 0x7100b99738 (D2) / 0x7100b99774 (D0)
 AudioSystemCafe::~AudioSystemCafe() { ; }
 
+// 0x7100b99854
+AudioTaskThreadCafe::AudioTaskThreadCafe(s32 priority, Heap* heap, const SafeString& name, s32 stack_size,
+                                         s32 message_queue_size)
+    : Thread(name, heap, priority, MessageQueue::BlockType::Blocking, 0x7fffffff, stack_size, message_queue_size)
+{
+}
+
+// 0x7100b998b4 (D2) / 0x7100b99908 (D0)
+AudioTaskThreadCafe::~AudioTaskThreadCafe()
+{
+    if (!isDone())
+        quitAndWaitDoneSingleThread(false);
+}
+
+// 0x7100b99964
+bool AudioTaskThreadCafe::start()
+{
+    return Thread::start();
+}
+
 // 0x7100b994c0
 void AudioSystemCafe::setHeap(Heap* heap)
 {

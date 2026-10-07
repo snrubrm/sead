@@ -4,10 +4,29 @@
 #include <container/seadOffsetList.h>
 #include <hostio/seadHostIONode.h>
 #include <thread/seadCriticalSection.h>
+#include <thread/seadThread.h>
 #include <nn/atk/SoundArchivePlayer.h>
 
 namespace sead
 {
+/// The thread that the audio system runs its tasks on.
+class AudioTaskThreadCafe : public Thread
+{
+public:
+    AudioTaskThreadCafe(s32 priority, Heap* heap, const SafeString& name, s32 stack_size, s32 message_queue_size);
+    ~AudioTaskThreadCafe() override;
+
+    bool start() override;
+
+protected:
+    void calc_(MessageQueue::Element msg) override;
+
+private:
+    /// Called before and after each task (purpose unknown).
+    void* mTaskCallback = nullptr;
+};
+static_assert(sizeof(AudioTaskThreadCafe) == 0x108);
+
 /// TODO: only the constructor is declared (0x7100b99018); the class is 0x188 bytes.
 class AudioSystemCafe : public AudioSystem, public hostio::Node
 {
