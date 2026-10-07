@@ -72,11 +72,15 @@ public:
     void genInformation_(hostio::Context* context) override;
 
 protected:
+    SeparateHeap(const SafeString& name, void* start, size_t size, bool enable_lock);
     ~SeparateHeap() override;
 
     u8 _dc[4];
     BlockList mBlocks;
     Block* mUnusedBlocks;
+    /// The memory of the blocks (inside of the memory the heap object lives in) and their number.
+    Block* mBlockArray;
+    s32 mBlockNum;
 };
 
 }  // namespace sead
