@@ -22,6 +22,8 @@ public:
     class Slot : public IDisposer
     {
     public:
+        Slot() = default;
+
         template <typename TDelegate>
         Slot(TDelegate delegate)  // NOLINT(google-explicit-constructor)
         {

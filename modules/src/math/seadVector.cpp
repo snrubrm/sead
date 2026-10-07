@@ -3,6 +3,12 @@
 namespace sead
 {
 template <>
+const Vector2<s32> Vector2<s32>::zero(0, 0);
+
+template <>
+const Vector2<s32> Vector2<s32>::ones(1, 1);
+
+template <>
 const Vector2<f32> Vector2<f32>::zero(0.0f, 0.0f);
 
 template <>

@@ -1,6 +1,9 @@
 #include "stream/seadStreamFormat.h"
 
+#include <cstdio>
+#include "codec/seadBase64.h"
 #include "math/seadMathCalcCommon.h"
+#include "prim/seadStringUtil.h"
 #include "prim/seadScopedLock.h"
 #include "stream/seadStreamSrc.h"
 #include "thread/seadMutex.h"
@@ -215,10 +218,267 @@ void BinaryStreamFormat::rewind(StreamSrc* src)
 }
 
 // The lock of the shared read buffer of the text formats (0x71025f9568).
+static FixedSafeString<1024> sTextReadBuffer;
 static Mutex sTextMutex;
 
 // 0x7100b162c8
 TextStreamFormat::TextStreamFormat() : mDelimiters(" \t\r\n") {}
+
+u8 TextStreamFormat::readU8(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    u8 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseU8(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+u16 TextStreamFormat::readU16(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    u16 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseU16(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+u32 TextStreamFormat::readU32(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    u32 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseU32(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+u64 TextStreamFormat::readU64(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    u64 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseU64(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+s8 TextStreamFormat::readS8(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    s8 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseS8(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+s16 TextStreamFormat::readS16(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    s16 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseS16(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+s32 TextStreamFormat::readS32(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    s32 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseS32(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+s64 TextStreamFormat::readS64(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    s64 value = 0;
+    getNextData_(src);
+    StringUtil::tryParseS64(&value, sTextReadBuffer.cstr(), StringUtil::CardinalNumber::BaseAuto);
+    return value;
+}
+
+f32 TextStreamFormat::readF32(StreamSrc* src, Endian::Types)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    f32 value = 0;
+    getNextData_(src);
+    if (sTextReadBuffer.calcLength() != 0)
+        std::sscanf(sTextReadBuffer.cstr(), "%f", &value);
+    return value;
+}
+
+void TextStreamFormat::readString(StreamSrc* src, BufferedSafeString* str, u32)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    getNextData_(src);
+    str->copy(sTextReadBuffer);
+}
+
+// NON_MATCHING: loop induction and register allocation differ.
+void TextStreamFormat::readBit(StreamSrc* src, void* buffer, u32 bits)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    getNextData_(src);
+    SafeString text = sTextReadBuffer;
+    if (text.comparen("0b", 2) == 0)
+        text = text.getPart(2);
+    // The original loop includes the terminating character in its available count.
+    const u32 length = text.calcLength() + 1;
+    u8 value = 0;
+    u32 count = 0;
+    u8* bytes = static_cast<u8*>(buffer);
+    for (u32 i = 0; i < length && count < bits; ++i)
+    {
+        value = (value << 1) | (text.at(i) == '1');
+        ++count;
+        if ((count & 7) == 0)
+        {
+            bytes[(count >> 3) - 1] = value;
+            value = 0;
+        }
+    }
+    if (count & 7)
+    {
+        const u32 index = count >> 3;
+        bytes[index] = (bytes[index] & (0xff << (count & 7))) | value;
+    }
+}
+
+u32 TextStreamFormat::readMemBlock(StreamSrc* src, void* buffer, u32 size)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    getNextData_(src);
+    const u32 length = sTextReadBuffer.calcLength();
+    size_t decoded_size = 0;
+    Base64::decode(buffer, size, sTextReadBuffer.cstr(), length, &decoded_size);
+    return decoded_size;
+}
+
+// NON_MATCHING: the terminating Base64 buffer index width and saved registers differ.
+void TextStreamFormat::writeMemBlock(StreamSrc* src, const void* buffer, u32 size)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    sTextReadBuffer.clear();
+    const u32 encoded_size = (size / 3 + (size % 3 != 0)) * 4;
+    if (encoded_size + 1 < u32(sTextReadBuffer.getBufferSize()))
+    {
+        char* text = sTextReadBuffer.getBuffer();
+        text[encoded_size] = '\0';
+        Base64::encode(text, buffer, size, false);
+        const u32 length = sTextReadBuffer.calcLength();
+        src->write("\"", 1);
+        src->write(sTextReadBuffer.cstr(), length);
+        src->write("\"", 1);
+        src->write(mDelimiters.cstr(), 1);
+    }
+}
+
+void TextStreamFormat::writeBit(StreamSrc* src, const void* buffer, u32 bits)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    sTextReadBuffer.copy("0b");
+    const u8* bytes = static_cast<const u8*>(buffer);
+    const u32 byte_count = (bits + 7) / 8;
+    for (u32 i = 0; i < byte_count; ++i)
+    {
+        const s32 byte_bits = Mathu::min(bits - i * 8, 8u);
+        for (s32 bit = byte_bits - 1; bit >= 0; --bit)
+        {
+            if (bytes[i] & (1 << bit))
+                sTextReadBuffer.append('1');
+            else
+                sTextReadBuffer.append('0');
+        }
+    }
+    src->write(sTextReadBuffer.cstr(), bits + 2);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeDecorationText(StreamSrc* src, const SafeString& text)
+{
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+}
+
+void TextStreamFormat::writeU8(StreamSrc* src, Endian::Types, u8 value)
+{
+    FixedSafeString<32> text;
+    text.format("%u", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeU16(StreamSrc* src, Endian::Types, u16 value)
+{
+    FixedSafeString<32> text;
+    text.format("%u", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeU32(StreamSrc* src, Endian::Types, u32 value)
+{
+    FixedSafeString<32> text;
+    text.format("%u", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeU64(StreamSrc* src, Endian::Types, u64 value)
+{
+    FixedSafeString<32> text;
+    text.format("%llu", static_cast<unsigned long long>(value));
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeS8(StreamSrc* src, Endian::Types, s8 value)
+{
+    FixedSafeString<32> text;
+    text.format("%d", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeS16(StreamSrc* src, Endian::Types, s16 value)
+{
+    FixedSafeString<32> text;
+    text.format("%d", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeS32(StreamSrc* src, Endian::Types, s32 value)
+{
+    FixedSafeString<32> text;
+    text.format("%d", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeS64(StreamSrc* src, Endian::Types, s64 value)
+{
+    FixedSafeString<32> text;
+    text.format("%lld", static_cast<long long>(value));
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
+
+void TextStreamFormat::writeF32(StreamSrc* src, Endian::Types, f32 value)
+{
+    FixedSafeString<32> text;
+    text.format("%.8f", value);
+    const s32 length = text.calcLength();
+    src->write(text.cstr(), length);
+    src->write(mDelimiters.cstr(), 1);
+}
 
 // 0x7100b18744
 void TextStreamFormat::writeNullChar(StreamSrc* src)

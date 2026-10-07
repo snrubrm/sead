@@ -266,6 +266,12 @@ struct Vector4 : public Policies<T>::Vec4Base
 };
 
 template <>
+const Vector2<s32> Vector2<s32>::zero;
+
+template <>
+const Vector2<s32> Vector2<s32>::ones;
+
+template <>
 const Vector2<f32> Vector2<f32>::zero;
 
 template <>
