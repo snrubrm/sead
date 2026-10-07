@@ -33,23 +33,40 @@ public:
     void finalize() override;
     void calc() override;
 
+    /// 0x7100bb8510
+    void stopAll(s32 frames);
+    /// 0x7100bb8f50
+    void unpauseAll(s32 frames);
+
 private:
     u8 _8[0x3c8 - 0x8];
 };
 static_assert(sizeof(AudioPlayerCafe) == 0x3c8);
 
-/// TODO: only the constructor is declared (0x7100bb9818); the class is 0x20 bytes.
+/// Fades the master volume out and back in around a reset (and when shutting down), and stops / unpauses the sounds.
 class AudioResetterCafe : public AudioResetter
 {
 public:
     AudioResetterCafe();
-    ~AudioResetterCafe() override;
+    ~AudioResetterCafe() override = default;
 
-    void initialize(AudioMgr* mgr) override;
+    void initialize(AudioMgr& mgr) override;
     void calc() override;
+    void reset(s32 frames) override;
+    bool isResetting() const override;
+    bool isResetDone() const override;
+    void recoverReset() override;
+    void shutdown(s32 frames) override;
+    bool isShuttingDown() const override;
+    bool isShutdownDone() const override;
 
 private:
-    u8 _8[0x20 - 0x8];
+    /// 0: idle, 1: fading out / paused, 2: reset done
+    s32 mResetState = 0;
+    /// 0: idle, 1: fading out, 2: shutdown done
+    s32 mShutdownState = 0;
+    /// The master volume before the reset, restored by recoverReset.
+    f32 mSavedMasterVolume = 1.0f;
 };
 static_assert(sizeof(AudioResetterCafe) == 0x20);
 

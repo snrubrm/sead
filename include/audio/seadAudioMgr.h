@@ -9,6 +9,7 @@ namespace sead
 {
 class AudioMgr;
 class AudioResourceLoader;
+class SoundHandle;
 class AudioSettingParameter;
 class Heap;
 
@@ -22,24 +23,43 @@ public:
     virtual void finalize() = 0;
 };
 
-/// Plays the sounds. TODO: only the virtual functions that the AudioMgr calls.
+/// Plays the sounds. The base class does nothing (no sound can be started).
 class AudioPlayer
 {
     SEAD_RTTI_BASE(AudioPlayer)
 public:
     virtual ~AudioPlayer() = default;
-    virtual void initialize() = 0;
-    virtual void finalize() = 0;
-    virtual void calc() = 0;
+    virtual void initialize() {}
+    virtual void finalize() {}
+    virtual void calc() {}
+    virtual bool startSound(SoundHandle*, u32) { return false; }
+    virtual bool startSound(SoundHandle*, const char*) { return false; }
+    virtual bool holdSound(SoundHandle*, u32) { return false; }
+    virtual bool holdSound(SoundHandle*, const char*) { return false; }
+    virtual u32 getSoundCount() const { return 0; }
+    virtual const char* getSoundName(u32) const { return nullptr; }
+    virtual u32 getSoundId(const char*) const { return 0xffffffff; }
 };
 
-/// Resets the audio system (e.g. when the output device changes).
+/// Resets the audio system (e.g. when the output device changes). The base class forwards everything to the
+/// subsets of the AudioMgr.
 class AudioResetter
 {
 public:
+    AudioResetter();
     virtual ~AudioResetter() = default;
-    virtual void initialize(AudioMgr* mgr) = 0;
+    virtual void initialize(AudioMgr& mgr);
     virtual void calc() = 0;
+    virtual void reset(s32 frames);
+    virtual bool isResetting() const;
+    virtual bool isResetDone() const;
+    virtual void recoverReset();
+    virtual void shutdown(s32 frames);
+    virtual bool isShuttingDown() const;
+    virtual bool isShutdownDone() const;
+
+protected:
+    AudioMgr* mMgr;
 };
 
 /// A part of the audio system that is set up and shut down by the AudioMgr (kept in a list through the node at
@@ -54,6 +74,16 @@ public:
     virtual void initialize(AudioMgr* mgr, Heap* heap) = 0;
     virtual void finalize() = 0;
     virtual void calc() = 0;
+    /// Purpose unknown (virtual function 8 and 9, in between calc and reset).
+    virtual void unknown8_() = 0;
+    virtual void unknown9_() = 0;
+    virtual void reset(s32 frames) = 0;
+    virtual bool isResetting() const = 0;
+    virtual bool isResetDone() const = 0;
+    virtual void recoverReset() = 0;
+    virtual void shutdown(s32 frames) = 0;
+    virtual bool isShuttingDown() const = 0;
+    virtual bool isShutdownDone() const = 0;
 
 private:
     friend class AudioMgr;
@@ -75,7 +105,12 @@ public:
     void exit();
     void calc();
 
+    AudioSystem* getAudioSystem() const { return mAudioSystem; }
+    AudioPlayer* getPlayer() const { return mPlayer; }
+
 private:
+    friend class AudioResetter;
+
     AudioSystem* mAudioSystem = nullptr;
     AudioResetter* mResetter = nullptr;
     AudioPlayer* mPlayer = nullptr;

@@ -66,7 +66,7 @@ void AudioMgr::prepare(AudioSettingParameter* parameter, Heap* heap)
     if (mPlayer)
         mPlayer->initialize();
     if (mResetter)
-        mResetter->initialize(this);
+        mResetter->initialize(*this);
     if (mResourceLoader)
         mResourceLoader->initialize(*this);
     if (!mSubsets.isEmpty())
