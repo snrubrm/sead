@@ -70,7 +70,7 @@ public:
     void genInformation_(hostio::Context* context) override;
 
     size_t freeAndGetAllocatableSize(void* ptr, s32 alignment);
-    virtual s32 destroyAndGetAllocatableSize(s32);
+    virtual size_t destroyAndGetAllocatableSize(s32 alignment);
     virtual void setFindFreeBlockMode(FindFreeBlockMode mode);
 
     AllocMode getAllocMode() const { return mAllocMode; }
@@ -111,8 +111,8 @@ protected:
     }
     MemBlock* pushToFreeList_(MemBlock*);
 
-    size_t adjustBack_();
-    size_t adjustFront_();
+    MemBlock* adjustBack_();
+    MemBlock* adjustFront_();
 
     MemBlock* allocFromHead_(size_t);
     MemBlock* allocFromHead_(size_t, s32);

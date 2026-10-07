@@ -114,7 +114,8 @@ private:
     nn::os::SystemEventType mVsyncEvent;
     bool _208;
     u8 _209;
-    bool _20a;
+    /// Two flag bits; the GPU time stamps are converted unless both are set.
+    u8 mGpuTimeStampFlags;
     u8 _20b;
     /// 1: use the GPU, 2: do not (requestChangeUseGPU).
     u8 mUseGPURequest;

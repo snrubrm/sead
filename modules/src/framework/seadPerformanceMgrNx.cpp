@@ -5,6 +5,12 @@ namespace sead
 nn::oe::PerformanceConfiguration PerformanceMgrNx::sNormalConfiguration = 0x20003;
 nn::oe::PerformanceConfiguration PerformanceMgrNx::sBoostConfiguration = 0x10001;
 
+// 0x7100af9bc0
+void PerformanceMgrNx::initialize()
+{
+    nn::oe::Initialize();
+}
+
 // 0x7100af9bc4
 void PerformanceMgrNx::setPerformanceConfiguration(nn::oe::PerformanceMode mode,
                                                    nn::oe::PerformanceConfiguration config)

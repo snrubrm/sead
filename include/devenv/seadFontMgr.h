@@ -13,6 +13,9 @@ namespace sead
 class UniformBlockBuffer
 {
 public:
+    UniformBlockBuffer() = default;
+    UniformBlockBuffer(u32 first, u32 second) : _0(first), _4(second) {}
+
     void swap(u32 temp, u32 size)
     {
         _4 = temp;
@@ -25,6 +28,8 @@ public:
     }
 
     u32 get_0() const { return _0; }
+    u32 get_4() const { return _4; }
+    u32 fetchAdd(u32 size) { return _0.fetchAdd(size); }
 
 private:
     Atomic<u32> _0, _4;

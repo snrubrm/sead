@@ -1,7 +1,9 @@
 #include "stream/seadStreamFormat.h"
 
 #include "math/seadMathCalcCommon.h"
+#include "prim/seadScopedLock.h"
 #include "stream/seadStreamSrc.h"
+#include "thread/seadMutex.h"
 
 namespace sead
 {
@@ -211,4 +213,34 @@ void BinaryStreamFormat::rewind(StreamSrc* src)
 {
     src->rewind();
 }
+
+// The lock of the shared read buffer of the text formats (0x71025f9568).
+static Mutex sTextMutex;
+
+// 0x7100b162c8
+TextStreamFormat::TextStreamFormat() : mDelimiters(" \t\r\n") {}
+
+// 0x7100b18744
+void TextStreamFormat::writeNullChar(StreamSrc* src)
+{
+    char null_char = '\0';
+    src->write(&null_char, 1);
+}
+
+// 0x7100b1877c
+void TextStreamFormat::skip(StreamSrc* src, u32)
+{
+    ScopedLock<Mutex> lock(&sTextMutex);
+    getNextData_(src);
+}
+
+// 0x7100b187c4
+void TextStreamFormat::rewind(StreamSrc* src)
+{
+    src->rewind();
+}
+
+// 0x7100b187d4
+void TextStreamFormat::flush(StreamSrc*) {}
+
 }  // namespace sead

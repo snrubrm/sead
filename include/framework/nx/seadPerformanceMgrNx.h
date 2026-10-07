@@ -8,7 +8,7 @@ namespace sead
 class PerformanceMgrNx
 {
 public:
-    /// 0x7100af9bc0 (declared only): a tail call into the SDK.
+    /// 0x7100af9bc0: a tail call into the SDK.
     static void initialize();
     static void printPerformance();
     static void printPerformanceForConfiguration_(int configuration);

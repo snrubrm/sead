@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nvn/nvn.h>
+#include "devenv/seadFontMgr.h"
 #include "gfx/seadColor.h"
 #include "heap/seadDisposer.h"
 #include "math/seadMatrix.h"
@@ -67,7 +68,12 @@ private:
                    u32 index_count, const Texture* texture, const Vector2f* uv0,
                    const Vector2f* uv1);
 
-    u8 _28[0x330 - 0x28];
+    NVNprogram mProgram;
+    u8 _e8[0x218 - 0xe8];
+    NVNvertexAttribState mVertexAttribStates[3];
+    u8 _224[0x228 - 0x224];
+    NVNvertexStreamState mVertexStreamState;
+    u8 _230[0x330 - 0x230];
     NVNbuffer mQuadVertexBuffer;
     NVNbuffer mQuadIndexBuffer;
     NVNbuffer mBoxIndexBuffer;
@@ -91,12 +97,12 @@ private:
     NVNbuffer mCylinder16IndexBuffer;
     NVNbuffer mCylinder32VertexBuffer;
     NVNbuffer mCylinder32IndexBuffer;
-    u8 _780[0x7b0 - 0x780];
+    NVNbuffer mUniformBuffer;
     void* _7b0;
-    Atomic<s32> _7b8;
-    Atomic<s32> _7bc;
-    u32 _7c0;
-    u16 _7c4;
+    UniformBlockBuffer mUniformBlockBuffer;
+    u32 mUniformBlockBufferSize;
+    bool _7c4;
+    bool _7c5;
 };
 static_assert(sizeof(PrimitiveDrawMgrNvn) == 0x7c8);
 

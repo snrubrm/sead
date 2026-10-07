@@ -3,6 +3,7 @@
 #include <heap/seadHeapMgr.h>
 #include <prim/seadPtrUtil.h>
 #include <prim/seadScopedLock.h>
+#include <atomic>
 
 namespace sead
 {
@@ -130,6 +131,51 @@ void FrameHeap::restoreState(const State& state)
         dispose_(mState.mTailPtr, state.mTailPtr);
         mState.mTailPtr = state.mTailPtr;
     }
+}
+
+// NON_MATCHING: same code; only the registers of the two temporaries of the forward end-of-heap comparison are swapped
+// 0x7100b07570
+size_t FrameHeap::adjust()
+{
+    if (!mParent)
+        return mSize;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+    Heap* parent = mParent;
+    if (parent->isLockEnabled())
+        parent->mCS.lock();
+
+    size_t size;
+    if (mDirection == cHeapDirection_Forward)
+    {
+        size = mSize;
+        if (mState.mTailPtr == PtrUtil::addOffset(mStart, size))
+            size = adjustBack_();
+    }
+    else if (mState.mHeadPtr == mStart)
+    {
+        const size_t new_size = getEndAddress() - reinterpret_cast<uintptr_t>(mState.mTailPtr);
+        if (mParent->resizeFront(mStart, new_size))
+        {
+            mSize = new_size;
+            std::atomic_thread_fence(std::memory_order_seq_cst);
+            mState.mHeadPtr = mState.mTailPtr;
+            mStart = mState.mTailPtr;
+            size = new_size;
+        }
+        else
+        {
+            size = mSize;
+        }
+    }
+    else
+    {
+        size = mSize;
+    }
+
+    if (parent->isLockEnabled())
+        parent->mCS.unlock();
+    return size;
 }
 
 size_t FrameHeap::adjustBack_()

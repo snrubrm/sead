@@ -1,4 +1,6 @@
 #include "gfx/nin/seadGraphicsNvn.h"
+#include <nn/os.h>
+#include <nn/time.h>
 #include <nvn/nvn_FuncPtrInline.h>
 
 namespace sead
@@ -14,6 +16,14 @@ GraphicsNvn::GraphicsNvn(const CreateArg& arg)
 }
 
 GraphicsNvn::~GraphicsNvn() = default;
+
+// 0x7100b00f78
+u64 GraphicsNvn::convertGPUTimeStampToSystemTick(const NVNcounterData* counter_data)
+{
+    const u64 nanoseconds = nvnDeviceGetTimestampInNanoseconds(
+        static_cast<GraphicsNvn*>(Graphics::instance())->getNvnDevice(), counter_data);
+    return nn::os::ConvertToTick(nn::TimeSpan::FromNanoSeconds(nanoseconds)).value;
+}
 
 void GraphicsNvn::defaultNvnDebugCallback_(const NvnDebugCallbackParam&) {}
 

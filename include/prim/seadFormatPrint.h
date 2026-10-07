@@ -22,7 +22,10 @@ public:
 class StringPrintOutput : public PrintOutput
 {
 public:
-    explicit StringPrintOutput(BufferedSafeString* buffer);
+    explicit StringPrintOutput(BufferedSafeString* buffer) : mBuffer(buffer), mPos(0)
+    {
+        mBuffer->clear();
+    }
     ~StringPrintOutput() override = default;
     void write(const char* string, s32 size) override;
 
@@ -34,7 +37,10 @@ protected:
 class StringCutOffPrintOutput : public PrintOutput
 {
 public:
-    explicit StringCutOffPrintOutput(BufferedSafeString* buffer);
+    explicit StringCutOffPrintOutput(BufferedSafeString* buffer) : mBuffer(buffer), mPos(0)
+    {
+        mBuffer->clear();
+    }
     ~StringCutOffPrintOutput() override;
     void write(const char* string, s32 size) override;
 
@@ -78,7 +84,11 @@ public:
         static void out(const Class<T>&, const char*, PrintOutput* output);
     };
 
-    PrintFormatter(const char*, PrintOutput* output);
+    PrintFormatter(const char* format, PrintOutput* output)
+        : mFormatStr(format), mPrintOutput(output), mPos(0),
+          mFormatStrLength(format ? static_cast<s32>(__builtin_strlen(format)) : 0), mX(false)
+    {
+    }
 
     void setPrintOutput(PrintOutput* output);
 

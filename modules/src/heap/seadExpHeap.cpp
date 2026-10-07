@@ -4,6 +4,7 @@
 #include <prim/seadPtrUtil.h>
 #include <prim/seadScopedLock.h>
 #include <string.h>
+#include <atomic>
 
 namespace sead
 {
@@ -639,6 +640,87 @@ ExpHeap::~ExpHeap()
 size_t ExpHeap::getManagementAreaSize(s32 alignment)
 {
     return alignment + cExpHeapObjectSize + sizeof(MemBlock);
+}
+
+// NON_MATCHING: same code; the original duplicates the "unlock the parent" tail after each failing resize and loads the block
+// offset / size before the subtractions
+// 0x7100b0502c
+size_t ExpHeap::adjust()
+{
+    if (!mParent)
+        return mSize;
+
+    ConditionalScopedLock<CriticalSection> lock(&mCS, isLockEnabled());
+    Heap* parent = mParent;
+    if (parent->isLockEnabled())
+        parent->mCS.lock();
+
+    size_t size;
+    if (mDirection == cHeapDirection_Forward)
+    {
+        MemBlock* block = adjustBack_();
+        if (block)
+        {
+            size = reinterpret_cast<uintptr_t>(block) - reinterpret_cast<uintptr_t>(mStart);
+            mFreeList.erase(block);
+            if (mParent->resizeBack(mStart, size))
+                mSize = size;
+            else
+                size = mSize;
+        }
+        else
+        {
+            size = mSize;
+        }
+    }
+    else
+    {
+        MemBlock* block = adjustFront_();
+        size = mSize;
+        if (block)
+        {
+            size = mSize - sizeof(MemBlock) - block->mOffset - block->mSize;
+            mFreeList.erase(block);
+            void* new_start = mParent->resizeFront(mStart, size);
+            if (new_start)
+            {
+                mSize = size;
+                std::atomic_thread_fence(std::memory_order_seq_cst);
+                mStart = new_start;
+            }
+            else
+            {
+                size = mSize;
+            }
+        }
+    }
+
+    if (parent->isLockEnabled())
+        parent->mCS.unlock();
+    return size;
+}
+
+// 0x7100b04c24
+// Flag bit 3 is set (by the tryCreate that takes the heap memory from the caller) when the memory does not come from the parent.
+size_t ExpHeap::destroyAndGetAllocatableSize(s32 alignment)
+{
+    Heap* const parent = mParent;
+    void* const start = mStart;
+    const BitFlag16 flag = mFlag;
+    this->~ExpHeap();
+
+    if (!parent)
+        return 0;
+
+    const bool freeable = parent->isFreeable();
+    if (flag.isOnBit(3) || !freeable)
+        return 0;
+
+    if (ExpHeap* exp_heap = DynamicCast<ExpHeap>(parent))
+        return exp_heap->freeAndGetAllocatableSize(start, alignment);
+
+    parent->free(start);
+    return 0;
 }
 
 void ExpHeap::destroy()

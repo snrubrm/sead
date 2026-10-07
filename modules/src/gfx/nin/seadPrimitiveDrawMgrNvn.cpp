@@ -1,16 +1,51 @@
 #include "gfx/nin/seadPrimitiveDrawMgrNvn.h"
 #include <nvn/nvn_FuncPtrInline.h>
 #include "gfx/seadDrawContext.h"
+#include "math/seadMatrix.hpp"
+#include "math/seadMatrixCalcCommon.hpp"
+#include "prim/seadPtrUtil.h"
 
 namespace sead
 {
 SEAD_SINGLETON_DISPOSER_IMPL(PrimitiveDrawMgrNvn)
 
-PrimitiveDrawMgrNvn::PrimitiveDrawMgrNvn() : _7b0(nullptr), _7b8(0), _7bc(0), _7c0(0x32000), _7c4(0)
+PrimitiveDrawMgrNvn::PrimitiveDrawMgrNvn() : _7b0(nullptr), mUniformBlockBuffer(0, 0), mUniformBlockBufferSize(0x32000), _7c4(false), _7c5(false)
 {
 }
 
 PrimitiveDrawMgrNvn::~PrimitiveDrawMgrNvn() = default;
+
+// NON_MATCHING: the projection * camera multiplication is inlined (vectorised) in the original; here it stays a call
+// 0x7100b021d8
+void PrimitiveDrawMgrNvn::beginImpl(DrawContext* context, const Matrix34f& camera,
+                                    const Matrix44f& projection)
+{
+    if (_7c4)
+        return;
+
+    const u32 offset = mUniformBlockBuffer.fetchAdd(0x100);
+    if (offset + 0x100 - mUniformBlockBuffer.get_4() > mUniformBlockBufferSize)
+    {
+        _7c4 = true;
+        return;
+    }
+
+    const u32 position = offset % mUniformBlockBufferSize;
+    NVNcommandBuffer* command_buffer = context->getCommandBuffer()->ToData()->pNvnCommandBuffer;
+    nvnCommandBufferBindProgram(command_buffer, &mProgram, 0x1f);
+    nvnCommandBufferBindVertexAttribState(command_buffer, 3, mVertexAttribStates);
+    nvnCommandBufferBindVertexStreamState(command_buffer, 1, &mVertexStreamState);
+
+    static_cast<Matrix44f*>(PtrUtil::addOffset(_7b0, position))->setMul(projection, camera);
+    nvnCommandBufferBindUniformBuffer(command_buffer, NVN_SHADER_STAGE_VERTEX, 0,
+                                      nvnBufferGetAddress(&mUniformBuffer) + position, 0x40);
+}
+
+void PrimitiveDrawMgrNvn::swapUniformBlockBuffer()
+{
+    mUniformBlockBuffer.swap(mUniformBlockBuffer.get_0(), mUniformBlockBufferSize);
+    _7c4 = false;
+}
 
 void PrimitiveDrawMgrNvn::endImpl(DrawContext*) {}
 

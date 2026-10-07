@@ -2,6 +2,7 @@
 #include <framework/nx/seadPerformanceMgrNx.h>
 #include <framework/seadSingleScreenMethodTreeMgr.h>
 #include <gfx/nin/seadDisplayBufferNvn.h>
+#include <gfx/nin/seadGraphicsNvn.h>
 #include <nn/os.h>
 #include <time/seadTickSpan.h>
 
@@ -11,6 +12,15 @@ namespace sead
 // The body keeps the store of the GameFrameworkNx vtable pointer before the tail call to ~GameFramework (a defaulted or
 // empty destructor drops it).
 GameFrameworkNx::~GameFrameworkNx() { ; }
+
+// 0x7100af9828
+void GameFrameworkNx::setGpuTimeStamp_()
+{
+    if ((mGpuTimeStampFlags & 3) == 3)
+        return;
+    GraphicsNvn::convertGPUTimeStampToSystemTick(_160);
+    GraphicsNvn::convertGPUTimeStampToSystemTick(_160 + 1);
+}
 
 // 0x7100af8ef0
 void GameFrameworkNx::outOfMemoryCallback_(NVNcommandBuffer*, NVNcommandBufferMemoryEvent, size_t,
