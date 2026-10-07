@@ -1,6 +1,8 @@
 #include <gfx/seadViewport.h>
+#include <gfx/seadDrawContext.h>
 #include <gfx/seadFrameBuffer.h>
 #include <gfx/seadProjection.h>
+#include <nvn/nvn_FuncPtrInline.h>
 
 namespace sead
 {
@@ -77,6 +79,50 @@ void Viewport::getOnFrameBufferSize(Vector2f* out, const LogicalFrameBuffer& buf
     out->x *= buffer.getPhysicalArea().getSizeX();
     out->y *= buffer.getPhysicalArea().getSizeY();
 }
+// NON_MATCHING: the original reloads the position from the stack for the second call (here the converted values are
+// kept in registers).
+// 0x7100b20164
+void Viewport::apply(DrawContext* context, const LogicalFrameBuffer& buffer) const
+{
+    Vector2f pos;
+    getOnFrameBufferPos(&pos, buffer);
+    Vector2f size;
+    getOnFrameBufferSize(&size, buffer);
+    pos.y = buffer.getPhysicalArea().getSizeY() - size.y - pos.y;
+
+    NVNcommandBuffer* command_buffer = context->getCommandBuffer()->ToData()->pNvnCommandBuffer;
+    nvnCommandBufferSetScissor(command_buffer, s32(pos.x), s32(pos.y), u32(size.x), u32(size.y));
+    nvnCommandBufferSetViewport(command_buffer, s32(pos.x), s32(pos.y), u32(size.x), u32(size.y));
+    nvnCommandBufferSetDepthRange(command_buffer, mMinDepth, mMaxDepth);
+}
+
+// 0x7100b20440
+void Viewport::applyViewport(DrawContext* context, const LogicalFrameBuffer& buffer) const
+{
+    Vector2f pos;
+    getOnFrameBufferPos(&pos, buffer);
+    Vector2f size;
+    getOnFrameBufferSize(&size, buffer);
+    pos.y = buffer.getPhysicalArea().getSizeY() - size.y - pos.y;
+
+    NVNcommandBuffer* command_buffer = context->getCommandBuffer()->ToData()->pNvnCommandBuffer;
+    nvnCommandBufferSetViewport(command_buffer, s32(pos.x), s32(pos.y), u32(size.x), u32(size.y));
+    nvnCommandBufferSetDepthRange(command_buffer, mMinDepth, mMaxDepth);
+}
+
+// 0x7100b20510
+void Viewport::applyScissor(DrawContext* context, const LogicalFrameBuffer& buffer) const
+{
+    Vector2f pos;
+    getOnFrameBufferPos(&pos, buffer);
+    Vector2f size;
+    getOnFrameBufferSize(&size, buffer);
+    pos.y = buffer.getPhysicalArea().getSizeY() - size.y - pos.y;
+
+    NVNcommandBuffer* command_buffer = context->getCommandBuffer()->ToData()->pNvnCommandBuffer;
+    nvnCommandBufferSetScissor(command_buffer, s32(pos.x), s32(pos.y), u32(size.x), u32(size.y));
+}
+
 // NON_MATCHING: natural vector construction combines bounds/input loads differently.
 void Viewport::unproject(Vector3f* out, const Vector2f& point, const Projection& projection,
                          const Camera& camera) const
