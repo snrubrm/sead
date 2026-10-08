@@ -20,7 +20,8 @@ class DisplayBufferNvn;
 class GraphicsNvn : public Graphics
 {
     // Native NVNMgr::waitDrawDone b32128 and DisplayList::callDirect b34a64
-    // lock the owning graphics critical section at +0x118 directly.
+    // lock the owning graphics critical section at +0x118 directly. Native
+    // NVNMgr constructor b312fc installs its debug callback at +0x1f8.
     friend class agl::driver::NVNMgr;
     friend class agl::DisplayList;
 public:
@@ -111,7 +112,9 @@ private:
 
     NVNdevice* mNvnDevice;
     NVNqueue* mNvnQueue;  // set by registerQueue; used to present the display buffer textures
-    void* _40;
+    // registerDefaultCommandBuffer and native agl NVNMgr constructor b311b4
+    // prove this registered native command buffer pointer.
+    NVNcommandBuffer* _40;
     nn::gfx::Device* mNnDevice;
     void* _50;
     NVNtexturePool mNvnTexturePool;
