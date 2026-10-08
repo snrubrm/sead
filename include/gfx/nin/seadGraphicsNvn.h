@@ -8,12 +8,21 @@
 #include <thread/seadAtomic.h>
 #include "nvn/nvn.h"
 
+namespace agl {
+class DisplayList;
+namespace driver { class NVNMgr; }
+}
+
 namespace sead
 {
 class DisplayBufferNvn;
 
 class GraphicsNvn : public Graphics
 {
+    // Native NVNMgr::waitDrawDone b32128 and DisplayList::callDirect b34a64
+    // lock the owning graphics critical section at +0x118 directly.
+    friend class agl::driver::NVNMgr;
+    friend class agl::DisplayList;
 public:
     struct CreateArg
     {
