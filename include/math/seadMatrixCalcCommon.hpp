@@ -432,6 +432,18 @@ void Matrix33CalcCommon<T>::transposeTo(Base& o, const Base& n)
     o.m[2][2] = n.m[2][2];
 }
 
+// Native 0x71000ff354 converts both matrices to quaternions, interpolates
+// them and reconstructs a 3x3 rotation, like the Matrix34 operation below.
+template <typename T>
+void Matrix33CalcCommon<T>::slerpTo(Base& o, const Base& a, const Base& b, T t)
+{
+    Quat first, second, interpolated;
+    toQuat(first, a);
+    toQuat(second, b);
+    QuatCalcCommon<T>::slerpTo(interpolated, first, second, t);
+    makeQ(o, interpolated);
+}
+
 template <typename T>
 void Matrix33CalcCommon<T>::makeQ(Base& o, const Quat& q)
 {
