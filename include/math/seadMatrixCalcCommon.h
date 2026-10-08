@@ -47,6 +47,9 @@ public:
     static void transpose(Base& o);
     static void transposeTo(Base& o, const Base& n);
 
+    // Native 0x71000ff354; CameraTail passes two 3x3 matrices and an interpolation factor.
+    static void slerpTo(Base& o, const Base& a, const Base& b, T t);
+
     static void makeQ(Base& o, const Quat& q);
     static void makeR(Base& o, const Vec3& r);
     static void makeRIdx(Base& o, u32 xr, u32 yr, u32 zr);
