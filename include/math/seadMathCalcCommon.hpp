@@ -433,7 +433,9 @@ inline u32 MathCalcCommon<T>::deg2idx(T a)
 template <typename T>
 inline u32 MathCalcCommon<T>::rad2idx(T a)
 {
-    return static_cast<u32>(a * (cHalfRoundIdx / pi()));
+    // Signed intermediate preserves negative angles when wrapping to the unsigned index.
+    // BotW SoundParam::setAngle and Player::sub_71008569B8 both use a signed 64-bit conversion.
+    return static_cast<u32>(static_cast<s64>(a * (cHalfRoundIdx / pi())));
 }
 
 template <typename T>
