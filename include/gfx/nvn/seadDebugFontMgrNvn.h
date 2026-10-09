@@ -40,6 +40,8 @@ private:
     void* mBuffer2Map = nullptr;
     UniformBlockBuffer mUniformBlockBuffer;
     bool _530 = false;
+    // The native initializer reads this flag when selecting texture dimensions.
+    bool _531 = false;
 };
 static_assert(sizeof(DebugFontMgrJis1Nvn) == 0x538);
 
