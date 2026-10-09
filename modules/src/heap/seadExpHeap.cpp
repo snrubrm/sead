@@ -69,6 +69,12 @@ ExpHeap* ExpHeap::tryCreate(void* address, size_t size, const SafeString& name, 
     return heap;
 }
 
+ExpHeap* ExpHeap::tryCreate(void* address, size_t size, const SafeString& name, Heap* parent,
+                            bool enable_lock)
+{
+    return sub_7100B04A2C(address, size, name, parent, enable_lock);
+}
+
 void ExpHeap::createMaxSizeFreeMemBlock_(ExpHeap* heap)
 {
     ConditionalScopedLock<CriticalSection> lock(&heap->mCS, heap->isLockEnabled());

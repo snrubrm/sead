@@ -44,6 +44,12 @@ public:
                               bool enable_lock = false);
     static ExpHeap* tryCreate(void* address, size_t size, const SafeString& name,
                               bool enable_lock = false);
+    // Full native B04A24/B04A2C and independent DungeonPackMgr caller8A5700
+    // establish the existing parent-heap variant; B044E8 constructs the same type.
+    static ExpHeap* tryCreate(void* address, size_t size, const SafeString& name, Heap* parent,
+                              bool enable_lock);
+    static ExpHeap* sub_7100B04A2C(void* address, size_t size, const SafeString& name, Heap* parent,
+                                 bool enable_lock);
 
     static size_t getManagementAreaSize(s32);
 
