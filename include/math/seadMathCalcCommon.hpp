@@ -22,6 +22,12 @@ const MathCalcCommon<float>::ExpSample MathCalcCommon<float>::cExpTbl[];
 template <>
 const MathCalcCommon<float>::LogSample MathCalcCommon<float>::cLogTbl[];
 
+template <>
+f32 MathCalcCommon<f32>::expTable(f32 x);
+
+template <>
+f32 MathCalcCommon<f32>::logTable(f32 x);
+
 template <typename T>
 inline T MathCalcCommon<T>::sign(T value)
 {
@@ -44,6 +50,22 @@ template <typename T>
 inline T MathCalcCommon<T>::pow(T x, T y)
 {
     return std::pow(x, y);
+}
+
+// Inline in aal::CustomCurve::interpolate (0x7100ba2d80) and
+// aal::RollOffCurveStrategyExp::calc (0x7100ba589c).
+template <>
+inline f32 MathCalcCommon<f32>::powTable(f32 x, f32 y)
+{
+    if (x == 0.0f)
+    {
+        if (y > 0.0f)
+            return 0.0f;
+        if (y < 0.0f)
+            return infinity();
+        return 1.0f;
+    }
+    return expTable(logTable(x) * y);
 }
 
 template <typename T>
