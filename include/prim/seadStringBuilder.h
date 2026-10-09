@@ -278,16 +278,17 @@ inline s32 StringBuilderBase<T>::findIndex(const T* str, s32 start_pos) const
     return -1;
 }
 
-// UNCHECKED
+// Reverse scans in FE0860, FE3760 and FE3DC0 start at the last character.
 template <typename T>
 inline s32 StringBuilderBase<T>::rfindIndex(const T* str) const
 {
-    const s32 len = calcLength();
     const s32 sub_str_len = calcStrLength_(str);
-
-    for (s32 i = len - sub_str_len; i >= 0; --i)
+    for (s32 i = calcLength() - 1; i >= 0; --i)
     {
-        if (SafeStringBase<T>(&mBuffer[i]).comparen(str, sub_str_len) == 0)
+        s32 j = 0;
+        while (j < sub_str_len && mBuffer[i + j] == str[j])
+            ++j;
+        if (j == sub_str_len)
             return i;
     }
     return -1;
