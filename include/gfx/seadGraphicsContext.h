@@ -15,6 +15,10 @@ public:
     void setDepthTestEnable(bool enable) { mDepthTestEnable = enable; }
     void setDepthWriteEnable(bool enable) { mDepthWriteEnable = enable; }
     void setStencilTestEnable(bool enable) { mStencilTestEnable = enable; }
+    // Inline-only in the original; name is a guess. Native b1cef8 passes
+    // +0x65 directly to NVN SetCullFace (0 none, 1 front, 2 back, 3 both),
+    // and independent draw caller 1059c00 explicitly writes the back value.
+    void setCullFace(u8 face) { mCullFace = face; }
     void setBlendEnable(bool enable, u32 target)
     {
         if (enable)
