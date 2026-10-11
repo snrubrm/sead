@@ -290,6 +290,11 @@ void XmlDocument::writeXmlAttributesAsText_(WriteStream* stream, XmlElement* ele
     }
 }
 
+XmlElement* XmlDocument::findElementByAbsolutePath(const SafeString& path)
+{
+    return mRoot ? mRoot->findElementByAbsolutePath_(path) : nullptr;
+}
+
 void XmlDocument::deleteElementRecursive_(XmlElement* element)
 {
     if (!element)

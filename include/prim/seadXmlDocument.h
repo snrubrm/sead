@@ -17,6 +17,8 @@ public:
     virtual ~XmlDocument();
     static XmlDocument* create(ReadStream* stream, Heap* heap, bool binary, u32 work_buffer_size);
     bool addEntity(const SafeString& name, const SafeString& value);
+    // Descriptive name: B28E04 forwards the owned root; independent 1391EC4 mutates the result.
+    XmlElement* findElementByAbsolutePath(const SafeString& path);
     bool save(WriteStream* stream, Heap* heap, bool binary, XmlElement* element) const;
 
     // Inline-only in the original; name is a guess. Independent effect XML
