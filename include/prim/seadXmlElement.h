@@ -27,6 +27,11 @@ public:
     // inline-only in the original; name is a guess. The three native curve
     // writers ba905c, bb424c and bb5dfc copy their root tag into +0x28.
     void setName(const SafeString& name) { mName.copy(name); }
+    // inline-only in the original; names are guesses. Recursive deletion
+    // b28d9c and independent AGL subtree cleanup 13733a0 traverse these
+    // typed child/sibling links owned by the TreeNode base.
+    XmlElement* getFirstChild() const { return static_cast<XmlElement*>(mChild); }
+    XmlElement* getNextSibling() const { return static_cast<XmlElement*>(mNext); }
     SafeString getContentString() const;
     SafeString findAttributeValue(const SafeString& name) const;
     void setContent(u8* content, u32 size, bool own);

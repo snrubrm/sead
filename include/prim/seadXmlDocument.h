@@ -21,6 +21,12 @@ public:
     XmlElement* getRoot() const { return mRoot; }
 
 private:
+    XmlDocument() = default;
+    void resetEntity_(Heap* heap);
+    void parseXml_(ReadStream* stream, Heap* heap, bool binary);
+    // Descriptive name: native b28d9c recursively releases child/sibling trees.
+    static void deleteElementRecursive_(XmlElement* element);
+
     struct Entity
     {
         FixedSafeString<8> mName;
@@ -28,14 +34,14 @@ private:
     };
     static_assert(sizeof(Entity) == 0xb8, "XmlDocument::Entity size");
 
-    XmlElement* mRoot;
+    XmlElement* mRoot = nullptr;
     // parseXml_ B25334 allocates and releases three temporary text buffers.
-    u8* mWorkBuffer0;
-    u8* mWorkBuffer1;
-    u8* mWorkBuffer2;
+    u8* mWorkBuffer0 = nullptr;
+    u8* mWorkBuffer1 = nullptr;
+    u8* mWorkBuffer2 = nullptr;
     u32 mWorkBufferSize;
     ObjList<Entity> mEntities;
-    Heap* mHeap;
+    Heap* mHeap = nullptr;
 };
 static_assert(sizeof(XmlDocument) == 0x68, "XmlDocument size");
 

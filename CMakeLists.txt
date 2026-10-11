@@ -262,6 +262,7 @@ add_library(sead OBJECT
   modules/src/prim/seadFormatPrint.cpp
   modules/src/prim/seadSafeString.cpp
   modules/src/prim/seadStringBuilder.cpp
+  modules/src/prim/seadXmlDocument.cpp
   modules/src/prim/seadXmlElement.cpp
   modules/src/prim/seadStringUtil.cpp
 
