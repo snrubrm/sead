@@ -13,6 +13,10 @@ public:
     Frustum();
     void set(const Matrix34f& view, f32 fovy, f32 aspect, f32 near, f32 far);
     bool isInside(const Vector3f& position, f32 radius, f32 near, f32 far) const;
+    // inline-only in the original; names are guesses: D8AFCC, D8B080,
+    // D8B138, D8B1F4 and D8B2AC read these values after set() for isInside().
+    f32 getNear() const { return mNear; }
+    f32 getFar() const { return mFar; }
 
 private:
     Vector3f mRight;

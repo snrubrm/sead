@@ -1,4 +1,5 @@
 #include <cmath>
+#include <math/seadMathCalcCommon.h>
 #include "geom/seadFrustum.h"
 
 namespace sead
@@ -38,12 +39,12 @@ bool Frustum::isInside(const Vector3f& position, f32 radius, f32 near, f32 far) 
         return false;
 
     f32 horizontal = relative.dot(mRight);
-    horizontal = horizontal > 0.0f ? horizontal : -horizontal;
+    horizontal = Mathf::abs(horizontal);
     if (depth * mHorizontalTangent + mHorizontalNormalLength * radius < horizontal)
         return false;
 
     f32 vertical = relative.dot(mUp);
-    vertical = vertical > 0.0f ? vertical : -vertical;
+    vertical = Mathf::abs(vertical);
     return !(depth * mVerticalTangent + mVerticalNormalLength * radius < vertical);
 }
 }  // namespace sead
