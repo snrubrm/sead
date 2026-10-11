@@ -2,6 +2,7 @@
 #include <prim/seadXmlElement.h>
 
 #include <basis/seadNew.h>
+#include <codec/seadBase64.h>
 #include <heap/seadHeapMgr.h>
 #include <stream/seadStream.h>
 
@@ -272,6 +273,100 @@ void XmlDocument::writeXmlInstanceAsText_(WriteStream* stream, XmlElement* eleme
         stream->writeU8('>');
     }
     stream->writeU8('\n');
+}
+
+// NON_MATCHING: entity-copy output cursor and register allocation differ.
+void XmlDocument::writeXmlContentAsText_(WriteStream* stream, XmlElement* element, u32 content_type,
+                                         u32 work_buffer_size, Heap* heap)
+{
+    if (!element->mContent)
+        return;
+    switch (content_type)
+    {
+    case 1:
+    {
+        stream->writeString("<![CDATA[", 9);
+        stream->writeMemBlock(element->mContent, element->mContentSize);
+        stream->writeString("]]>", 3);
+        return;
+    }
+
+    case 2:
+    {
+        u32 encoded_size = element->mContentSize / 3;
+        if (element->mContentSize % 3)
+            ++encoded_size;
+        encoded_size *= 4;
+        if (encoded_size > work_buffer_size)
+            return;
+        auto* encoded = new (heap, -8) char[encoded_size];
+        Base64::encode(encoded, element->mContent, element->mContentSize, false);
+        stream->writeString("<![CDATA[<!BASE64[", 18);
+        stream->writeMemBlock(encoded, encoded_size);
+        stream->writeString("]>]]>", 5);
+        delete[] encoded;
+        return;
+    }
+    default:
+        break;
+    }
+
+    const char* content = element->getContentString().cstr();
+    const s32 length = element->getContentString().calcLength();
+    s32 entity_count = 0;
+    if (length > 0 && sUnk_71024bfd98 > 0)
+    {
+        for (s32 index = 0; index < length; ++index)
+        {
+            for (u32 entity = 0; entity < sUnk_71024bfd98; ++entity)
+            {
+                if (sUnk_71024bfd90[entity][0] == content[index])
+                {
+                    ++entity_count;
+                    break;
+                }
+            }
+        }
+    }
+    if (entity_count == 0)
+    {
+        stream->writeMemBlock(element->mContent, element->mContentSize);
+        return;
+    }
+
+    auto* escaped = new (heap, -8) char[length + entity_count * 5];
+    s32 written = 0;
+    for (s32 index = 0; index < length; ++index)
+    {
+        char character = content[index];
+        if (character == '&' && content[index + 1] == '&')
+        {
+            ++index;
+        }
+        else
+        {
+            for (u32 entity = 0; entity < sUnk_71024bfd98; ++entity)
+            {
+                if (sUnk_71024bfd90[entity][0] == character)
+                {
+                    escaped[written] = '&';
+                    const s32 name_length = SafeString(sUnk_71024bfd60[entity]).calcLength();
+                    for (s32 name_index = 0; name_index < name_length; ++name_index)
+                    {
+                        escaped[written + name_index + 1] = sUnk_71024bfd60[entity][name_index];
+                    }
+                    written += name_length + 1;
+                    character = ';';
+                    break;
+                }
+            }
+        }
+        escaped[written] = character;
+        ++written;
+    }
+    escaped[written] = SafeString::cNullChar;
+    stream->writeMemBlock(escaped, written);
+    delete[] escaped;
 }
 
 void XmlDocument::writeXmlAttributesAsText_(WriteStream* stream, XmlElement* element)
