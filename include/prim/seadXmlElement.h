@@ -24,6 +24,9 @@ public:
     // Inline-only in the original; name is a guess. The effect XML readers
     // 1051604 and 12cbe84 compare the FixedSafeString at +0x28 to their root tag.
     const SafeString& getName() const { return mName; }
+    // inline-only in the original; name is a guess. The three native curve
+    // writers ba905c, bb424c and bb5dfc copy their root tag into +0x28.
+    void setName(const SafeString& name) { mName.copy(name); }
     SafeString getContentString() const;
     SafeString findAttributeValue(const SafeString& name) const;
     void setContent(u8* content, u32 size, bool own);
