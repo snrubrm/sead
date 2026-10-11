@@ -249,6 +249,8 @@ add_library(sead OBJECT
   include/prim/seadSizedEnum.h
   include/prim/seadStorageFor.h
   include/prim/seadStringBuilder.h
+  include/prim/seadXmlDocument.h
+  include/prim/seadXmlElement.h
   include/prim/seadStringUtil.h
   include/prim/seadTypedBitFlag.h
   include/prim/seadTypedLongBitFlag.h
@@ -259,6 +261,7 @@ add_library(sead OBJECT
   modules/src/prim/seadFormatPrint.cpp
   modules/src/prim/seadSafeString.cpp
   modules/src/prim/seadStringBuilder.cpp
+  modules/src/prim/seadXmlElement.cpp
   modules/src/prim/seadStringUtil.cpp
 
   include/random/seadGlobalRandom.h
