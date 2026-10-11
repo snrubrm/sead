@@ -58,8 +58,6 @@ void Camera::projectByMatrix(Vector2f* dst, const Vector3f& world_pos,
     projection.project(dst, camera_pos, viewport);
 }
 
-LookAtCamera::~LookAtCamera() = default;
-
 LookAtCamera::LookAtCamera(const Vector3f& pos, const Vector3f& at, const Vector3f& up)
     : mPos(pos), mAt(at), mUp(up)
 {
