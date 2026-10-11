@@ -22,6 +22,12 @@ protected:
     virtual bool isFull_() = 0;
 };
 
+class StackSymbolResolver
+{
+public:
+    static bool isIllegalSymbolAddress(uintptr_t symbol_address, uintptr_t address);
+};
+
 template <s32 Capacity>
 class StackTrace : public StackTraceBase
 {
