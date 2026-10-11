@@ -123,6 +123,87 @@ ObjList<XmlElement::XmlAttribute>* XmlElement::expandAttributeList(s32 capacity,
     return &mAttributes;
 }
 
+const XmlElement* XmlElement::findElementByAbsolutePath_(const SafeString& path) const
+{
+    if (path.comparen("/", 1) == 0)
+        return findElementFromRootPath_(path);
+    // Native b2a63c tests one character even for the two-character ./ literal.
+    if (path.comparen("./", 1) == 0)
+        return findElementByRelativePath_(path.getPart(2));
+    return findElementByRelativePath_(path);
+}
+
+// NON_MATCHING: the existing TreeNode root API is out of line, unlike the native traversal.
+const XmlElement* XmlElement::findElementFromRootPath_(const SafeString& path) const
+{
+    const auto* element = static_cast<const XmlElement*>(TreeNode::findRoot());
+    FixedSafeString<256> remaining(path);
+    FixedSafeString<256> component;
+    while (true)
+    {
+        component.copy(remaining.getPart(1));
+        if (component.isEmpty())
+            return element;
+        element = element->getFirstChild();
+        if (!findSiblingElement_(&element, component))
+            return nullptr;
+        remaining.copy(component.getPart(element->mName.calcLength()));
+        if (remaining.isEmpty())
+            return element;
+    }
+}
+
+// NON_MATCHING: prefix string termination devirtualizes and loop copy blocks group differently.
+const XmlElement* XmlElement::findElementByRelativePath_(const SafeString& path) const
+{
+    FixedSafeString<256> remaining;
+    FixedSafeString<256> component(path);
+    const XmlElement* element = this;
+    while (true)
+    {
+        if (component.comparen("..", 2) == 0)
+        {
+            element = static_cast<const XmlElement*>(element->mParent);
+            if (!element)
+                return nullptr;
+            remaining.copy(component.getPart(2));
+        }
+        else
+        {
+            if (component.isEmpty())
+                return element;
+            element = element->getFirstChild();
+            if (!findSiblingElement_(&element, component))
+                return nullptr;
+            remaining.copy(component.getPart(element->mName.calcLength()));
+            if (remaining.isEmpty())
+                return element;
+        }
+        component.copy(remaining.getPart(1));
+    }
+}
+
+XmlElement* XmlElement::findElementByAbsolutePath_(const SafeString& path)
+{
+    return const_cast<XmlElement*>(
+        static_cast<const XmlElement*>(this)->findElementByAbsolutePath_(path));
+}
+
+bool XmlElement::findSiblingElement_(const XmlElement** element, SafeString path) const
+{
+    for (const XmlElement* candidate = *element; candidate; candidate = candidate->getNextSibling())
+    {
+        const s32 length = candidate->mName.calcLength();
+        if (candidate->mName.comparen(path, length) == 0 &&
+            (path[length] == '/' || path[length] == '\0'))
+        {
+            *element = candidate;
+            return true;
+        }
+    }
+    return false;
+}
+
 // NON_MATCHING: the compiler inlines XML element construction/content APIs, unlike the original.
 XmlElement* XmlUtil::createBackSiblingElement(XmlElement* element, Heap* heap)
 {

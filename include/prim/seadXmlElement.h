@@ -46,8 +46,14 @@ public:
     void setContent(u8* content, u32 size, bool own);
     void setContentString(const SafeString& content, Heap* heap);
     const XmlElement* findElementByAbsolutePath_(const SafeString& path) const;
+    XmlElement* findElementByAbsolutePath_(const SafeString& path);
 
 private:
+    const XmlElement* findElementByRelativePath_(const SafeString& path) const;
+    // Descriptive name: complete native b2a7d4 climbs to the root and resolves components.
+    const XmlElement* findElementFromRootPath_(const SafeString& path) const;
+    bool findSiblingElement_(const XmlElement** element, SafeString path) const;
+
     // Native XmlUtil creation helpers initialize the owned name/content.
     friend class XmlUtil;
 
