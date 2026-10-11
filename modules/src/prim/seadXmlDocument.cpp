@@ -42,6 +42,24 @@ XmlDocument* XmlDocument::create(ReadStream* stream, Heap* heap, bool binary, u3
     return document;
 }
 
+bool XmlDocument::addEntity(const SafeString& name, const SafeString& value)
+{
+    if (mEntities.isFull())
+        return false;
+    for (auto& entity : mEntities)
+    {
+        if (entity.mName == name)
+        {
+            entity.mValue.copy(value);
+            return true;
+        }
+    }
+    auto* entity = mEntities.emplaceBack();
+    entity->mName.copy(name);
+    entity->mValue.copy(value);
+    return true;
+}
+
 void XmlDocument::deleteElementRecursive_(XmlElement* element)
 {
     if (!element)

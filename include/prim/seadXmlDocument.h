@@ -15,6 +15,7 @@ class XmlDocument
 public:
     virtual ~XmlDocument();
     static XmlDocument* create(ReadStream* stream, Heap* heap, bool binary, u32 work_buffer_size);
+    bool addEntity(const SafeString& name, const SafeString& value);
 
     // Inline-only in the original; name is a guess. Independent effect XML
     // readers 1051604 and 12cbe84 obtain their root element from +8.
@@ -29,6 +30,9 @@ private:
 
     struct Entity
     {
+        // B237EC and independent B2342C default-construct both strings without record zeroing.
+        Entity() {}
+
         FixedSafeString<8> mName;
         FixedSafeString<128> mValue;
     };
