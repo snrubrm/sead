@@ -1,4 +1,5 @@
 #include <prim/seadXmlElement.h>
+#include <prim/seadXmlUtil.h>
 
 #include <cstring>
 #include <basis/seadNew.h>
@@ -39,6 +40,51 @@ void XmlElement::setContentString(const SafeString& content, Heap* heap)
     std::memcpy(buffer, content.cstr(), size);
     buffer[size] = 0;
     setContent(buffer, size, true);
+}
+
+SafeString XmlElement::findAttributeValue(const SafeString& name) const
+{
+    for (const auto& attribute : mAttributes)
+    {
+        if (attribute.mName == name)
+            return attribute.mValue;
+    }
+    return SafeString::cEmptyString;
+}
+
+// NON_MATCHING: the compiler inlines XML element construction/content APIs, unlike the original.
+XmlElement* XmlUtil::createBackSiblingElement(XmlElement* element, Heap* heap)
+{
+    if (!heap)
+        heap = element->mHeap;
+    auto* sibling = new (heap, 8) XmlElement;
+    element->pushBackSibling(sibling);
+    return sibling;
+}
+
+// NON_MATCHING: the compiler inlines XML element construction/content APIs, unlike the original.
+XmlElement* XmlUtil::createBackChildElement(XmlElement* element, Heap* heap)
+{
+    if (!heap)
+        heap = element->mHeap;
+    auto* child = new (heap, 8) XmlElement;
+    element->pushBackChild(child);
+    return child;
+}
+
+// NON_MATCHING: the compiler inlines XML element construction/content APIs, unlike the original.
+XmlElement* XmlUtil::createBackSiblingAndSetupElement(XmlElement* element, const SafeString& name,
+                                                    const SafeString& content, Heap* heap)
+{
+    if (!heap)
+        heap = element->mHeap;
+    auto* child = createBackChildElement(element, heap);
+    child->mName = name;
+    if (content.isEmpty())
+        child->setContent(nullptr, 0, false);
+    else
+        child->setContentString(content, heap);
+    return child;
 }
 
 }  // namespace sead

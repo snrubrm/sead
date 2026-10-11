@@ -251,6 +251,7 @@ add_library(sead OBJECT
   include/prim/seadStringBuilder.h
   include/prim/seadXmlDocument.h
   include/prim/seadXmlElement.h
+  include/prim/seadXmlUtil.h
   include/prim/seadStringUtil.h
   include/prim/seadTypedBitFlag.h
   include/prim/seadTypedLongBitFlag.h

@@ -25,11 +25,15 @@ public:
     // 1051604 and 12cbe84 compare the FixedSafeString at +0x28 to their root tag.
     const SafeString& getName() const { return mName; }
     SafeString getContentString() const;
+    SafeString findAttributeValue(const SafeString& name) const;
     void setContent(u8* content, u32 size, bool own);
     void setContentString(const SafeString& content, Heap* heap);
     const XmlElement* findElementByAbsolutePath_(const SafeString& path) const;
 
 private:
+    // Native XmlUtil creation helpers initialize the owned name/content.
+    friend class XmlUtil;
+
     FixedSafeString<64> mName;
     u8* mContent = nullptr;
     u32 mContentSize = 0;
