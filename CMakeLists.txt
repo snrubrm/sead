@@ -163,6 +163,7 @@ add_library(sead OBJECT
   modules/src/gfx/seadViewport.cpp
 
   include/geom/seadCapsule.h
+  include/geom/seadFrustum.h
   include/geom/seadGeometry.h
   include/geom/seadLine.h
   include/geom/seadPlane.h
@@ -170,6 +171,7 @@ add_library(sead OBJECT
   include/geom/seadSegment.h
   include/geom/seadSphere.h
   modules/src/geom/seadGeometry.cpp
+  modules/src/geom/seadFrustum.cpp
 
   include/heap/seadArena.h
   include/heap/seadDisposer.h
