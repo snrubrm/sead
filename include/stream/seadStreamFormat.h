@@ -115,7 +115,7 @@ public:
     void rewind(StreamSrc* src) override;
 
 private:
-    // Reads the next token of the stream (declared only).
+    // Reads the next token of the stream.
     void getNextData_(StreamSrc* src);
 
     /// The characters that separate the tokens.

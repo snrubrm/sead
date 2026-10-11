@@ -224,6 +224,93 @@ static Mutex sTextMutex;
 // 0x7100b162c8
 TextStreamFormat::TextStreamFormat() : mDelimiters(" \t\r\n") {}
 
+// NON_MATCHING: comment-state branches and register allocation differ.
+// 0x7100b1646c
+void TextStreamFormat::getNextData_(StreamSrc* src)
+{
+    sTextReadBuffer.clear();
+    bool quoted = false;
+    char comment_end = '\0';
+    s32 count = 0;
+    char c;
+    while (src->read(&c, 1) != 0)
+    {
+        if (comment_end != '\0')
+        {
+            if (c == comment_end)
+            {
+                if (comment_end == '*')
+                {
+                    comment_end = '/';
+                    continue;
+                }
+                c = mDelimiters[0];
+                comment_end = '\0';
+            }
+            else
+            {
+                if (comment_end == '/')
+                    comment_end = '*';
+                continue;
+            }
+        }
+
+        if (quoted)
+        {
+            if (c == '"')
+            {
+                if (count < 2 || sTextReadBuffer[count - 1] != '\\')
+                    return;
+                sTextReadBuffer.copyAt(count - 1, "\"", 1);
+            }
+            else
+            {
+                sTextReadBuffer.append(c);
+                ++count;
+            }
+            continue;
+        }
+
+        if (count == 0 && c == '"')
+        {
+            quoted = true;
+            continue;
+        }
+        if (mDelimiters.include(c) || c == '\0')
+        {
+            if (!sTextReadBuffer.isEmpty())
+                return;
+            continue;
+        }
+
+        sTextReadBuffer.append(c);
+        if (sTextReadBuffer[count] == '#')
+        {
+            sTextReadBuffer.trim(count);
+            comment_end = '\n';
+        }
+        else
+        {
+            ++count;
+        }
+        if (count >= 2 && sTextReadBuffer[count - 2] == '/')
+        {
+            if (sTextReadBuffer[count - 1] == '/')
+            {
+                count -= 2;
+                sTextReadBuffer.trim(count);
+                comment_end = '\n';
+            }
+            else if (sTextReadBuffer[count - 1] == '*')
+            {
+                count -= 2;
+                sTextReadBuffer.trim(count);
+                comment_end = '*';
+            }
+        }
+    }
+}
+
 u8 TextStreamFormat::readU8(StreamSrc* src, Endian::Types)
 {
     ScopedLock<Mutex> lock(&sTextMutex);
