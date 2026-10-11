@@ -7,6 +7,15 @@
 namespace sead
 {
 
+// Native default entity tables, indirection pointers and count at 24bfd38..98.
+// Both complete reset B2342C and save B24410 consume these original objects.
+const char* const sUnk_71024bfd38[] = {"lt", "gt", "amp", "apos", "quot"};
+const char* const* sUnk_71024bfd60 = sUnk_71024bfd38;
+const char* const sUnk_71024bfd68[] = {"<", ">", "&", "'", "\""};
+const char* const* sUnk_71024bfd90 = sUnk_71024bfd68;
+u32 sUnk_71024bfd98 = 5;
+
+
 XmlDocument::~XmlDocument()
 {
     if (mRoot)
@@ -40,6 +49,19 @@ XmlDocument* XmlDocument::create(ReadStream* stream, Heap* heap, bool binary, u3
     }
     document->mHeap = heap;
     return document;
+}
+
+void XmlDocument::resetEntity_(Heap* heap)
+{
+    mEntities.freeBuffer();
+    mEntities.allocBuffer(sUnk_71024bfd98, heap);
+    mEntities.clear();
+    for (u32 index = 0; index < sUnk_71024bfd98; ++index)
+    {
+        auto* entity = mEntities.emplaceBack();
+        entity->mName.copy(sUnk_71024bfd60[index]);
+        entity->mValue.copy(sUnk_71024bfd90[index]);
+    }
 }
 
 bool XmlDocument::addEntity(const SafeString& name, const SafeString& value)
