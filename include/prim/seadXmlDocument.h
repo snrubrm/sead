@@ -24,6 +24,8 @@ public:
 private:
     XmlDocument() = default;
     void resetEntity_(Heap* heap);
+    struct Entity;
+    ObjList<Entity>* expandEntityList(s32 capacity, Heap* heap);
     void parseXml_(ReadStream* stream, Heap* heap, bool binary);
     // Descriptive name: native b28d9c recursively releases child/sibling trees.
     static void deleteElementRecursive_(XmlElement* element);

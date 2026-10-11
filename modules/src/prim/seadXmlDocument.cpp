@@ -60,6 +60,39 @@ bool XmlDocument::addEntity(const SafeString& name, const SafeString& value)
     return true;
 }
 
+// NON_MATCHING: existing list allocation width and restored-list capacity checks differ.
+ObjList<XmlDocument::Entity>* XmlDocument::expandEntityList(s32 capacity, Heap* heap)
+{
+    if (!heap)
+        heap = mHeap;
+    if (!mEntities.isBufferReady())
+    {
+        mEntities.allocBuffer(capacity, heap);
+        return &mEntities;
+    }
+    if (capacity <= mEntities.size())
+        return &mEntities;
+
+    ObjList<Entity> temporary;
+    temporary.allocBuffer(mEntities.size(), heap, -8);
+    for (auto& entity : mEntities)
+    {
+        auto* copy = temporary.emplaceBack();
+        copy->mName.copy(entity.mName);
+        copy->mValue.copy(entity.mValue);
+    }
+    mEntities.freeBuffer();
+    mEntities.allocBuffer(capacity, heap);
+    for (auto& entity : temporary)
+    {
+        auto* copy = mEntities.emplaceBack();
+        copy->mName.copy(entity.mName);
+        copy->mValue.copy(entity.mValue);
+    }
+    temporary.freeBuffer();
+    return &mEntities;
+}
+
 void XmlDocument::deleteElementRecursive_(XmlElement* element)
 {
     if (!element)
