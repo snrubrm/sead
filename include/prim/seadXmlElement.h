@@ -13,6 +13,11 @@ class XmlElement : public TreeNode
 public:
     struct XmlAttribute
     {
+        XmlAttribute(Heap* heap, const SafeString& name, const SafeString& value)
+            : mName(heap, name), mValue(heap, value)
+        {
+        }
+
         HeapSafeString mName;
         HeapSafeString mValue;
     };
@@ -34,6 +39,10 @@ public:
     XmlElement* getNextSibling() const { return static_cast<XmlElement*>(mNext); }
     SafeString getContentString() const;
     SafeString findAttributeValue(const SafeString& name) const;
+    // Native b29b78 returns the owned list at +0x98 on every exit.
+    ObjList<XmlAttribute>* expandAttributeList(s32 capacity, Heap* heap);
+    bool addAttribute(const SafeString& name, const SafeString& value, Heap* heap);
+    bool updateAttribute(const SafeString& name, const SafeString& value, Heap* heap);
     void setContent(u8* content, u32 size, bool own);
     void setContentString(const SafeString& content, Heap* heap);
     const XmlElement* findElementByAbsolutePath_(const SafeString& path) const;
