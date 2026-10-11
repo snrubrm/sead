@@ -31,6 +31,15 @@ private:
     struct Entity;
     ObjList<Entity>* expandEntityList(s32 capacity, Heap* heap);
     void parseXml_(ReadStream* stream, Heap* heap, bool binary);
+    // Descriptive names: complete B256B8 returns a signed root-start offset;
+    // B25ED8 returns the owned element tree. B25334 independently consumes both.
+    s32 parseXmlPreamble_(ReadStream* stream, Heap* heap);
+    XmlElement* parseXmlTree_(ReadStream* stream, Heap* heap);
+    // Descriptive name: complete B28B40 and independent B25334 establish the
+    // static five-argument reader and two borrowed 1024-character scratch strings.
+    static void readXmlInstanceAsBinary_(XmlElement* element, ReadStream* stream, Heap* heap,
+                                         BufferedSafeString* attribute_name,
+                                         BufferedSafeString* attribute_value);
     // Descriptive name: complete B24958 writes the binary element tree.
     static void writeXmlInstanceAsBinary_(WriteStream* stream, XmlElement* element);
     // Descriptive name: complete B292D0 writes the owned attribute list as text.

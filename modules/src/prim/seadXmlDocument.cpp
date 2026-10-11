@@ -1,5 +1,7 @@
 #include <prim/seadXmlDocument.h>
 #include <prim/seadXmlElement.h>
+#include <prim/seadXmlUtil.h>
+#include <prim/seadEndian.h>
 
 #include <basis/seadNew.h>
 #include <codec/seadBase64.h>
@@ -51,6 +53,127 @@ XmlDocument* XmlDocument::create(ReadStream* stream, Heap* heap, bool binary, u3
     }
     document->mHeap = heap;
     return document;
+}
+
+// NON_MATCHING: fixed-string stack placement adds addressing instructions.
+void XmlDocument::parseXml_(ReadStream* stream, Heap* heap, bool binary)
+{
+    if (mRoot)
+    {
+        deleteElementRecursive_(mRoot);
+        mRoot = nullptr;
+    }
+    stream->setMode(Stream::Modes::Binary);
+    stream->rewind();
+    if (binary)
+    {
+        FixedSafeString<8> name;
+        FixedSafeString<128> value;
+        u8 length = 0;
+        u8 count = 0;
+        if (!stream->readMemBlock(&count, 1))
+            return;
+        resetEntity_(heap);
+        expandEntityList(count, heap);
+        for (u8 index = 0; index < count; ++index)
+        {
+            if (!stream->readMemBlock(&length, 1))
+                return;
+            if (stream->readMemBlock(name.getBuffer(), length) < length)
+                return;
+            name.trim(length);
+            if (!stream->readMemBlock(&length, 1))
+                return;
+            if (stream->readMemBlock(value.getBuffer(), length) < length)
+                return;
+            value.trim(length);
+            addEntity(name, value);
+        }
+        auto* element = new (heap, 8) XmlElement;
+        FixedSafeString<1024> attribute_name;
+        FixedSafeString<1024> attribute_value;
+        readXmlInstanceAsBinary_(element, stream, heap, &attribute_name, &attribute_value);
+        mRoot = element;
+    }
+    else
+    {
+        mWorkBuffer0 = new (heap, -8) u8[mWorkBufferSize];
+        mWorkBuffer1 = new (heap, -8) u8[mWorkBufferSize];
+        mWorkBuffer2 = new (heap, -8) u8[mWorkBufferSize];
+        resetEntity_(heap);
+        const s32 offset = parseXmlPreamble_(stream, heap);
+        if (offset >= 0)
+        {
+            stream->rewind();
+            stream->skip(offset);
+            mRoot = parseXmlTree_(stream, heap);
+        }
+        // Native B25668..94 releases these raw byte allocations through scalar delete.
+        if (mWorkBuffer0)
+            ::operator delete(mWorkBuffer0);
+        mWorkBuffer0 = nullptr;
+        if (mWorkBuffer1)
+            ::operator delete(mWorkBuffer1);
+        mWorkBuffer1 = nullptr;
+        if (mWorkBuffer2)
+            ::operator delete(mWorkBuffer2);
+        mWorkBuffer2 = nullptr;
+    }
+}
+
+// NON_MATCHING: name-length normalization uses an extra temporary register.
+void XmlDocument::readXmlInstanceAsBinary_(XmlElement* element, ReadStream* stream, Heap* heap,
+                                          BufferedSafeString* attribute_name,
+                                          BufferedSafeString* attribute_value)
+{
+    while (true)
+    {
+        const u8 name_length = stream->readU8();
+        if (name_length)
+            stream->readString(&element->mName, name_length);
+        element->mName.trim(name_length);
+        const u8 count = stream->readU8();
+        if (count)
+        {
+            element->expandAttributeList(count, heap);
+            for (u8 index = 0; index < count; ++index)
+            {
+                const u8 attribute_name_length = stream->readU8();
+                stream->readString(attribute_name, attribute_name_length);
+                attribute_name->trim(attribute_name_length);
+                const u8 attribute_value_length = stream->readU8();
+                stream->readString(attribute_value, attribute_value_length);
+                attribute_value->trim(attribute_value_length);
+                element->addAttribute(*attribute_name, *attribute_value, heap);
+            }
+        }
+        const u16 content_size = Endian::toHostU16(Endian::cLittle, stream->readU16());
+        if (content_size)
+        {
+            auto* content = new (heap, 8) u8[content_size + 1];
+            stream->readMemBlock(content, content_size);
+            content[content_size] = SafeString::cNullChar;
+            element->setContent(content, content_size, true);
+        }
+        switch (stream->readU8())
+        {
+        case 1:
+            element = XmlUtil::createBackChildElement(element, heap);
+            break;
+        case 2:
+            readXmlInstanceAsBinary_(XmlUtil::createBackChildElement(element, heap), stream, heap,
+                                     attribute_name, attribute_value);
+            [[fallthrough]];
+        case 0:
+        case 4:
+            element = XmlUtil::createBackSiblingElement(element, heap);
+            if (!element)
+                return;
+            break;
+        default:
+            return;
+        }
+    }
 }
 
 void XmlDocument::resetEntity_(Heap* heap)
