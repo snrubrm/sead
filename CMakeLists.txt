@@ -30,6 +30,7 @@ add_library(sead OBJECT
   modules/src/basis/seadNew.cpp
 
   include/codec/seadBase64.h
+  modules/src/codec/seadBase64.cpp
   include/codec/seadHashCRC16.h
   include/codec/seadHashCRC32.h
   modules/src/codec/seadHashCRC16.cpp
