@@ -7,6 +7,7 @@ namespace sead
 {
 class Heap;
 class ReadStream;
+class WriteStream;
 class XmlElement;
 
 // Native factory B28370 allocates 0x68; table 24bfda0 has two destructor slots.
@@ -16,6 +17,7 @@ public:
     virtual ~XmlDocument();
     static XmlDocument* create(ReadStream* stream, Heap* heap, bool binary, u32 work_buffer_size);
     bool addEntity(const SafeString& name, const SafeString& value);
+    bool save(WriteStream* stream, Heap* heap, bool binary, XmlElement* element) const;
 
     // Inline-only in the original; name is a guess. Independent effect XML
     // readers 1051604 and 12cbe84 obtain their root element from +8.
@@ -27,6 +29,15 @@ private:
     struct Entity;
     ObjList<Entity>* expandEntityList(s32 capacity, Heap* heap);
     void parseXml_(ReadStream* stream, Heap* heap, bool binary);
+    // Descriptive name: complete B24958 writes the binary element tree.
+    static void writeXmlInstanceAsBinary_(WriteStream* stream, XmlElement* element);
+    // Descriptive name: complete B292D0 writes the owned attribute list as text.
+    static void writeXmlAttributesAsText_(WriteStream* stream, XmlElement* element);
+    // Descriptive name: complete B28E14 handles escaped, CDATA and base64 content.
+    static void writeXmlContentAsText_(WriteStream* stream, XmlElement* element, u32 content_type,
+                                       u32 work_buffer_size, Heap* heap);
+    static void writeXmlInstanceAsText_(WriteStream* stream, XmlElement* element, s32 depth,
+                                        u32 work_buffer_size, Heap* heap);
     // Descriptive name: native b28d9c recursively releases child/sibling trees.
     static void deleteElementRecursive_(XmlElement* element);
 

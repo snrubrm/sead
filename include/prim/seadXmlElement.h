@@ -56,6 +56,8 @@ private:
 
     // Native XmlUtil creation helpers initialize the owned name/content.
     friend class XmlUtil;
+    // Complete native document writers serialize this owned element data.
+    friend class XmlDocument;
 
     FixedSafeString<64> mName;
     u8* mContent = nullptr;
