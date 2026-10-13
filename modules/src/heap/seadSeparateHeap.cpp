@@ -74,6 +74,8 @@ void SeparateHeap::free(void* ptr)
         if (block->mStart == ptr)
             break;
     }
+    if (block == mBlocks.blockEnd())
+        return;
     if (block)
     {
         mBlocks.eraseNode(&block->mNode);
