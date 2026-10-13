@@ -49,6 +49,8 @@ public:
 
     static SeparateHeap* create(const SafeString& name, void* start, size_t size, void* work,
                                 size_t work_size, bool enable_lock);
+    // MemoryPoolHeap B2FFF4 passes a size_t block count and allocates the returned work size.
+    static size_t sub_710136A690(size_t block_num);
 
     void destroy() override;
     size_t adjust() override;

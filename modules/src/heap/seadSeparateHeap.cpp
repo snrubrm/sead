@@ -32,6 +32,11 @@ SeparateHeap* SeparateHeap::create(const SafeString& name, void* memory, size_t 
     return heap;
 }
 
+size_t SeparateHeap::sub_710136A690(size_t block_num)
+{
+    return sizeof(SeparateHeap) + block_num * sizeof(Block);
+}
+
 SeparateHeap::SeparateHeap(const SafeString& name, void* start, size_t size, bool enable_lock)
     : Heap(name, nullptr, start, size, cHeapDirection_Forward, enable_lock), mUnusedBlocks(nullptr),
       mBlockArray(nullptr), mBlockNum(0)
