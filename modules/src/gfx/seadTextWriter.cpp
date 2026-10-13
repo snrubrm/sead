@@ -1,4 +1,6 @@
 #include <gfx/seadTextWriter.h>
+#include <gfx/seadGraphicsContext.h>
+#include <gfx/nvn/seadDebugFontMgrNvn.h>
 #include <devenv/seadFontMgr.h>
 #include <gfx/seadViewport.h>
 #include <math/seadMathCalcCommon.h>
@@ -6,6 +8,32 @@
 
 namespace sead
 {
+// Native initializer B1FFC0, registered at init-array entry 25AC738,
+// constructs this shared graphics state and disables cull/depth testing/writes.
+static GraphicsContext sUnk_71025F9670 = [] {
+    GraphicsContext context;
+    context.setCullFace(0);
+    context.setDepthTestEnable(false);
+    context.setDepthWriteEnable(false);
+    return context;
+}();
+
+FontBase* TextWriter::sDefaultFont;
+
+TextWriter::~TextWriter() = default;
+
+FontBase* TextWriter::getDefaultFont() {
+    return sDefaultFont ? sDefaultFont : DebugFontMgrNvn::instance();
+}
+
+void TextWriter::setDefaultFont(FontBase* font) {
+    sDefaultFont = font;
+}
+
+void TextWriter::setupGraphics(DrawContext* context) {
+    sUnk_71025F9670.apply(context);
+}
+
 // 0x7100b1f7d0
 void TextWriter::setCursorFromTopLeft(const Vector2f& pos)
 {

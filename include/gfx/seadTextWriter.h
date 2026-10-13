@@ -19,7 +19,8 @@ public:
     TextWriter(DrawContext* context, const Viewport* viewport);
     virtual ~TextWriter();
 
-    FontBase* getDefaultFont();
+    // Complete DebugMenu constructor AF00F8 calls this without a TextWriter receiver.
+    static FontBase* getDefaultFont();
     static void setDefaultFont(FontBase* font);
     static void setupGraphics(DrawContext* context);
     void getCursorFromTopLeft(Vector2f* pos) const;
@@ -45,6 +46,8 @@ public:
     void printImpl_(const char*, int, bool, BoundBox2f*);
 
 private:
+    static FontBase* sDefaultFont;
+
     Viewport* mViewport;
     Projection* mProjection;
     Camera* mCamera;
