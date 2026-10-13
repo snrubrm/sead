@@ -1,4 +1,5 @@
 #include "gfx/nin/seadGraphicsNvn.h"
+#include "gfx/nin/seadDisplayBufferNvn.h"
 #include <nn/os.h>
 #include <nn/time.h>
 #include <nvn/nvn_FuncPtrInline.h>
@@ -40,6 +41,26 @@ s32 GraphicsNvn::getNewSamplerId()
 s32 GraphicsNvn::getNewTextureId()
 {
     return mTextureIdCounter.increment();
+}
+
+void GraphicsNvn::setDisplayBufferWindowCrop(s32 x, s32 y, s32 width, s32 height)
+{
+    static_cast<DisplayBufferNvn*>(_50)->setWindowCrop(x, y, width, height);
+}
+
+void GraphicsNvn::registerQueue(NVNqueue* queue)
+{
+    mNvnQueue = queue;
+}
+
+void GraphicsNvn::registerDefaultCommandBuffer(NVNcommandBuffer* buffer)
+{
+    _40 = buffer;
+}
+
+void GraphicsNvn::registerDisplayBufferNvn(DisplayBufferNvn* buffer)
+{
+    _50 = buffer;
 }
 
 void GraphicsNvn::applyDeferredFinalizes()
