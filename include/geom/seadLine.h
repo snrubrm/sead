@@ -10,7 +10,7 @@ class Line
 {
 public:
     Line() = default;
-    Line(const Vec& pos, const Vec& dir) : mPos(pos), mDir(dir) {}
+    Line(const Vec& pos, const Vec& dir) : mPos(pos), mDir(dir) { mDir.normalize(); }
 
     const Vec& getPos() const { return mPos; }
     const Vec& getDir() const { return mDir; }
