@@ -224,4 +224,28 @@ inline void QuatCalcCommon<T>::setAxisRadian(Base& q, const Vec3& axis, T radian
     q.z = sa * axis.z;
 }
 
+template <typename T>
+inline void QuatCalcCommon<T>::calcRPY(Vec3& rpy, const Base& q)
+{
+    const T x2 = 2 * q.x;
+    const T y2 = 2 * q.y;
+    const T w2 = 2 * q.w;
+    const T a31 = x2 * q.z - w2 * q.y;
+    const T abs = MathCalcCommon<T>::abs(a31);
+
+    // As in Matrix34::getRotation, choose zero roll at the pitch singularity.
+    if (1 - abs < MathCalcCommon<T>::epsilon() * 10)
+    {
+        rpy.x = 0;
+        rpy.y = (a31 / abs) * (-numbers::pi_v<T> / 2);
+        rpy.z = std::atan2(-(x2 * q.y - w2 * q.z), -(a31 * (x2 * q.z + w2 * q.y)));
+    }
+    else
+    {
+        rpy.x = std::atan2(w2 * q.x + y2 * q.z, 1 - x2 * q.x - y2 * q.y);
+        rpy.y = std::asin(-a31);
+        rpy.z = std::atan2(x2 * q.y + w2 * q.z, 1 - y2 * q.y - 2 * q.z * q.z);
+    }
+}
+
 }  // namespace sead
