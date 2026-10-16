@@ -164,6 +164,14 @@ public:
 
     T* nth(s32 n) const { return listNodeToObjWithNullCheck(ListImpl::nth(n)); }
 
+    /// Insertion sort with a predicate: `cmp(a, b) > 0` means that `a` has to come after `b`.
+    /// Inlined in uking::action::SwarmGullMove (0x71002870d4).
+    template <class ComparePredicate>
+    void insertionSort(const ComparePredicate& cmp)
+    {
+        ListImpl::insertionSort<T>(Node::getListNodeOffset(), cmp);
+    }
+
     s32 indexOf(const T* obj) const { return ListImpl::indexOf(objToListNode(obj)); }
 
     bool isNodeLinked(const T* obj) const { return objToListNode(obj)->isLinked(); }
