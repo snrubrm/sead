@@ -162,14 +162,47 @@ protected:
     void insertArray(s32 idx, void* array, s32 array_length, s32 elem_size);
     bool checkInsert(s32 idx, s32 num);
 
+    // BotW has no out-of-line PtrArrayImpl::sort: GameSceneStatusMgr::registerStatus (0x71010bd280),
+    // BoneBlendState (0x7101257934) and PouchItem::sortIngredients (0x71009800f8) inline this shaker sort.
     template <typename T>
     void sort(s32 (*cmpT)(const T* a, const T* b))
     {
-        // Symbols show that `sort()` accepts a `void*` comparer, but needs to receive a `T*`
-        // comparer in order to match SMO. This overload exists to safely accept a `T*` comparer.
-        // This cast is UB, but we know that `cmpT` and `cmpVoid` have the same representation.
-        auto cmpVoid = reinterpret_cast<s32 (*)(const void*, const void*)>(cmpT);
-        sort(cmpVoid);
+        if (mPtrNum <= 1)
+            return;
+
+        void** ptrs = mPtrs;
+        s32 top = 0;
+        s32 bottom = mPtrNum - 1;
+        do
+        {
+            s32 last = top;
+            for (s32 i = top; i < bottom; ++i)
+            {
+                if (cmpT(static_cast<const T*>(ptrs[i]), static_cast<const T*>(ptrs[i + 1])) > 0)
+                {
+                    void* tmp = ptrs[i + 1];
+                    ptrs[i + 1] = ptrs[i];
+                    ptrs[i] = tmp;
+                    last = i;
+                }
+            }
+            bottom = last;
+            if (bottom <= top)
+                return;
+
+            last = bottom;
+            for (s32 i = bottom; i > top; --i)
+            {
+                if (cmpT(static_cast<const T*>(ptrs[i]), static_cast<const T*>(ptrs[i - 1])) < 0)
+                {
+                    void* tmp = ptrs[i - 1];
+                    ptrs[i - 1] = ptrs[i];
+                    ptrs[i] = tmp;
+                    last = i;
+                }
+            }
+            top = last;
+        } while (top != bottom);
     }
 
     void sort(CompareCallbackImpl cmp);
