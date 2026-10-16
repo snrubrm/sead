@@ -313,6 +313,26 @@ public:
         return {};
     }
 
+    // Removes the front element without copying it out. The original only has this inlined, so the
+    // name is ours (BotW 0x710071c034).
+    void dropFront()
+    {
+        if (mSize >= 1)
+        {
+            mHead = mHead + 1 < mCapacity ? mHead + 1 : 0;
+            --mSize;
+        }
+    }
+
+    // Appends an element and returns its slot for the caller to fill in place, or nullptr when the
+    // buffer is full. The original only has this inlined, so the name is ours (BotW 0x710071c550).
+    T* reserveBack()
+    {
+        if (mSize >= mCapacity)
+            return nullptr;
+        return unsafeGet(mSize++);
+    }
+
     void remove(s32 index)
     {
         if (index >= mSize || mSize <= 0 || index < 0)
