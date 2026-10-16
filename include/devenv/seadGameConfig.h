@@ -20,6 +20,10 @@ public:
 
     // A flag byte at 0x81a (read through the singleton by the game's gliding / surfing rupee checks).
     bool get_81a() const { return _81a; }
+    // Flag bytes at 0x80a / 0x80b (Player::decreaseStaminaForActionMaybe 0x7100885bd0 skips the stamina cost
+    // and the cost scaling; Unk_71008502cc::sub_71008508FC 0x71008508fc reads 0x80b).
+    bool get_80a() const { return _80a; }
+    bool get_80b() const { return _80b; }
 
 protected:
     struct FileWriteCallback
@@ -29,8 +33,11 @@ protected:
     };
 
     // Members from the singleton disposer (0x6a0 + 0x20) to the end of the object (0x840) that are not modelled
-    // except for the byte at 0x81a.
-    u8 _6c0[0x81a - 0x6c0];
+    // except for the bytes at 0x80a, 0x80b and 0x81a.
+    u8 _6c0[0x80a - 0x6c0];
+    bool _80a;
+    bool _80b;
+    u8 _80c[0x81a - 0x80c];
     bool _81a;
     u8 _81b[0x840 - 0x81b];
 };
