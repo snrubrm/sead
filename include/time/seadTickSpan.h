@@ -107,6 +107,10 @@ public:
         return span;
     }
 
+    // inline-only in the original; name is ours. ksys::tera 0x71011320b4 computes
+    // s64(f32(cFrequency) * 2.0f) (scvtf, fadd, fcvtzs) for a debug message display time.
+    static TickSpan makeFromSecondsF(f32 sec) { return TickSpan(s64(cFrequency * sec)); }
+
 private:
     s64 mSpan;
 
