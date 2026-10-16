@@ -177,6 +177,52 @@ public:
     };
     RobustRange robustRange() const { return {*this}; }
 
+    /// Walks from the back to the front; the previous node is fetched before the current element is
+    /// visited, so the element may be erased. Inlined in ksys::tera ImageResourceMgr (0x71011311bc,
+    /// 0x71011334b4, 0x7101136950).
+    class reverseRobustIterator
+    {
+    public:
+        reverseRobustIterator(T* ptr, s32 offset)
+            : mPtr{ptr}, mPrevNode(static_cast<ListNode*>(PtrUtil::addOffset(ptr, offset))->prev()),
+              mOffset{offset}
+        {
+        }
+        bool operator==(const reverseRobustIterator& other) const { return mPtr == other.mPtr; }
+        bool operator!=(const reverseRobustIterator& other) const { return !operator==(other); }
+        reverseRobustIterator& operator++()
+        {
+            mPtr = static_cast<T*>(PtrUtil::addOffset(mPrevNode, -mOffset));
+            mPrevNode = mPrevNode->prev();
+            return *this;
+        }
+        T& operator*() const { return *mPtr; }
+        T* operator->() const { return mPtr; }
+
+    private:
+        T* mPtr;
+        ListNode* mPrevNode;
+        s32 mOffset;
+    };
+
+    reverseRobustIterator reverseRobustBegin() const
+    {
+        return reverseRobustIterator(listNodeToObj(mStartEnd.prev()), mOffset);
+    }
+
+    reverseRobustIterator reverseRobustEnd() const
+    {
+        return reverseRobustIterator(listNodeToObj(const_cast<ListNode*>(&mStartEnd)), mOffset);
+    }
+
+    struct ReverseRobustRange
+    {
+        auto begin() const { return mList.reverseRobustBegin(); }
+        auto end() const { return mList.reverseRobustEnd(); }
+        const OffsetList& mList;
+    };
+    ReverseRobustRange reverseRobustRange() const { return {*this}; }
+
 protected:
     static int compareT(const T* lhs, const T* rhs)
     {
