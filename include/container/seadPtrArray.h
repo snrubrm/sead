@@ -23,6 +23,9 @@ public:
     bool tryAllocBuffer(s32 ptrNumMax, Heap* heap, s32 alignment = sizeof(void*));
     void freeBuffer();
     bool isBufferReady() const { return mPtrs != nullptr; }
+    // The raw pointer buffer. ForestRenderer::requestDraw 0x7100f03964 hands the buffer of a
+    // PtrArray (+0x8) and its size to gsys::ModelUnitDrawArray::setUnits.
+    void** data() const { return mPtrs; }
 
     bool isEmpty() const { return mPtrNum == 0; }
     bool isFull() const { return mPtrNum >= mPtrNumMax; }

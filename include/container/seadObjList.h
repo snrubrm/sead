@@ -192,6 +192,37 @@ public:
     iterator end() const { return iterator(listNodeToObj(const_cast<ListNode*>(&mStartEnd))); }
     iterator begin(T* ptr) const { return iterator(ptr); }
 
+    class robustIterator
+    {
+    public:
+        explicit robustIterator(T* ptr)
+            : mPtr{ptr}, mNextNode(static_cast<ListNode*>(
+                             PtrUtil::addOffset(ptr, Node::getListNodeOffset()))
+                                       ->next())
+        {
+        }
+        bool operator==(const robustIterator& other) const { return mPtr == other.mPtr; }
+        bool operator!=(const robustIterator& other) const { return !operator==(other); }
+        robustIterator& operator++()
+        {
+            mPtr = static_cast<T*>(PtrUtil::addOffset(mNextNode, -Node::getListNodeOffset()));
+            mNextNode = mNextNode->next();
+            return *this;
+        }
+        T& operator*() const { return *mPtr; }
+        T* operator->() const { return mPtr; }
+
+    private:
+        T* mPtr;
+        ListNode* mNextNode;
+    };
+
+    robustIterator robustBegin() const { return robustIterator(listNodeToObj(mStartEnd.next())); }
+    robustIterator robustEnd() const
+    {
+        return robustIterator(listNodeToObj(const_cast<ListNode*>(&mStartEnd)));
+    }
+
     static constexpr size_t calculateWorkBufferSize(s32 n) { return n * ElementSize; }
 
 private:
