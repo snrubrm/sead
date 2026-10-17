@@ -24,6 +24,8 @@ public:
     // and the cost scaling; Unk_71008502cc::sub_71008508FC 0x71008508fc reads 0x80b).
     bool get_80a() const { return _80a; }
     bool get_80b() const { return _80b; }
+    // Byte 0x80c: AutoPlacementMgr::threadFn 0x7100654e44 tests it before cmd2_c().
+    bool get_80c() const { return _80c; }
 
 protected:
     struct FileWriteCallback
@@ -37,7 +39,8 @@ protected:
     u8 _6c0[0x80a - 0x6c0];
     bool _80a;
     bool _80b;
-    u8 _80c[0x81a - 0x80c];
+    bool _80c;
+    u8 _80d[0x81a - 0x80d];
     bool _81a;
     u8 _81b[0x840 - 0x81b];
 };

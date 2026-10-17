@@ -268,6 +268,7 @@ add_library(sead OBJECT
   modules/src/prim/seadXmlElement.cpp
   modules/src/prim/seadStringUtil.cpp
   include/ptcl/seadPtclHeap.h
+  include/ptcl/seadPtclSystem.h
   modules/src/ptcl/seadPtclHeap.cpp
 
   include/random/seadGlobalRandom.h
