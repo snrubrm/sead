@@ -85,6 +85,9 @@ public:
     T* front() const { return at(0); }
     T* back() const { return at(mPtrNum - 1); }
 
+    // Inline-only in the original; name is a guess (lane1 requested it for 0x710111a4dc's callers).
+    s32 indexOf(const T* ptr) const { return PtrArrayImpl::indexOf(ptr); }
+
     void pushBack(const T& item)
     {
         if (isFull())
