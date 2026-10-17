@@ -67,7 +67,8 @@ public:
     size_t getFreeSize() const override;
     size_t getMaxAllocatableSize(int alignment) const override;
     bool isInclude(const void* p_void) const override;
-    bool isEmpty() const override;
+    // Inline in the original: callers test the use list size directly (lane4 request).
+    bool isEmpty() const override { return mUseList.size() == 0; }
     bool isFreeable() const override;
     bool isResizable() const override;
     bool isAdjustable() const override;

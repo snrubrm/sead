@@ -773,11 +773,6 @@ void ExpHeap::genInformation_(hostio::Context* context)
     Heap::genInformation_(context);
 }
 
-bool ExpHeap::isEmpty() const
-{
-    return this->mUseList.size() == 0;
-}
-
 bool ExpHeap::isFreeable() const
 {
     return true;
