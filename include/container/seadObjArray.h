@@ -109,6 +109,25 @@ public:
         return item;
     }
 
+    // Batch emplace used by uking::GameScene::sb::init 0x71011f3a88 (inlined): reserves `count`
+    // entries at the front, moves the existing ones up and default-constructs the new ones from the
+    // free list. The name is a guess (the original is inline-only).
+    void emplaceFrontN(s32 count)
+    {
+        if (!checkInsert(0, count))
+            return;
+
+        createVacancy(0, count);
+
+        for (s32 i = 0; i < count; ++i)
+        {
+            T* item = new (mFreeList.alloc()) T();
+            mPtrs[i] = item;
+        }
+
+        mPtrNum += count;
+    }
+
     void insert(s32 pos, const T& item) { PtrArrayImpl::insert(pos, alloc(item)); }
 
     void erase(int index) { erase(index, 1); }
