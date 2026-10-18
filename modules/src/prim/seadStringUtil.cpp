@@ -152,4 +152,48 @@ s32 convertUtf8ToUtf16(char16* dst, u32 dst_len, const char* src, s32 src_len) {
     dst[written] = 0;
     return written;
 }
+
+// NON_MATCHING: capacity-exhaustion and output-pointer scheduling differ.
+s32 convertUtf16ToUtf8(char* dst, u32 dst_len, const char16* src, s32 src_len) {
+    if (dst_len == 0 || src_len < -1)
+        return 0;
+    if (src_len == -1)
+        src_len = INT_MAX;
+    u32 written = 0;
+    s32 read = 0;
+    while (read < src_len && src[read] != 0) {
+        char* current = dst + written;
+        const u16 c = src[read];
+        u32 width;
+        if (c <= 0x7f) {
+            current[0] = c;
+            width = 1;
+        } else if (c <= 0x7ff) {
+            if (written + 1 >= dst_len) {
+                --written;
+                break;
+            }
+            current[0] = 0xc0 | (c >> 6);
+            current[1] = 0x80 | (c & 0x3f);
+            width = 2;
+        } else {
+            if (written + 2 >= dst_len) {
+                --written;
+                break;
+            }
+            current[0] = 0xe0 | (c >> 12);
+            current[1] = 0x80 | ((c >> 6) & 0x3f);
+            current[2] = 0x80 | (c & 0x3f);
+            width = 3;
+        }
+        written += width;
+        ++read;
+        if (written >= dst_len) {
+            --written;
+            break;
+        }
+    }
+    dst[written] = 0;
+    return written;
+}
 }
