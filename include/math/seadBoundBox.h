@@ -87,6 +87,22 @@ struct BoundBox3
     void setMin(const Vector3& min);
     void setMax(const Vector3& max);
     void addPoint(const Vector3& p);
+    // 0x7100bf9820 inlines this box union for Model::calcBoundAABB.
+    void expand(const BoundBox3& box)
+    {
+        if (mMin.x > box.mMin.x)
+            mMin.x = box.mMin.x;
+        if (mMin.y > box.mMin.y)
+            mMin.y = box.mMin.y;
+        if (mMin.z > box.mMin.z)
+            mMin.z = box.mMin.z;
+        if (mMax.x < box.mMax.x)
+            mMax.x = box.mMax.x;
+        if (mMax.y < box.mMax.y)
+            mMax.y = box.mMax.y;
+        if (mMax.z < box.mMax.z)
+            mMax.z = box.mMax.z;
+    }
     void offset(T dx, T dy, T dz);
     void offset(const Vector3& dv);
     void scaleX(T sx);
