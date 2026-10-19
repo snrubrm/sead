@@ -34,6 +34,11 @@ void PrimitiveDrawer::setModelMatrix(const Matrix34f* model_mtx)
     mModel = const_cast<Matrix34f*>(model_mtx);
 }
 
+void PrimitiveDrawer::setDrawContext(DrawContext* context)
+{
+    mDrawContext = context;
+}
+
 void PrimitiveDrawer::begin()
 {
     PrimitiveDrawMgrNvn::instance()->beginImpl(mDrawContext, *mCamera, *mProjection);
