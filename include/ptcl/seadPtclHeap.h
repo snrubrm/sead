@@ -15,6 +15,10 @@ public:
     void* Alloc(size_t size, size_t alignment) override;
     void Free(void* ptr) override;
 
+    // inline-only in the original; name is a guess: the borrowed SEAD heap. ForestRenderer::loadModel
+    // 0x7100f06010 passes the third PtclSystem adapter's heap (PtclSystem+0x1870) to EffectModelMgr::entry.
+    sead::Heap* getHeap() const { return mHeap; }
+
 private:
     sead::Heap* mHeap;
 };
