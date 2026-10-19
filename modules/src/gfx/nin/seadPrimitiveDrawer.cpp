@@ -54,6 +54,11 @@ void PrimitiveDrawer::drawQuad(const Color4f& color0, const Color4f& color1)
     PrimitiveDrawMgrNvn::instance()->drawQuadImpl(mDrawContext, *mModel, color0, color1);
 }
 
+void PrimitiveDrawer::drawCylinder32(const Color4f& color0, const Color4f& color1)
+{
+    PrimitiveDrawMgrNvn::instance()->drawCylinder32Impl(mDrawContext, *mModel, color0, color1);
+}
+
 void PrimitiveDrawer::drawBox(const Color4f& color0, const Color4f& color1)
 {
     PrimitiveDrawMgrNvn::instance()->drawBoxImpl(mDrawContext, *mModel, color0, color1);
