@@ -270,6 +270,8 @@ add_library(sead OBJECT
   include/ptcl/seadPtclHeap.h
   include/ptcl/seadPtclSystem.h
   modules/src/ptcl/seadPtclHeap.cpp
+  include/ptcl/seadPtclModelEnumerator.h
+  modules/src/ptcl/seadPtclModelEnumerator.cpp
 
   include/random/seadGlobalRandom.h
   include/random/seadRandom.h
