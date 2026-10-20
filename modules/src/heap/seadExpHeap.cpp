@@ -706,6 +706,31 @@ size_t ExpHeap::adjust()
     return size;
 }
 
+// NON_MATCHING: the original folds the list node offset out of the inlined address
+// comparison; ours subtracts it from both nodes before comparing.
+// 0x7100b0519c
+MemBlock* ExpHeap::adjustBack_()
+{
+    mUseList.insertionSort(compareMemBlockAddr_);
+    MemBlock* free_block = mFreeList.back();
+    MemBlock* use_block = mUseList.back();
+    if (free_block > use_block)
+        return free_block;
+    return nullptr;
+}
+
+// NON_MATCHING: same list node offset difference as adjustBack_.
+// 0x7100b052a0
+MemBlock* ExpHeap::adjustFront_()
+{
+    mUseList.insertionSort(compareMemBlockAddr_);
+    MemBlock* free_block = mFreeList.front();
+    MemBlock* use_block = mUseList.front();
+    if (free_block < use_block || !use_block)
+        return free_block;
+    return nullptr;
+}
+
 // 0x7100b04c24
 // Flag bit 3 is set (by the tryCreate that takes the heap memory from the caller) when the memory does not come from the parent.
 size_t ExpHeap::destroyAndGetAllocatableSize(s32 alignment)
