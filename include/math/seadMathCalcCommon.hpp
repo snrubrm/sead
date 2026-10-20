@@ -558,6 +558,15 @@ inline bool MathCalcCommon<T>::isNan(T value)
     return std::isnan(value);
 }
 
+// The original tests the bits, not the FP unordered predicate: (bits & 0x7fffffff) > 0x7f800000.
+// Inline in ksys::tera::Core::sub_7101300D50 (0x7101300d50), which repeats the sequence four times.
+// The bit test excludes both infinities, which is the contract the callers rely on.
+template <>
+inline bool MathCalcCommon<f32>::isNan(f32 value)
+{
+    return (BitUtil::bitCast<u32>(value) & 0x7FFFFFFF) > 0x7F800000;
+}
+
 template <typename T>
 inline bool MathCalcCommon<T>::chase(T* value, T target, T step)
 {
