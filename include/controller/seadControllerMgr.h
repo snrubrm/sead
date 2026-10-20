@@ -75,6 +75,8 @@ public:
     Framework* getFramework() const;
 
     Controller* getController(int port) { return mControllers[port]; }
+    // name is a guess; eui::Screen::registerController_ (0x7100bea518) tests the count before getController(1)
+    s32 getControllerNum() const { return mControllers.size(); }
 
 private:
     OffsetList<ControlDevice> mDevices;
