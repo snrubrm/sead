@@ -150,6 +150,11 @@ public:
     void setByViewport(const Viewport& viewport);
     void setTBLR(f32 top, f32 bottom, f32 left, f32 right);
 
+    f32 getTop() const { return mTop; }
+    f32 getBottom() const { return mBottom; }
+    f32 getLeft() const { return mLeft; }
+    f32 getRight() const { return mRight; }
+
 private:
     f32 mNear;
     f32 mFar;

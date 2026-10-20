@@ -81,7 +81,37 @@ void LookAtCamera::doUpdateMatrix(Matrix34f* dst) const
     dst->setRow(2, {look.x, look.y, look.z, -look.dot(mPos)});
 }
 
+// 0x7100b1c02c
+OrthoCamera::OrthoCamera()
+    : LookAtCamera(Vector3f(0.0f, 0.0f, 1.0f), Vector3f(0.0f, 0.0f, 0.0f),
+                   Vector3f(0.0f, 1.0f, 0.0f))
+{
+}
+
+// 0x7100b1c094
+OrthoCamera::OrthoCamera(const OrthoProjection& projection)
+    : LookAtCamera(Vector3f((projection.getLeft() + projection.getRight()) * 0.5f,
+                            (projection.getTop() + projection.getBottom()) * 0.5f,
+                            projection.getNear()),
+                   Vector3f((projection.getLeft() + projection.getRight()) * 0.5f,
+                            (projection.getTop() + projection.getBottom()) * 0.5f,
+                            projection.getNear() - 1.0f),
+                   Vector3f(0.0f, 1.0f, 0.0f))
+{
+}
+
 OrthoCamera::~OrthoCamera() = default;
+
+// 0x7100b1c17c
+void OrthoCamera::setByOrthoProjection(const OrthoProjection& projection)
+{
+    setPos(Vector3f((projection.getLeft() + projection.getRight()) * 0.5f,
+                    (projection.getTop() + projection.getBottom()) * 0.5f, projection.getNear()));
+    setAt(Vector3f((projection.getLeft() + projection.getRight()) * 0.5f,
+                   (projection.getTop() + projection.getBottom()) * 0.5f,
+                   projection.getNear() - 1.0f));
+    setUp(Vector3f(0.0f, 1.0f, 0.0f));
+}
 
 DirectCamera::~DirectCamera() = default;
 
