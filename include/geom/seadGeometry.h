@@ -33,6 +33,12 @@ public:
     static f32 calcSquaredDistancePointToSegment(const Vector3f& point, const Segment<Vector3f>& segment,
                                                  f32* t);
 
+    // 0x7100b20dc8: the named 2D ray/segment entry point; its optional
+    // outputs receive the two closest-point parameters. Used by HavokAI F86DE4.
+    static f32 calcSquaredDistanceRayToSegment(const Ray<Vector2f>& ray,
+                                               const Segment<Vector2f>& segment,
+                                               f32* ray_t, f32* segment_t);
+
     // Original B20B34 is the segment-pair squared-distance entry point; original spelling is unknown.
     // Both optional outputs receive the closest-point parameters on the respective segments.
     static f32 sub_7100B20B34(const Segment<Vector3f>& first, const Segment<Vector3f>& second,
