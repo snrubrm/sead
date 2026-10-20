@@ -13,7 +13,21 @@ namespace sead
 namespace hostio
 {
 class NodeEvent;
-class PropertyEvent;
+
+// Partial release layout. The original listeners read only the flags byte at +0 and the 64-bit
+// payload at +8: agl::proc::LUT 0x710140082c tests bit 1 of the byte (the payload is then an id,
+// not an object address) and agl::utl::IParameterIO 0x7100b532c8 compares the payload with a
+// Reflexible pointer. The debug-only state of the class is left unmodelled.
+class PropertyEvent
+{
+public:
+    u64 getId() const { return mValue; }
+
+private:
+    u8 mType;
+    u8 _1[7];
+    u64 mValue;
+};
 
 // These classes always exist (even in release builds, as can be seen in SMO's RTTI) but
 // their functions are only defined in debug or develop builds.
