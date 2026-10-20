@@ -14,6 +14,9 @@ public:
 
     const Vec& getCenter() const { return mCenter; }
     f32 getRadius() const { return mRadius; }
+    // Inline-only names follow the existing getters. ModelRenderUnit C800A0 sets both fields.
+    void setCenter(const Vec& center) { mCenter = center; }
+    void setRadius(f32 radius) { mRadius = radius; }
 
 private:
     Vec mCenter;
