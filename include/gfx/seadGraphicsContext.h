@@ -19,6 +19,12 @@ public:
     // +0x65 directly to NVN SetCullFace (0 none, 1 front, 2 back, 3 both),
     // and independent draw caller 1059c00 explicitly writes the back value.
     void setCullFace(u8 face) { mCullFace = face; }
+    // Inline-only in the original; names are guesses. agl::cull::OcclusionQueryDrawer::draw
+    // 0x71013ec42c clears the whole blend-enable mask (+0x4) and the channel mask (+0x1c) and sets
+    // the depth clamp byte (+0x6e).
+    void setBlendEnableMask(u32 mask) { mBlendEnableMask = mask; }
+    void setColorMask(u32 mask) { mChannelMask = mask; }
+    void setDepthClampEnable(bool enable) { mDepthClampEnable = enable; }
     void setBlendEnable(bool enable, u32 target)
     {
         if (enable)
