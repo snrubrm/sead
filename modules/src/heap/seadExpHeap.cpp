@@ -119,19 +119,20 @@ size_t ExpHeap::getMaxAllocatableSize(int alignment) const
     else
     {
         const uintptr_t mask = u32(abs_alignment - 1);
+        const uintptr_t inv_mask = ~mask;
         for (; it != end; ++it)
         {
             if (it->mSize < 8)
                 continue;
             const uintptr_t data = reinterpret_cast<uintptr_t>(&*it) + it->mOffset + sizeof(MemBlock);
-            const size_t block_padding = ((data + mask) & ~mask) - data;
+            const size_t block_padding = ((data + mask) & inv_mask) - data;
             if (it->mSize >= block_padding + 8 && (!best || best->mSize < it->mSize))
                 best = &*it;
         }
         if (best)
         {
             const uintptr_t data = reinterpret_cast<uintptr_t>(best) + best->mOffset + sizeof(MemBlock);
-            padding = ((data + mask) & ~mask) - data;
+            padding = ((data + mask) & inv_mask) - data;
         }
     }
     return best ? best->mSize - padding : 0;
