@@ -533,6 +533,8 @@ inline void TreeMap<Key, Value>::freeBuffer()
     if (!buffer)
         return;
 
+    // The original clears the map before freeing the node buffer (lane3: TreeMap<u32,...> users).
+    clear();
     ::operator delete[](buffer);
     mCapacity = 0;
     mFreeList.reset();
