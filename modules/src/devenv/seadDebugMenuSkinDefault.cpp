@@ -68,9 +68,8 @@ void DebugMenuSkinDefault::drawScrollBar(DrawInstance* instance, const Vector3f&
                                          float begin, float end)
 {
     drawQuad(instance, pos, size, sScrollBarColor, sScrollBarColor, false);
-    const Vector3f bar_pos(pos.x, pos.y - size.y * begin, 0.0f);
-    const Vector2f bar_size(size.x, (end - begin) * size.y);
-    drawQuad(instance, bar_pos, bar_size, Color4f::cWhite, Color4f::cWhite, false);
+    drawQuad(instance, Vector3f(pos.x, pos.y - size.y * begin, 0.0f),
+             Vector2f(size.x, (end - begin) * size.y), Color4f::cWhite, Color4f::cWhite, false);
 }
 
 // 0x7100af075c
