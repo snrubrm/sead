@@ -233,6 +233,9 @@ void UnitHeap::dump() const
                                                 isLockEnabled());
 }
 
-void UnitHeap::genInformation_(hostio::Context*) {}
+void UnitHeap::genInformation_(hostio::Context* context)
+{
+    Heap::genInformation_(context);
+}
 
 }  // namespace sead

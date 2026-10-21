@@ -198,6 +198,9 @@ void SeparateHeap::dump() const
     }
 }
 
-void SeparateHeap::genInformation_(hostio::Context*) {}
+void SeparateHeap::genInformation_(hostio::Context* context)
+{
+    Heap::genInformation_(context);
+}
 
 }  // namespace sead
