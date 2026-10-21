@@ -31,6 +31,15 @@ public:
     void setLineSpaceFromLineHeight(float lineHeight);
     void setFormatBuffer(char16_t*, int);
     void setDrawContext(DrawContext* context);
+    // Inline in the original: sead::DebugMenuSkinDefault::beginDrawText 0x7100af07fc / drawText 0x7100af0940.
+    void setViewport(const Viewport* viewport) { mViewport = viewport; }
+    // name is a guess; the original copies x then y (one load and store each).
+    void setCursor(const Vector3f& pos)
+    {
+        mCursor.x = pos.x;
+        mCursor.y = pos.y;
+    }
+    void setColor(const Color4f& color) { mColor = color; }
     void beginDraw();
     void endDraw();
     void printf(const char16_t* format, ...);
@@ -48,7 +57,7 @@ public:
 private:
     static FontBase* sDefaultFont;
 
-    Viewport* mViewport;
+    const Viewport* mViewport;
     Projection* mProjection;
     Camera* mCamera;
     FontBase* mFont;

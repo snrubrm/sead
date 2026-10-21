@@ -32,7 +32,7 @@ TextWriter::TextWriter(DrawContext* context)
 
 // 0x7100b1f740
 TextWriter::TextWriter(DrawContext* context, const Viewport* viewport)
-    : mViewport(const_cast<Viewport*>(viewport)), mProjection(nullptr), mCamera(nullptr), mFont(getDefaultFont()),
+    : mViewport(viewport), mProjection(nullptr), mCamera(nullptr), mFont(getDefaultFont()),
       mCursor(0.0f, 0.0f), mScale(1.0f, 1.0f), mColor(1.0f, 1.0f, 1.0f, 1.0f), _48(0), mLineSpace(0.0f),
       _50(nullptr), _58(std::numeric_limits<float>::infinity()), mFormatBuffer(nullptr), mFormatBufferSize(0),
       mEndedDrawing(true), mDrawContext(context)

@@ -74,11 +74,13 @@ add_library(sead OBJECT
   modules/src/controller/seadPatternRumbleAddon.cpp
 
   include/devenv/seadAssertConfig.h
+  include/devenv/seadDebugMenuSkin.h
   include/devenv/seadEnvUtil.h
   include/devenv/seadGameConfig.h
   include/devenv/seadRegionLanguageMgr.h
   include/devenv/seadStackTrace.h
   modules/src/devenv/seadAssertConfig.cpp
+  modules/src/devenv/seadDebugMenuSkinDefault.cpp
   modules/src/devenv/seadFontMgr.cpp
   modules/src/devenv/seadEnvUtil.cpp
   modules/src/devenv/seadGameConfig.cpp

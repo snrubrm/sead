@@ -30,7 +30,12 @@ public:
         }
         QuadArg() = default;
 
-        void setCornerAndSize(const Vector3f& corner, const Vector2f& size);
+        // Inline in the original (sead::DebugMenuSkinDefault::drawQuad 0x7100af075c).
+        void setCornerAndSize(const Vector3f& corner, const Vector2f& size)
+        {
+            mCenter.set(size.x * 0.5f + corner.x, corner.y - size.y * 0.5f, corner.z);
+            mSize = size;
+        }
         void setBoundBox(const BoundBox2f& box, float z);
         void setColor(const Color4f& color0, const Color4f& color1);
         void setColorHorizontal(const Color4f& color0, const Color4f& color1);
