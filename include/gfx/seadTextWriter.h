@@ -57,7 +57,10 @@ private:
     Color4f mColor;
     int _48;
     float mLineSpace;
-    BoundBox2f mBoundBox2;
+    // printImpl_ 0x7100b1f9a8 reads a pointer at +0x50 (null-checked, then pairs of floats) and a width limit at
+    // +0x58 that is ignored while it is infinite (the constructors store infinity).
+    void* _50;
+    float _58;
     char16_t* mFormatBuffer;
     int mFormatBufferSize;
     bool mEndedDrawing;

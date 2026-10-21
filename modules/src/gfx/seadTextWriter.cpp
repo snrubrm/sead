@@ -5,6 +5,7 @@
 #include <gfx/seadViewport.h>
 #include <math/seadMathCalcCommon.h>
 #include <prim/seadStringUtil.h>
+#include <limits>
 
 namespace sead
 {
@@ -19,6 +20,24 @@ static GraphicsContext sUnk_71025F9670 = [] {
 }();
 
 FontBase* TextWriter::sDefaultFont;
+
+// 0x7100b1f6b0
+TextWriter::TextWriter(DrawContext* context)
+    : mViewport(nullptr), mProjection(nullptr), mCamera(nullptr), mFont(getDefaultFont()), mCursor(0.0f, 0.0f),
+      mScale(1.0f, 1.0f), mColor(1.0f, 1.0f, 1.0f, 1.0f), _48(0), mLineSpace(0.0f), _50(nullptr),
+      _58(std::numeric_limits<float>::infinity()), mFormatBuffer(nullptr), mFormatBufferSize(0),
+      mEndedDrawing(true), mDrawContext(context)
+{
+}
+
+// 0x7100b1f740
+TextWriter::TextWriter(DrawContext* context, const Viewport* viewport)
+    : mViewport(const_cast<Viewport*>(viewport)), mProjection(nullptr), mCamera(nullptr), mFont(getDefaultFont()),
+      mCursor(0.0f, 0.0f), mScale(1.0f, 1.0f), mColor(1.0f, 1.0f, 1.0f, 1.0f), _48(0), mLineSpace(0.0f),
+      _50(nullptr), _58(std::numeric_limits<float>::infinity()), mFormatBuffer(nullptr), mFormatBufferSize(0),
+      mEndedDrawing(true), mDrawContext(context)
+{
+}
 
 TextWriter::~TextWriter() = default;
 
