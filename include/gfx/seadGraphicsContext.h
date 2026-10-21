@@ -24,6 +24,14 @@ public:
     // the depth clamp byte (+0x6e).
     void setBlendEnableMask(u32 mask) { mBlendEnableMask = mask; }
     void setColorMask(u32 mask) { mChannelMask = mask; }
+    // Inline-only in the original; name is a guess. OcclusionQueryDrawer::drawDebug 0x71013ec75c
+    // ORs 0xf into the channel mask (all four channels of target 0).
+    void setColorMask(u32 target, bool r, bool g, bool b, bool a)
+    {
+        const u32 shift = target * 4;
+        const u32 bits = (r ? 1 : 0) | (g ? 2 : 0) | (b ? 4 : 0) | (a ? 8 : 0);
+        mChannelMask = (mChannelMask & ~(0xfu << shift)) | (bits << shift);
+    }
     void setDepthClampEnable(bool enable) { mDepthClampEnable = enable; }
     void setBlendEnable(bool enable, u32 target)
     {
