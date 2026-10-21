@@ -17,6 +17,10 @@ public:
     void rewind() override { mCurrentPos = 0; }
     bool isEOF() override { return mCurrentPos >= mBufferSize; }
 
+    // Inline-only in the original; name is a guess. The replay recorder 0x71008bded4 writes
+    // the stream's current position as the file size after XmlDocument::save.
+    u32 getCurrentPos() const { return mCurrentPos; }
+
 private:
     u8* mBuffer = nullptr;
     u32 mBufferSize = 0;
@@ -40,6 +44,9 @@ public:
     RamWriteStream(void* buffer, u32 buffer_size, Stream::Modes mode);
     RamWriteStream(void* buffer, u32 buffer_size, StreamFormat* format);
     ~RamWriteStream() override;
+
+    // Inline-only in the original; name is a guess (see RamStreamSrc::getCurrentPos).
+    u32 getCurrentPos() const { return mSrc.getCurrentPos(); }
 
 private:
     RamStreamSrc mSrc;
