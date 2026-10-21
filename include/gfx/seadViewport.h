@@ -20,7 +20,8 @@ public:
     Viewport(float left, float top, float width, float height);
     explicit Viewport(const BoundBox2f& parent);
     explicit Viewport(const LogicalFrameBuffer& buffer);
-    virtual ~Viewport();
+    // Inline: Terrain 0x710114c648 / 0x710114c3c4 / 0x710114c72c destroy stack viewports with no call.
+    virtual ~Viewport() = default;
 
     // inline-only in the original; name is a guess. This posture read appears
     // in the viewport-based OrthoProjection constructor and Viewport::apply.

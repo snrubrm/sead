@@ -45,7 +45,6 @@ void Viewport::setByFrameBuffer(const LogicalFrameBuffer& buffer)
     }
 }
 
-Viewport::~Viewport() = default;
 
 // NON_MATCHING: equivalent projection, with different input and bounds load scheduling.
 void Viewport::project(Vector2f* out, const Vector3f& point) const
