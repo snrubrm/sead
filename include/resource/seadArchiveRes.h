@@ -103,7 +103,7 @@ protected:
     virtual u32 readDirectoryImpl_(HandleBuffer* handle, DirectoryEntry* entries,
                                    u32 num) SEAD_ARCHIVERES_CONST_TOKEN = 0;
 #if SEAD_ARCHIVERES_ISEXISTFILEIMPL
-    virtual bool isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN = 0;
+    virtual bool isExistFileImpl_(const SafeString& path) SEAD_ARCHIVERES_CONST_TOKEN;
 #endif
     virtual bool prepareArchive_(const void* archive) = 0;
 
