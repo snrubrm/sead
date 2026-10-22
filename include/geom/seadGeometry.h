@@ -39,10 +39,16 @@ public:
                                                const Segment<Vector2f>& segment,
                                                f32* ray_t, f32* segment_t);
 
-    // Original B20B34 is the segment-pair squared-distance entry point; original spelling is unknown.
-    // Both optional outputs receive the closest-point parameters on the respective segments.
+    // 0x7100b20b34: the segment-pair squared-distance entry point; the optional
+    // outputs receive the closest-point parameters on the respective segments.
+    static f32 calcSquaredDistanceSegmentToSegment(const Segment<Vector3f>& first,
+                                                   const Segment<Vector3f>& second, f32* first_t,
+                                                   f32* second_t);
+    // Kept for the existing AI caller; inline-only alias.
     static f32 sub_7100B20B34(const Segment<Vector3f>& first, const Segment<Vector3f>& second,
-                             f32* first_t, f32* second_t);
+                             f32* first_t, f32* second_t) {
+        return calcSquaredDistanceSegmentToSegment(first, second, first_t, second_t);
+    }
 
     static s32 calcIntersectionSegmentToPlane(const Segment<Vector3f>& segment, const Plane3<f32>& plane,
                                               f32* t);
@@ -50,6 +56,15 @@ public:
     static s32 calcIntersectionRayToSphere(const Ray<Vector3f>& ray, const Sphere<Vector3f>& sphere,
                                            f32* t0, f32* t1);
     static bool calcIntersectionSphereToAABB(const Sphere<Vector2f>& sphere, const BoundBox2<f32>& box);
+
+private:
+    // 0x7100b20b38 / 0x7100b20dcc (declared only; bodies U).
+    static f32 calcSquaredDistanceSegmentToSegmentImpl(const Segment<Vector3f>& first,
+                                                       const Segment<Vector3f>& second,
+                                                       f32* first_t, f32* second_t);
+    static f32 calcSquaredDistanceRayToSegmentImpl(const Ray<Vector2f>& ray,
+                                                   const Segment<Vector2f>& segment, f32* ray_t,
+                                                   f32* segment_t);
 };
 
 }  // namespace sead

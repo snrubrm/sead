@@ -171,4 +171,18 @@ f32 Geometry::calcSquaredDistancePointToSegment(const Vector3f& point,
     return calcSquaredDistancePointToSegmentImpl(point, segment, t);
 }
 
+// 0x7100b20b34
+f32 Geometry::calcSquaredDistanceSegmentToSegment(const Segment<Vector3f>& first,
+                                                  const Segment<Vector3f>& second, f32* first_t,
+                                                  f32* second_t) {
+    return calcSquaredDistanceSegmentToSegmentImpl(first, second, first_t, second_t);
+}
+
+// 0x7100b20dc8
+f32 Geometry::calcSquaredDistanceRayToSegment(const Ray<Vector2f>& ray,
+                                              const Segment<Vector2f>& segment, f32* ray_t,
+                                              f32* segment_t) {
+    return calcSquaredDistanceRayToSegmentImpl(ray, segment, ray_t, segment_t);
+}
+
 }  // namespace sead
