@@ -221,6 +221,10 @@ public:
             mBuffer = nullptr;
             mSize = 0;
         }
+        else
+        {
+            SEAD_ASSERT(mSize == 0);
+        }
     }
 
     void setBuffer(s32 size, T* bufferptr)
