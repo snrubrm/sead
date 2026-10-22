@@ -73,6 +73,12 @@ public:
         const SafeStringBase mDelimiter;
     };
 
+    // Tag for statics that the original constant-initialises into .data (e.g. the message-set
+    // strings at 0x71024929e8 and 0x7102500c90). The ordinary constructors stay non-constexpr so
+    // TUs whose merged .bss blocks hold dynamically initialised SafeStrings keep their layout.
+    struct ConstInitTag {};
+    constexpr SafeStringBase(ConstInitTag, const T* str) : mStringTop(str) {}
+
     SafeStringBase() : mStringTop(&cNullChar) {}
     SafeStringBase(const T* str) : mStringTop(str)
     {
