@@ -187,12 +187,12 @@ void SZSDecompressor::DecompContext::initialize(void* dst)
     destp = static_cast<u8*>(dst);
     destCount = 0;
     forceDestCount = 0;
-    flagMask = 0;
-    flags = 0;
-    packHigh = 0;
+    headerSize = 0x10;
     step = SZSDecompressor::cStepNormal;
     lzOffset = 0;
-    headerSize = 0x10;
+    packHigh = 0;
+    flagMask = 0;
+    flags = 0;
 }
 
 SZSDecompressor::SZSDecompressor(u32 workSize, u8* workBuffer) : Decompressor("szs")
