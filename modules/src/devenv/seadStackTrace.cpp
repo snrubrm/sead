@@ -23,7 +23,8 @@ bool StackSymbolResolver::isIllegalSymbolAddress(uintptr_t symbol_address, uintp
 {
     if (symbol_address == 0)
         return true;
-    return nn::diag::GetSymbolSize(symbol_address) < address - symbol_address;
+    const uintptr_t size = nn::diag::GetSymbolSize(symbol_address);
+    return address - symbol_address > size;
 }
 
 }
