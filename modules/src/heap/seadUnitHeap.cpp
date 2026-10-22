@@ -195,12 +195,11 @@ size_t UnitHeap::getMaxAllocatableSize(int) const
     return mFreeList ? mUnitSize : 0;
 }
 
-// NON_MATCHING: the end address is computed as size + start instead of start + size.
 bool UnitHeap::isInclude(const void* ptr) const
 {
-    const uintptr_t start = reinterpret_cast<uintptr_t>(mUnitAreaStart);
-    const uintptr_t end = mUnitAreaSize + start;
-    const uintptr_t address = reinterpret_cast<uintptr_t>(ptr);
+    const u8* start = static_cast<const u8*>(mUnitAreaStart);
+    const u8* end = start + mUnitAreaSize;
+    const u8* address = static_cast<const u8*>(ptr);
     return (end > address) & (start <= address);
 }
 
