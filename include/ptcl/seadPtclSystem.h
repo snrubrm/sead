@@ -18,6 +18,11 @@ public:
     nn::util::Matrix4x3fType& getCameraMatrix() { return mCameraMatrix; }
     const nn::util::Matrix4x3fType& getCameraMatrix() const { return mCameraMatrix; }
 
+    // Descriptive inline accessor; name is a guess. ForestRenderer::loadModel 0x7100f06010 reads
+    // the borrowed heap of the third adapter (mHeaps[2] + 8) and passes it to EffectModelMgr::entry.
+    sead::Heap* getHeap(u32 index) { return mHeaps[index].getHeap(); }
+    sead::Heap* getHeap(u32 index) const { return mHeaps[index].getHeap(); }
+
 private:
     u8 _17b0[0x1848 - 0x17b0];
     // Five nn::vfx::Heap adapters built by the constructor 0x7100c51c3c from the config heaps
