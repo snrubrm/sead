@@ -184,7 +184,7 @@ class PrimitiveRenderer
     SEAD_SINGLETON_DISPOSER(PrimitiveRenderer)
 public:
     PrimitiveRenderer();
-    virtual ~PrimitiveRenderer() {}
+    virtual ~PrimitiveRenderer();
 
     void prepareFromBinary(Heap* heap, const void* bin_data, u32 bin_size);
     void prepare(Heap* heap, const SafeString& path);

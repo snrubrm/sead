@@ -160,6 +160,7 @@ add_library(sead OBJECT
   modules/src/gfx/seadGraphicsContext.cpp
   # modules/src/gfx/seadPrimitiveRenderer.cpp
   modules/src/gfx/seadPrimitiveRendererUtil.cpp
+  modules/src/gfx/seadPrimitiveRendererNvn.cpp
   modules/src/gfx/seadRendering.cpp
   modules/src/gfx/seadProjection.cpp
   modules/src/gfx/seadTextWriter.cpp
