@@ -27,6 +27,10 @@ public:
     // Byte 0x80c: AutoPlacementMgr::threadFn 0x7100654e44 tests it before cmd2_c().
     bool get_80c() const { return _80c; }
 
+    // Type of an XML-backed parameter; updateXmlNodeJustAsTreeMapParamImpl_ 0x7100af2344
+    // switches on its first word and the delegate interface takes it by reference.
+    enum class ParamValueType;
+
 protected:
     struct FileWriteCallback
     {
