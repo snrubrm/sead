@@ -3,6 +3,7 @@
 #include <nn/util/MathTypes.h>
 #include <nn/vfx/System.h>
 #include <ptcl/seadPtclHeap.h>
+#include <thread/seadCriticalSection.h>
 
 namespace sead::ptcl {
 
@@ -32,7 +33,10 @@ private:
     /* 0x1848 */ sead::ptcl::Heap mHeaps[5];
     u8 _1898[0x2268 - 0x1898];
     nn::util::Matrix4x3fType mCameraMatrix;
-    u8 _2298[0x29b0 - 0x2298];
+    u8 _2298[0x2950 - 0x2298];
+    // The destructor 0x7100c54b4c destroys this critical section, then the vfx base.
+    sead::CriticalSection mCriticalSection;
+    u8 _2990[0x29b0 - 0x2990];
 };
 static_assert(sizeof(PtclSystem) == 0x29b0);
 
