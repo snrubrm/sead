@@ -113,11 +113,6 @@ void TaskBase::adjustHeapAll()
     }
 }
 
-void TaskBase::doneDestroy()
-{
-    mInternalFlag.setBit(2);
-}
-
 Framework* TaskBase::getFramework() const
 {
     return mTaskMgr->mParentFramework;

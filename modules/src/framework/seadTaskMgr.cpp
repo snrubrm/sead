@@ -236,4 +236,10 @@ void TaskMgr::finalize()
     }
 }
 
+void TaskBase::doneDestroy()
+{
+    mInternalFlag.setBit(2);
+}
+
 }  // namespace sead
+
