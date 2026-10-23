@@ -57,11 +57,11 @@ bool PatternRumbleAddon::calc()
             }
         }
 
-        if (mPattern[mPatternIdx] == '*')
-            startRumbleImpl_();
+        if (mPattern[mPatternIdx] == '-')
+            stopRumbleImpl_();
 
         else
-            stopRumbleImpl_();
+            startRumbleImpl_();
 
         mPatternIdx++;
     }
