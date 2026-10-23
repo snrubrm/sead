@@ -114,6 +114,11 @@ public:
 
     const T* getStringTop() const { return mStringTop; }
 
+    /// Write a null terminator at the start of the buffer the string points into.
+    /// The buffer is mutable even though the pointer is const; callers in the game clear string
+    /// members that point into their own storage (0x710095f944 clears five of them this way).
+    void clear() { const_cast<T*>(mStringTop)[0] = cNullChar; }
+
     inline const T& at(s32 idx) const;
     inline const T& operator[](s32 idx) const { return at(idx); }
 
