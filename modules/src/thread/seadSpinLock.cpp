@@ -10,17 +10,22 @@ SpinLock::~SpinLock() = default;
 void SpinLock::lock()
 {
     Thread* current_thread = ThreadMgr::instance()->getCurrentThread();
-    if (mOwnerThread.load() == current_thread)
+    while (true)
     {
-        ++mCount;
-        return;
+        Thread* owner;
+        if (mOwnerThread.compareExchange(nullptr, current_thread, &owner))
+        {
+            SEAD_ASSERT_MSG(mCount == 0, "mCount[%u] must be 0", mCount);
+            mCount = 1;
+            return;
+        }
+
+        if (owner == current_thread)
+        {
+            ++mCount;
+            return;
+        }
     }
-
-    while (!mOwnerThread.compareExchange(nullptr, current_thread))
-        continue;
-
-    SEAD_ASSERT_MSG(mCount == 0, "mCount[%u] must be 0", mCount);
-    mCount = 1;
 }
 
 bool SpinLock::tryLock()
