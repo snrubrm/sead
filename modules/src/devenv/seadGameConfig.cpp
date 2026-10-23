@@ -8,6 +8,9 @@ SEAD_SINGLETON_DISPOSER_IMPL(GameConfig)
 
 const SafeString GameConfig::cNodeName = "sead::GameConfig";
 
+// 0x7100af233c
+GameConfig::~GameConfig() {}
+
 void GameConfig::FileWriteCallback::save()
 {
     // FIXME
