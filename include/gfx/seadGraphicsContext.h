@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basis/seadTypes.h"
+#include "prim/seadBitFlag.h"
 
 namespace sead
 {
@@ -32,6 +33,13 @@ public:
         const u32 bits = (r ? 1 : 0) | (g ? 2 : 0) | (b ? 4 : 0) | (a ? 8 : 0);
         mChannelMask = (mChannelMask & ~(0xfu << shift)) | (bits << shift);
     }
+    // Inline-only in the original; name is a guess. Native apply 0x7100b1cef8 reads only the
+    // first byte, but ModelRenderCache::reset 0x7100c80574 stores the same mode into both
+    // adjacent bytes at +0x6b / +0x6c, like Graphics::setPolygonMode's front/back pair.
+    void setPolygonMode(u8 mode, u8 back_mode) { mPolygonMode = mode; _6c = back_mode; }
+    // Native 0x7100b1cef8 reads bit 0 of the byte at +0x6d; ModelRenderCache::reset
+    // 0x7100c80574 changes that bit in place, so the field is a flag byte.
+    void setPolygonOffsetEnable(bool enable) { mPolygonOffsetEnable.changeBit(0, enable); }
     void setDepthClampEnable(bool enable) { mDepthClampEnable = enable; }
     void setBlendEnable(bool enable, u32 target)
     {
@@ -76,7 +84,7 @@ private:
     u8 mStencilFunc = 1;
     u8 mPolygonMode = 2;
     u8 _6c = 2;
-    bool mPolygonOffsetEnable = false;
+    sead::BitFlag8 mPolygonOffsetEnable;
     bool mDepthClampEnable = false;
     u32 _70 = 0xffffffff;
 };

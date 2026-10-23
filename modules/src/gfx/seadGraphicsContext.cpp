@@ -70,7 +70,7 @@ void GraphicsContext::apply(DrawContext* context) const
     nvnPolygonStateSetFrontFace(&polygon, NVN_FRONT_FACE_CCW);
     nvnPolygonStateSetPolygonMode(&polygon, NVNpolygonMode(mPolygonMode));
     nvnPolygonStateSetPolygonOffsetEnables(&polygon,
-                                         mPolygonOffsetEnable ? NVN_POLYGON_OFFSET_ENABLE_FILL : 0);
+                                         mPolygonOffsetEnable.isOnBit(0) ? NVN_POLYGON_OFFSET_ENABLE_FILL : 0);
     nvnCommandBufferBindPolygonState(command_buffer, &polygon);
     nvnCommandBufferSetPolygonOffsetClamp(command_buffer, mPolygonOffsetFactor, mPolygonOffsetUnits,
                                         mPolygonOffsetClamp);
