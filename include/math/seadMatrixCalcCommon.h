@@ -155,6 +155,7 @@ public:
     static void multiply(Base& o, const Base& a, const Mtx34& b);
     static void transpose(Base& o);
     static void transposeTo(Base& o, const Base& n);
+    static void transposeTo(Base& o, const Mtx34& n);
 
     static void makeQ(Base& o, const Quat& q);
     static void makeR(Base& o, const Vec3& r);

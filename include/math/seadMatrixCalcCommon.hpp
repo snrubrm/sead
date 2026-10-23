@@ -2512,9 +2512,34 @@ void Matrix44CalcCommon<T>::transposeTo(Base& o, const Base& n)
     o.m[3][3] = n.m[3][3];
 }
 
+// Transposes a 3x4 matrix into a 4x4 one, with the source's implicit fourth row taken as zero.
+template <typename T>
+void Matrix44CalcCommon<T>::transposeTo(Base& o, const Mtx34& n)
+{
+    o.m[0][0] = n.m[0][0];
+    o.m[0][1] = n.m[1][0];
+    o.m[0][2] = n.m[2][0];
+    o.m[0][3] = 0;
+
+    o.m[1][0] = n.m[0][1];
+    o.m[1][1] = n.m[1][1];
+    o.m[1][2] = n.m[2][1];
+    o.m[1][3] = 0;
+
+    o.m[2][0] = n.m[0][2];
+    o.m[2][1] = n.m[1][2];
+    o.m[2][2] = n.m[2][2];
+    o.m[2][3] = 0;
+
+    o.m[3][0] = n.m[0][3];
+    o.m[3][1] = n.m[1][3];
+    o.m[3][2] = n.m[2][3];
+    o.m[3][3] = 0;
+}
+
 #ifdef __aarch64__
 
-// Reconstructed NX float transpose: the original 0x71009d00b8 loop transposes a 3x4 matrix with
+// Reconstructed NX float transposes: the original 0x71009d00b8 loop transposes a 3x4 matrix with
 // an implicit zero fourth row using zip1/zip2 and 64-bit lane combinations.
 template <>
 inline void Matrix44CalcCommon<f32>::transposeTo(Base& o, const Base& n)
@@ -2530,8 +2555,27 @@ inline void Matrix44CalcCommon<f32>::transposeTo(Base& o, const Base& n)
     const float32x4_t t3 = vzip2q_f32(r2, r3);
 
     vst1q_f32(o.m[0], vcombine_f32(vget_low_f32(t0), vget_low_f32(t2)));
-    vst1q_f32(o.m[1], vcombine_f32(vget_low_f32(t1), vget_low_f32(t3)));
-    vst1q_f32(o.m[2], vcombine_f32(vget_high_f32(t0), vget_high_f32(t2)));
+    vst1q_f32(o.m[1], vcombine_f32(vget_high_f32(t0), vget_high_f32(t2)));
+    vst1q_f32(o.m[2], vcombine_f32(vget_low_f32(t1), vget_low_f32(t3)));
+    vst1q_f32(o.m[3], vcombine_f32(vget_high_f32(t1), vget_high_f32(t3)));
+}
+
+template <>
+inline void Matrix44CalcCommon<f32>::transposeTo(Base& o, const Mtx34& n)
+{
+    const float32x4_t r0 = vld1q_f32(n.m[0]);
+    const float32x4_t r1 = vld1q_f32(n.m[1]);
+    const float32x4_t r2 = vld1q_f32(n.m[2]);
+    const float32x4_t r3 = vdupq_n_f32(0.0f);
+
+    const float32x4_t t0 = vzip1q_f32(r0, r1);
+    const float32x4_t t1 = vzip2q_f32(r0, r1);
+    const float32x4_t t2 = vzip1q_f32(r2, r3);
+    const float32x4_t t3 = vzip2q_f32(r2, r3);
+
+    vst1q_f32(o.m[0], vcombine_f32(vget_low_f32(t0), vget_low_f32(t2)));
+    vst1q_f32(o.m[1], vcombine_f32(vget_high_f32(t0), vget_high_f32(t2)));
+    vst1q_f32(o.m[2], vcombine_f32(vget_low_f32(t1), vget_low_f32(t3)));
     vst1q_f32(o.m[3], vcombine_f32(vget_high_f32(t1), vget_high_f32(t3)));
 }
 
