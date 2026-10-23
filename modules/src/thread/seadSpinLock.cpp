@@ -1,3 +1,5 @@
+#include <atomic>
+
 #include "thread/seadSpinLock.h"
 #include "thread/seadThread.h"
 
@@ -60,6 +62,10 @@ void SpinLock::unlock()
 
     --mCount;
     if (mCount == 0)
+    {
+        // Same ordering as JobQueueLock::unlock: release the owner with a seq_cst fence.
+        std::atomic_thread_fence(std::memory_order_seq_cst);
         mOwnerThread.exchange(nullptr);
+    }
 }
 }  // namespace sead
