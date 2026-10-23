@@ -28,6 +28,7 @@ add_library(sead OBJECT
   include/basis/seadRawPrint.h
   include/basis/seadTypes.h
   modules/src/basis/seadNew.cpp
+  modules/src/basis/seadRawPrint.cpp
 
   include/codec/seadBase64.h
   modules/src/codec/seadBase64.cpp
