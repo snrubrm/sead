@@ -81,6 +81,9 @@ public:
             --mIdx;
             return *this;
         }
+        // Inline-only; NavMeshCharacter 0x71003f76a0 compares and indexes with the iterator's
+        // index (its loop keeps the index in the iterator object).
+        s32 getIndex() const { return mIdx; }
         T* operator->() const { return &mBuffer[mIdx]; }
         T& operator*() const { return mBuffer[mIdx]; }
 
@@ -176,6 +179,9 @@ public:
             --mIdx;
             return *this;
         }
+        // Inline-only; NavMeshCharacter 0x71003f76a0 compares and indexes with the iterator's
+        // index (its loop keeps the index in the iterator object).
+        s32 getIndex() const { return mIdx; }
         T* operator->() const { return &mBuffer[mIdx]; }
         T& operator*() const { return mBuffer[mIdx]; }
 
