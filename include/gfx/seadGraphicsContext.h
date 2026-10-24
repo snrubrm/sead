@@ -14,7 +14,7 @@ public:
     void apply(DrawContext* context) const;
 
     void setDepthTestEnable(bool enable) { mDepthTestEnable = enable; }
-    void setDepthWriteEnable(bool enable) { mDepthWriteEnable = enable; }
+    void setDepthWriteEnable(u8 enable) { mDepthWriteEnable = enable; }
     void setStencilTestEnable(bool enable) { mStencilTestEnable = enable; }
     // Inline-only in the original; name is a guess. Native b1cef8 passes
     // +0x65 directly to NVN SetCullFace (0 none, 1 front, 2 back, 3 both),
@@ -41,6 +41,29 @@ public:
     // 0x7100c80574 changes that bit in place, so the field is a flag byte.
     void setPolygonOffsetEnable(bool enable) { mPolygonOffsetEnable.changeBit(0, enable); }
     void setDepthClampEnable(bool enable) { mDepthClampEnable = enable; }
+    // ModelRenderCache's constructor 0x7100c80100 writes the source/destination factors of all
+    // eight blend targets and the equation of the targets after the first one.
+    void setBlendControl(u32 target, u8 src_rgb, u8 src_alpha, u8 dst_rgb, u8 dst_alpha,
+                         u8 equation_rgb, u8 equation_alpha)
+    {
+        BlendControl& control = mBlendControl[target];
+        control.src_rgb = src_rgb;
+        control.src_alpha = src_alpha;
+        control.dst_rgb = dst_rgb;
+        control.dst_alpha = dst_alpha;
+        control.equation_rgb = equation_rgb;
+        control.equation_alpha = equation_alpha;
+    }
+    // Writes the depth comparison byte (+0x64) and the byte at +0x66.
+    void setDepthFuncMaybe(u8 func, u8 unk66)
+    {
+        mDepthFunc = func;
+        _66 = unk66;
+    }
+    // ModelRenderCache's constructor also clears the byte at +0x2 and writes 0.5f at +0x18.
+    // The meanings of both fields are unrecovered.
+    void setUnk2Maybe(u8 value) { _2 = value; }
+    void setBlendAlphaMaybe(f32 value) { _18 = value; }
     void setBlendEnable(bool enable, u32 target)
     {
         if (enable)
@@ -62,12 +85,12 @@ private:
     };
 
     bool mDepthTestEnable = true;
-    bool mDepthWriteEnable = true;
+    u8 mDepthWriteEnable = 1;
     u8 _2 = 0;
     bool mStencilTestEnable = false;
     u32 mBlendEnableMask = 0xff;
     f32 mBlendColor[4] = {1, 1, 1, 1};
-    u32 _18 = 0;
+    f32 _18 = 0;
     u32 mChannelMask = 0xffffffff;
     u32 mStencilRef = 0;
     u32 mStencilValueMask = 0xffffffff;
