@@ -8,8 +8,6 @@
 namespace sead
 {
 
-XmlElement::XmlElement() : mName("") {}
-
 XmlElement::~XmlElement()
 {
     if (mContent && mOwnContent)

@@ -11,6 +11,8 @@
 namespace sead
 {
 
+XmlElement::XmlElement() : mName("") {}
+
 // Native default entity tables, indirection pointers and count at 24bfd38..98.
 // Both complete reset B2342C and save B24410 consume these original objects.
 const char* const sUnk_71024bfd38[] = {"lt", "gt", "amp", "apos", "quot"};
