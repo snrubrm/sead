@@ -212,7 +212,7 @@ Color4u8& Color4u8::operator-=(u8 x)
 // NON_MATCHING: regalloc, one harmless reordering
 Color4u8& Color4u8::operator*=(float x)
 {
-    return apply_([&](auto m) { this->*m = std::max(0.0f, this->*m * x); });
+    return apply_([&](auto m) { this->*m = Mathf::max(this->*m * x, 0.0f); });
 }
 
 Color4u8& Color4u8::operator/=(float x)
