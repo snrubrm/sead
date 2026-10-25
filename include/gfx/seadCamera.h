@@ -80,6 +80,13 @@ public:
 
     void doUpdateMatrix(Matrix34f* dst) const override;
 
+    // Inline-only in the original; 0x7100f1ab70 stores a matrix into mDirectMatrix and then
+    // calls updateViewMatrix, and agl::env::CubeMapMgr::getCubeMapCamera 0x7101390bc8 writes the
+    // three rows and tail-calls it.
+    void setDirectMatrix(const Matrix34f& matrix) { mDirectMatrix = matrix; }
+    Matrix34f& getDirectMatrix() { return mDirectMatrix; }
+    const Matrix34f& getDirectMatrix() const { return mDirectMatrix; }
+
 private:
     Matrix34f mDirectMatrix = Matrix34f::ident;
 };
