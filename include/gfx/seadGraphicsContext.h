@@ -54,6 +54,9 @@ public:
         control.equation_rgb = equation_rgb;
         control.equation_alpha = equation_alpha;
     }
+    // Native Graphics::Unk_668::sub_710128CF08 0x710128cf08 writes only the depth comparison
+    // byte (+0x64), unlike setDepthFuncMaybe below, which also writes +0x66.
+    void setDepthFunc(u8 func) { mDepthFunc = func; }
     // Writes the depth comparison byte (+0x64) and the byte at +0x66.
     void setDepthFuncMaybe(u8 func, u8 unk66)
     {

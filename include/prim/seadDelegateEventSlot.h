@@ -37,6 +37,21 @@ public:
         {
         }
 
+        // Replaces only the delegate sub-object, keeping the node and the connection state.
+        // The game's reinit slot 0x7100e72034 does this to a static slot.
+        template <typename TDelegate>
+        void setDelegate(TDelegate delegate)
+        {
+            mDelegate.construct(std::move(delegate));
+            mDelegatePtr = mDelegate->getDelegate();
+        }
+
+        template <typename C>
+        void setDelegate(C* instance, void (C::*func)(T))
+        {
+            setDelegate(Delegate1<C, T>(instance, func));
+        }
+
         ~Slot() override { release(); }
 
         bool isConnected() const { return mConnectedToDelegateEvent; }
