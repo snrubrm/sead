@@ -220,11 +220,15 @@ OrthoProjection::OrthoProjection(f32 near, f32 far, const Viewport& viewport)
     setDevicePosture(viewport.getDevicePosture());
 }
 
-// NON_MATCHING: the bound values use different floating-point registers.
 void OrthoProjection::setByViewport(const Viewport& viewport)
 {
-    setTBLR(viewport.getSizeY() * 0.5f, viewport.getSizeY() * -0.5f,
-            viewport.getSizeX() * -0.5f, viewport.getSizeX() * 0.5f);
+    const f32 height = viewport.getSizeY();
+    const f32 width = viewport.getSizeX();
+    const f32 top = height * 0.5f;
+    const f32 bottom = height * -0.5f;
+    const f32 right = width * 0.5f;
+    const f32 left = width * -0.5f;
+    setTBLR(top, bottom, left, right);
 }
 
 f32 OrthoProjection::getNear() const { return mNear; }
