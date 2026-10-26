@@ -32,10 +32,12 @@ TaskBase::CreateArg::CreateArg(const TaskClassID& factory) : factory(factory) {}
 TaskBase::SystemMgrTaskArg::SystemMgrTaskArg(const TaskClassID& classID) : MgrTaskArg(classID)
 {
     const s32 n = HeapMgr::getRootHeapNum();
-    for (s32 i = 0; i < n; ++i)
-        heap_policies.mPolicies[i].adjust = true;
-    for (s32 i = 0; i < n; ++i)
-        heap_policies.mPolicies[i].dont_create = i != 0;
+    if (n > 0) {
+        for (s32 i = 0; i != n; ++i)
+            heap_policies.mPolicies[i].adjust = true;
+        for (s32 i = 0; i < n; ++i)
+            heap_policies.mPolicies[i].dont_create = i != 0;
+    }
     tag = cSystem;
 }
 
