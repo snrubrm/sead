@@ -234,12 +234,13 @@ size_t FrameHeap::getMaxAllocatableSize(int alignment) const
 
     ConditionalScopedLock<CriticalSection> lock(const_cast<CriticalSection*>(&mCS), isLockEnabled());
     const uintptr_t mask = abs_alignment - 1;
-    const uintptr_t aligned_head = (reinterpret_cast<uintptr_t>(mState.mHeadPtr) + mask) & ~mask;
-    const uintptr_t tail = reinterpret_cast<uintptr_t>(mState.mTailPtr);
-    size_t result = 0;
-    if (aligned_head <= tail)
-        result = tail - aligned_head;
-    return result;
+    const u8* head = static_cast<const u8*>(mState.mHeadPtr);
+    const u8* tail = static_cast<const u8*>(mState.mTailPtr);
+    const u8* aligned_head =
+        reinterpret_cast<const u8*>((reinterpret_cast<uintptr_t>(head) + mask) & ~mask);
+    if (aligned_head > tail)
+        return 0;
+    return static_cast<size_t>(tail - aligned_head);
 }
 
 bool FrameHeap::isInclude(const void* ptr) const
