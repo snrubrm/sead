@@ -46,18 +46,20 @@ void Viewport::setByFrameBuffer(const LogicalFrameBuffer& buffer)
 }
 
 
-// NON_MATCHING: equivalent projection, with different input and bounds load scheduling.
 void Viewport::project(Vector2f* out, const Vector3f& point) const
 {
-    out->x = point.x * getHalfSizeX();
-    out->y = point.y * getHalfSizeY();
+    const f32 half_x = getHalfSizeX();
+    out->x = point.x * half_x;
+    const f32 half_y = getHalfSizeY();
+    out->y = point.y * half_y;
 }
 
-// NON_MATCHING: equivalent projection, with different input and bounds load scheduling.
 void Viewport::project(Vector2f* out, const Vector2f& point) const
 {
-    out->x = point.x * getHalfSizeX();
-    out->y = point.y * getHalfSizeY();
+    const f32 half_x = getHalfSizeX();
+    out->x = point.x * half_x;
+    const f32 half_y = getHalfSizeY();
+    out->y = point.y * half_y;
 }
 // NON_MATCHING: natural vector copy and posture cases schedule bounds loads differently.
 void Viewport::getOnFrameBufferPos(Vector2f* out, const LogicalFrameBuffer& buffer) const
