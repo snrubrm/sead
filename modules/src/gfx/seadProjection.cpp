@@ -293,11 +293,12 @@ f32 FrustumProjection::getFovy() const
     return 2.0f * Mathf::atan2((mTop - mBottom) * 0.5f, getNear());
 }
 
-// NON_MATCHING: equivalent offset arithmetic, with different scheduling.
 void FrustumProjection::getOffset(Vector2f* offset) const
 {
-    offset->x = (mRight + mLeft) * 0.5f / (mRight - mLeft);
-    offset->y = (mTop + mBottom) * 0.5f / (mTop - mBottom);
+    const f32 width = mRight - mLeft;
+    offset->x = (mRight + mLeft) * 0.5f / width;
+    const f32 height = mTop - mBottom;
+    offset->y = (mTop + mBottom) * 0.5f / height;
 }
 
 // NON_MATCHING: equivalent screen conversion, with different arithmetic scheduling.
