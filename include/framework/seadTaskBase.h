@@ -4,6 +4,7 @@
 #include <container/seadTList.h>
 #include <container/seadTreeNode.h>
 #include <framework/seadHeapPolicies.h>
+#include <framework/seadMethodTree.h>
 #include <framework/seadTaskID.h>
 #include <heap/seadDisposer.h>
 #include <prim/seadBitFlag.h>
@@ -136,6 +137,19 @@ public:
     State mState;
     Tag mTag;
     TaskClassID mClassID;
+};
+
+// Partial: only the method-tree node at +0x210 is modelled. The class also has a
+// MethodTreeNode at +0x2a8 and more state after it.
+class FaderTaskBase : public TaskBase
+{
+public:
+    void detachCalcImpl() override;
+    MethodTreeNode* getMethodTreeNode(s32 method_type) override;
+
+private:
+    u8 _d0[0x210 - 0xd0];
+    /* 0x210 */ MethodTreeNode mMethodTreeNode;
 };
 
 }  // namespace sead

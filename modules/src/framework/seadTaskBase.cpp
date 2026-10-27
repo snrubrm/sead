@@ -138,4 +138,16 @@ void TaskBase::onDestroy()
 {
     doneDestroy();
 }
+
+void FaderTaskBase::detachCalcImpl()
+{
+    mMethodTreeNode.detachAll();
+}
+
+MethodTreeNode* FaderTaskBase::getMethodTreeNode(s32 method_type)
+{
+    if (u32(method_type) < 2)
+        return &mMethodTreeNode;
+    return nullptr;
+}
 }  // namespace sead
