@@ -1,6 +1,7 @@
 #pragma once
 
 #include "basis/seadTypes.h"
+#include "gfx/seadColor.h"
 #include "prim/seadBitFlag.h"
 
 namespace sead
@@ -10,6 +11,17 @@ class DrawContext;
 class GraphicsContext
 {
 public:
+    // B1CEF8 passes these six bytes to NVN blend-function/equation setters.
+    struct BlendControl
+    {
+        u8 src_rgb = 5;
+        u8 src_alpha = 5;
+        u8 dst_rgb = 6;
+        u8 dst_alpha = 6;
+        u8 equation_rgb = 1;
+        u8 equation_alpha = 1;
+    };
+
     GraphicsContext();
     void apply(DrawContext* context) const;
 
@@ -54,6 +66,17 @@ public:
         control.equation_rgb = equation_rgb;
         control.equation_alpha = equation_alpha;
     }
+    void setBlendControl(u32 target, const BlendControl& control) {
+        mBlendControl[target] = control;
+    }
+    // Inline-only in the original; name is a guess. ModelRenderCache::loadResource copies the
+    // material's blend colour into the context.
+    void setBlendColor(const Color4f& color) {
+        mBlendColor[0] = color.r;
+        mBlendColor[1] = color.g;
+        mBlendColor[2] = color.b;
+        mBlendColor[3] = color.a;
+    }
     // Native Graphics::Unk_668::sub_710128CF08 0x710128cf08 writes only the depth comparison
     // byte (+0x64), unlike setDepthFuncMaybe below, which also writes +0x66.
     void setDepthFunc(u8 func) { mDepthFunc = func; }
@@ -76,17 +99,6 @@ public:
     }
 
 private:
-    // B1CEF8 passes these six bytes to NVN blend-function/equation setters.
-    struct BlendControl
-    {
-        u8 src_rgb = 5;
-        u8 src_alpha = 5;
-        u8 dst_rgb = 6;
-        u8 dst_alpha = 6;
-        u8 equation_rgb = 1;
-        u8 equation_alpha = 1;
-    };
-
     bool mDepthTestEnable = true;
     u8 mDepthWriteEnable = 1;
     u8 _2 = 0;
