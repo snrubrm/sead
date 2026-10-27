@@ -144,6 +144,8 @@ public:
 class FaderTaskBase : public TaskBase
 {
 public:
+    // Declared only: the release keeps the two MethodTreeNode teardowns.
+    ~FaderTaskBase() override;
     void detachCalcImpl() override;
     MethodTreeNode* getMethodTreeNode(s32 method_type) override;
 
