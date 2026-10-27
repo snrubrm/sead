@@ -66,9 +66,6 @@ public:
         control.equation_rgb = equation_rgb;
         control.equation_alpha = equation_alpha;
     }
-    void setBlendControl(u32 target, const BlendControl& control) {
-        mBlendControl[target] = control;
-    }
     // Inline-only in the original; name is a guess. ModelRenderCache::loadResource copies the
     // material's blend colour into the context.
     void setBlendColor(const Color4f& color) {
