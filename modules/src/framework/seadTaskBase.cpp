@@ -150,4 +150,12 @@ MethodTreeNode* FaderTaskBase::getMethodTreeNode(s32 method_type)
         return &mMethodTreeNode;
     return nullptr;
 }
+
+void FaderTaskBase::doCalc_()
+{
+}
+
+void FaderTaskBase::onFadeEvent_(const FadeEvent&)
+{
+}
 }  // namespace sead

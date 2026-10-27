@@ -144,10 +144,17 @@ public:
 class FaderTaskBase : public TaskBase
 {
 public:
+    class FadeEvent;
+
     // Declared only: the release keeps the two MethodTreeNode teardowns.
     ~FaderTaskBase() override;
     void detachCalcImpl() override;
     MethodTreeNode* getMethodTreeNode(s32 method_type) override;
+    // 0x7100b2e118 / 0x7100b2e11c: empty in the release.
+    virtual void doCalc_();
+    virtual void onFadeEvent_(const FadeEvent& event);
+    // 0x7100b2e200: the null fader's draw, in the class's vtable.
+    virtual void draw();
 
 private:
     u8 _d0[0x210 - 0xd0];

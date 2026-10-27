@@ -241,5 +241,31 @@ void TaskBase::doneDestroy()
     mInternalFlag.setBit(2);
 }
 
+// 0x7100b2e1e4 / 0x7100b2e1e8 / 0x7100b2e1ec / 0x7100b2e1f0 / 0x7100b2e1f4 / 0x7100b2e200:
+// the null fader has no draw-side work.
+void NullFaderTask::pauseDraw(bool)
+{
+}
+
+void NullFaderTask::pauseDrawRec(bool)
+{
+}
+
+void NullFaderTask::pauseDrawChild(bool)
+{
+}
+
+void NullFaderTask::attachDrawImpl()
+{
+}
+
+void NullFaderTask::detachDrawImpl()
+{
+}
+
+void NullFaderTask::draw()
+{
+}
+
 }  // namespace sead
 
