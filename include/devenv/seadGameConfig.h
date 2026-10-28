@@ -29,6 +29,8 @@ public:
     // Byte 0x816: GameScene::callSceneStartDemoAuto 0x71008bab0c and the scene-change
     // loaders 0x71007b39dc / 0x71007b9d68 test it; both compare the byte with zero.
     bool get_816() const { return _816; }
+    // Byte 0x82d: read by the map static resource loader.
+    bool get_82d() const { return _82d; }
 
     // Type of an XML-backed parameter; updateXmlNodeJustAsTreeMapParamImpl_ 0x7100af2344
     // switches on its first word and the delegate interface takes it by reference.
@@ -51,7 +53,9 @@ protected:
     bool _816;
     u8 _817[0x81a - 0x817];
     bool _81a;
-    u8 _81b[0x840 - 0x81b];
+    u8 _81b[0x82d - 0x81b];
+    bool _82d;
+    u8 _82e[0x840 - 0x82e];
 };
 static_assert(sizeof(GameConfig) == 0x840);
 }  // namespace sead
