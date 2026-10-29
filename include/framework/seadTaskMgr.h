@@ -85,14 +85,15 @@ public:
     MethodTreeNode mCalcDestructionTreeNode;
 };
 
-// Partial: only the empty draw hooks are modelled. The constructor 0x7100b2d490, the deleting
-// destructor 0x7100b2e120 and getMethodTreeNode are still undecompiled. The destructor is
-// declared only so this class does not emit its vtable (the original uses the placeholder
-// Unk_71024c0140).
+// Partial: only the empty draw hooks and getMethodTreeNode are modelled. The constructor
+// 0x7100b2d490 and the deleting destructor 0x7100b2e120 are still undecompiled. The
+// destructor is declared only so this class does not emit its vtable (the original uses the
+// placeholder Unk_71024c0140).
 class NullFaderTask : public FaderTaskBase
 {
 public:
     ~NullFaderTask() override;
+    MethodTreeNode* getMethodTreeNode(s32 method_type) override;
     void pauseDraw(bool b) override;
     void pauseDrawRec(bool b) override;
     void pauseDrawChild(bool b) override;

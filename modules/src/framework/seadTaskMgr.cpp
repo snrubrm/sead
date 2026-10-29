@@ -267,5 +267,11 @@ void NullFaderTask::draw()
 {
 }
 
+// 0x7100b2e1f8: the null fader owns no method tree node.
+MethodTreeNode* NullFaderTask::getMethodTreeNode(s32)
+{
+    return nullptr;
+}
+
 }  // namespace sead
 
