@@ -209,7 +209,6 @@ void AudioSoundDataMgrCafe::unmountSoundArchive()
     }
 }
 
-// NON_MATCHING: same code; the registers of the arguments are numbered differently.
 // 0x7100b9898c
 bool AudioSoundDataMgrCafe::loadData(const char* label, u32 load_flag, u32 unknown, AudioSoundHeapCafe* heap)
 {
