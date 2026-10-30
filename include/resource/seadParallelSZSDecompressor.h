@@ -13,6 +13,7 @@ class ParallelSZSDecompressor : public Decompressor
 public:
     ParallelSZSDecompressor(u32 workSize, s32 threadPriority, sead::Heap* heap, u8* workBuffer,
                             const CoreIdMask& mask);
+    // NON_MATCHING: the compiler devirtualizes the embedded thread's shutdown call.
     ~ParallelSZSDecompressor() override;
 
     u8* tryDecompFromDevice(const ResourceMgr::LoadArg& loadArg, Resource* resource, u32* outSize,
@@ -26,6 +27,7 @@ private:
     class DecompThread : public Thread
     {
     public:
+        DecompThread(Heap* heap, s32 priority);
         ~DecompThread() override;
 
     private:
