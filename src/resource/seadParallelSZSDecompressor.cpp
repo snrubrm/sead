@@ -24,7 +24,8 @@ ParallelSZSDecompressor::ParallelSZSDecompressor(u32 workSize, s32 threadPriorit
 
 ParallelSZSDecompressor::~ParallelSZSDecompressor()
 {
-    mThread.quitAndWaitDoneSingleThread(false);
+    // called through a pointer in the original (not devirtualised)
+    (&mThread)->quitAndWaitDoneSingleThread(false);
 }
 
 ParallelSZSDecompressor::DecompThread::~DecompThread() = default;
